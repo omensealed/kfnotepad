@@ -1,0 +1,17 @@
+[package]
+name = "kfnotepad"
+version = "0.1.0"
+edition = "2021"
+description = "Terminal notepad for local UTF-8 text files."
+license = "AGPL-3.0-or-later"
+publish = false
+
+[dependencies]
+crossterm = { version = "0.29.0", default-features = false, features = ["events"] }
+iced = { version = "0.14.0", features = ["advanced", "highlighter", "tokio"] }
+iced_aw = { version = "0.14.1", default-features = false, features = ["menu", "drop_down"] }
+iced-swdir-tree = { version = "0.9.1", default-features = false }
+nerd-font-symbols = "0.3.0"
+rfd = { version = "0.17.2", default-features = false, features = ["xdg-portal", "wayland"] }
+syntect = { version = "5.3.0", default-features = false, features = ["default-syntaxes", "default-themes", "regex-fancy"] }
+unicode-width = "0.2.2"
