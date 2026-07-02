@@ -61,9 +61,10 @@ require_tool() {
 
 install_common_docs() {
   local doc_dir=$1
-  mkdir -p "$doc_dir"
+  mkdir -p "$doc_dir/assets"
   install -m 0644 LICENSE "$doc_dir/LICENSE"
   install -m 0644 README.md "$doc_dir/README.md"
+  install -m 0644 assets/kfnotepad-logo.png "$doc_dir/assets/kfnotepad-logo.png"
   install -m 0644 docs/13-OPERATIONS.md "$doc_dir/13-OPERATIONS.md"
   install -m 0644 docs/16-CLI-CONTRACT.md "$doc_dir/16-CLI-CONTRACT.md"
   install -m 0644 docs/17-GUI-CONTRACT.md "$doc_dir/17-GUI-CONTRACT.md"
@@ -105,8 +106,10 @@ build_tarball() {
   install -m 0755 target/release/kfnotepad "$staging_dir/bin/kfnotepad"
   install -m 0755 target/release/kfnotepad-gui "$staging_dir/bin/kfnotepad-gui"
   install_common_docs "$staging_dir/docs"
+  mkdir -p "$staging_dir/assets"
   install -m 0644 LICENSE "$staging_dir/LICENSE"
   install -m 0644 README.md "$staging_dir/README.md"
+  install -m 0644 assets/kfnotepad-logo.png "$staging_dir/assets/kfnotepad-logo.png"
 
   rm -f "$tarball" "${tarball}.sha256"
   tar -C "$package_root" -czf "$tarball" "$package_name"

@@ -93,6 +93,9 @@ Phase 2 threat model status: current as of 2026-06-24T17:08:57Z for the arbitrar
   behavior.
 - Atomic rename semantics vary by filesystem; tests cover normal local temporary directories only.
 - Temp-file cleanup on all failure modes is best-effort and not exhaustively fault-injected.
+- Workspace snapshots store local file paths only. Restoring a stale snapshot skips missing or unavailable files and
+  reports status; it does not recreate, truncate, or overwrite paths that no longer load. If no files can be loaded,
+  the editor opens a clean untitled document.
 - Undo history is bounded by count to reduce memory growth while editing within the 8 MiB file limit. It still stores
   full snapshots for recent edits; a future byte-budget or coalescing pass can reduce memory further if profiling
   shows it is needed.

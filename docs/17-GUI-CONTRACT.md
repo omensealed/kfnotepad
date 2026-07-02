@@ -19,7 +19,9 @@ kfnotepad-gui FILE1 FILE2
 - `--describe`: prints a deterministic non-window description for smoke checks, including GUI capability and current
   review-gap lines; exits 0.
 - no arguments: opens a window with one untitled in-memory tile unless `gui_restore_last_workspace = true` is set and
-  `current-workspace.v1` is valid. It does not create a file until the user opens or saves a normal file through the
+  `current-workspace.v1` exists. With restore enabled, the GUI loads all workspace files that still pass the normal
+  open adapter, reports skipped missing or unavailable files in status, and opens a clean untitled tile if no
+  workspace files can be loaded. It does not create a file until the user opens or saves a normal file through the
   existing adapter path.
 - one or more `FILE` arguments: opens each valid file as a separate tile in one window. Invalid files are reported in
   the status message; valid files still open when possible.
@@ -135,8 +137,10 @@ kfnotepad-gui FILE1 FILE2
 - Workspace auto-restore: normal GUI startup does not automatically reopen path-bearing workspace history unless
   `gui_restore_last_workspace = true` is set. With that opt-in, an argument-free launch attempts to restore
   `current-workspace.v1` through the existing project parser and file open validation. Explicit file arguments and
-  explicit saved-project launches take precedence. Invalid snapshots or invalid saved file paths fall back to an
-  empty untitled tile and report status without writing user files.
+  explicit saved-project launches take precedence. Invalid snapshots fall back to an empty untitled tile and report
+  status without writing user files. Missing or unavailable saved file paths are skipped; if no saved files can be
+  loaded, an empty untitled tile is opened instead. Partially restored workspaces do not reuse saved pane geometry,
+  because the saved layout may refer to files that were skipped.
 - Tiles: each document is a resizable/movable pane-grid tile styled like a compact mini-window with a visible outer
   frame and a 5px default tile gap. The live native editor viewport itself does not add a hover/focus border, so the
   tile frame is the primary window outline instead of a nested double-border editor box. Tile title bars show the

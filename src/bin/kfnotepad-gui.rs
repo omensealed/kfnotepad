@@ -1723,18 +1723,30 @@ impl KfnotepadGui {
                     .map(|path| (path, true))
             });
         if let Some((path, is_auto_restore)) = project_restore_path {
-            match load_workspace_project_launch_documents(&path) {
-                Ok((project, project_documents)) => {
+            match load_workspace_project_launch_documents(&path, current_dir.clone()) {
+                Ok(restored) => {
                     if is_auto_restore {
-                        status_messages
-                            .push(format!("restored last workspace project {}", project.name));
+                        status_messages.push(format!(
+                            "restored last workspace project {}",
+                            restored.project.name
+                        ));
                     } else {
-                        status_messages.push(format!("opened workspace project {}", project.name));
+                        status_messages.push(format!(
+                            "opened workspace project {}",
+                            restored.project.name
+                        ));
                     }
-                    documents = project_documents;
+                    if let Some(message) = restored.skipped_status_message() {
+                        status_messages.push(message);
+                    }
+                    documents = restored.documents;
                     launch_paths.clear();
-                    project_layout = project.layout.clone();
-                    project_active_ordinal = Some(project.active_ordinal);
+                    project_layout = if restored.skipped_files.is_empty() {
+                        restored.project.layout.clone()
+                    } else {
+                        None
+                    };
+                    project_active_ordinal = restored.active_loaded_ordinal;
                 }
                 Err(error) => {
                     let action = if is_auto_restore {
@@ -4696,19 +4708,14 @@ impl KfnotepadGui {
             return;
         }
 
-        let mut documents = Vec::new();
-        for path in &entry.project.files {
-            match open_text_file(path) {
-                Ok(document) => documents.push(document),
-                Err(error) => {
-                    self.pending_project_open = None;
-                    self.status_message =
-                        format!("workspace project open failed: {}: {error}", path.display());
-                    return;
-                }
-            }
-        }
-        let mut documents = documents.into_iter();
+        let restored = restore_gui_workspace_project_documents(
+            entry.project.clone(),
+            self.current_dir.clone(),
+        );
+        let skipped_status_message = restored.skipped_status_message();
+        let skipped_files_empty = restored.skipped_files.is_empty();
+        let active_loaded_ordinal = restored.active_loaded_ordinal;
+        let mut documents = restored.documents.into_iter();
         let Some(first_document) = documents.next() else {
             self.pending_project_open = None;
             self.status_message = "workspace project open failed: empty project".to_string();
@@ -4726,7 +4733,12 @@ impl KfnotepadGui {
             pane_states.push(GuiPane::new(tile_id, editor));
         }
 
-        let (panes, mut active_pane) = if let Some(layout) = entry.project.layout.clone() {
+        let project_layout = if skipped_files_empty {
+            entry.project.layout.clone()
+        } else {
+            None
+        };
+        let (panes, mut active_pane) = if let Some(layout) = project_layout {
             let (panes, pane) = panes_from_gui_layout(layout.clone(), pane_states);
             for ordinal in &layout.minimized_ordinals {
                 if let Some(tile_id) = workspace.tiles.get(*ordinal).map(|tile| tile.id) {
@@ -4746,7 +4758,18 @@ impl KfnotepadGui {
             close_minimized_panes_into_tray(panes, &workspace, active_pane);
         active_pane = active_pane_after_minimize;
 
-        if let Some(active_tile_id) = workspace
+        if let Some(active_loaded_ordinal) = active_loaded_ordinal {
+            if let Some(active_tile_id) = workspace
+                .tiles
+                .get(active_loaded_ordinal)
+                .map(|tile| tile.id)
+            {
+                workspace.focus_tile(active_tile_id);
+                if let Some(pane) = pane_for_tile_id(&panes, active_tile_id) {
+                    active_pane = pane;
+                }
+            }
+        } else if let Some(active_tile_id) = workspace
             .tiles
             .get(entry.project.active_ordinal)
             .map(|tile| tile.id)
@@ -4769,6 +4792,9 @@ impl KfnotepadGui {
         self.invalidate_all_syntax_caches();
         self.refresh_visible_syntax_caches();
         self.status_message = format!("opened workspace project {}", entry.project.name);
+        if let Some(message) = skipped_status_message {
+            self.status_message = format!("{}; {message}", self.status_message);
+        }
         self.persist_layout();
     }
 
@@ -4923,17 +4949,83 @@ fn load_workspace_project_launch(path: &Path) -> Result<GuiWorkspaceProject, Str
     parse_gui_workspace_project(&text).ok_or_else(|| "invalid workspace project".to_string())
 }
 
+#[derive(Debug)]
+struct RestoredGuiWorkspaceProject {
+    project: GuiWorkspaceProject,
+    documents: Vec<TextDocument>,
+    active_loaded_ordinal: Option<usize>,
+    skipped_files: Vec<String>,
+    created_blank: bool,
+}
+
+impl RestoredGuiWorkspaceProject {
+    fn skipped_status_message(&self) -> Option<String> {
+        if self.skipped_files.is_empty() {
+            return None;
+        }
+        let first = self
+            .skipped_files
+            .first()
+            .map(String::as_str)
+            .unwrap_or("unknown path");
+        let loaded = if self.created_blank {
+            "opened blank tile".to_string()
+        } else {
+            format!("loaded {} file(s)", self.documents.len())
+        };
+        Some(format!(
+            "skipped {} missing/unavailable workspace file(s), {loaded}; first: {first}",
+            self.skipped_files.len()
+        ))
+    }
+}
+
 fn load_workspace_project_launch_documents(
     path: &Path,
-) -> Result<(GuiWorkspaceProject, Vec<TextDocument>), String> {
+    current_dir: PathBuf,
+) -> Result<RestoredGuiWorkspaceProject, String> {
     let project = load_workspace_project_launch(path)?;
+    Ok(restore_gui_workspace_project_documents(
+        project,
+        current_dir,
+    ))
+}
+
+fn restore_gui_workspace_project_documents(
+    project: GuiWorkspaceProject,
+    current_dir: PathBuf,
+) -> RestoredGuiWorkspaceProject {
     let mut documents = Vec::new();
-    for file_path in &project.files {
-        let document = open_text_file(file_path)
-            .map_err(|error| format!("{}: {error}", file_path.display()))?;
+    let mut active_loaded_ordinal = None;
+    let mut skipped_files = Vec::new();
+    for (ordinal, file_path) in project.files.iter().enumerate() {
+        let document = match open_text_file(file_path) {
+            Ok(document) => document,
+            Err(error) => {
+                skipped_files.push(format!("{}: {error}", file_path.display()));
+                continue;
+            }
+        };
+        if ordinal == project.active_ordinal {
+            active_loaded_ordinal = Some(documents.len());
+        }
         documents.push(document);
     }
-    Ok((project, documents))
+    let created_blank = documents.is_empty();
+    if created_blank {
+        documents.push(empty_document(current_dir));
+        active_loaded_ordinal = Some(0);
+    }
+    if active_loaded_ordinal.is_none() && !documents.is_empty() {
+        active_loaded_ordinal = Some(documents.len() - 1);
+    }
+    RestoredGuiWorkspaceProject {
+        project,
+        documents,
+        active_loaded_ordinal,
+        skipped_files,
+        created_blank,
+    }
 }
 
 fn workspace_project_launch_command(executable: &Path, project_path: &Path) -> Command {
@@ -12353,11 +12445,13 @@ mod tests {
     }
 
     #[test]
-    fn gui_workspace_project_click_validates_files_before_replacing_workspace() {
-        let temp = TempArea::new("gui-workspace-open-invalid");
+    fn gui_workspace_project_click_skips_missing_files_and_loads_available_tiles() {
+        let temp = TempArea::new("gui-workspace-open-partial");
         let original = temp.path("original.txt");
+        let available = temp.path("available.txt");
         let missing = temp.path("missing.txt");
         fs::write(&original, "original\n").expect("write original");
+        fs::write(&available, "available\n").expect("write available");
         let mut state = KfnotepadGui::new_with_current_dir(
             GuiLaunch {
                 requested_paths: vec![original.clone()],
@@ -12368,8 +12462,8 @@ mod tests {
             path: temp.path("workspaces").join("project.v1"),
             project: GuiWorkspaceProject {
                 name: "project".to_string(),
-                files: vec![missing.clone()],
-                active_ordinal: 0,
+                files: vec![missing.clone(), available.clone()],
+                active_ordinal: 1,
                 layout: None,
             },
         }];
@@ -12379,10 +12473,51 @@ mod tests {
 
         assert_eq!(state.workspace.tiles.len(), 1);
         assert_eq!(state.pending_project_open, None);
-        assert_eq!(state.workspace.active_tile().document.path, original);
+        assert_eq!(state.workspace.active_tile().document.path, available);
+        assert_eq!(state.active_editor().text(), "available\n");
         assert!(state
             .status_message
-            .starts_with("workspace project open failed: "));
+            .contains("opened workspace project project"));
+        assert!(state
+            .status_message
+            .contains("skipped 1 missing/unavailable workspace file(s)"));
+        assert!(state
+            .status_message
+            .contains(&missing.display().to_string()));
+    }
+
+    #[test]
+    fn gui_workspace_project_click_uses_blank_tile_when_no_files_load() {
+        let temp = TempArea::new("gui-workspace-open-all-missing");
+        let original = temp.path("original.txt");
+        let missing = temp.path("missing.txt");
+        fs::write(&original, "original\n").expect("write original");
+        let mut state = KfnotepadGui::new_with_current_dir(
+            GuiLaunch {
+                requested_paths: vec![original],
+            },
+            temp.root.clone(),
+        );
+        state.workspace_projects = vec![GuiWorkspaceProjectEntry {
+            path: temp.path("workspaces").join("project.v1"),
+            project: GuiWorkspaceProject {
+                name: "project".to_string(),
+                files: vec![missing],
+                active_ordinal: 0,
+                layout: None,
+            },
+        }];
+        state.pending_project_open = Some(0);
+
+        let _ = update(&mut state, Message::WorkspaceProjectClicked(0));
+
+        assert_eq!(state.workspace.tiles.len(), 1);
+        assert_eq!(
+            state.workspace.active_tile().document.path,
+            temp.root.join("untitled.txt")
+        );
+        assert_eq!(state.active_editor().text(), "");
+        assert!(state.status_message.contains("opened blank tile"));
     }
 
     #[test]
@@ -12700,7 +12835,7 @@ mod tests {
     }
 
     #[test]
-    fn gui_workspace_auto_restore_invalid_path_falls_back_without_writing_files() {
+    fn gui_workspace_auto_restore_invalid_path_opens_blank_without_writing_files() {
         let temp = TempArea::new("gui-auto-restore-invalid");
         let config = temp.path("config").join("kfnotepad").join("config.toml");
         let projects_dir = temp.path("config").join("kfnotepad").join("workspaces");
@@ -12739,9 +12874,14 @@ mod tests {
 
         assert_eq!(state.workspace.tiles.len(), 1);
         assert_eq!(state.active_editor().text(), "");
+        assert_eq!(
+            state.workspace.active_tile().document.path,
+            temp.root.join("untitled.txt")
+        );
         assert!(state
             .status_message
-            .contains("workspace auto-restore failed: "));
+            .contains("restored last workspace project current workspace"));
+        assert!(state.status_message.contains("opened blank tile"));
         assert_eq!(
             fs::read_to_string(existing).expect("read existing"),
             "unchanged\n"

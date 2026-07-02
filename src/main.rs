@@ -91,11 +91,12 @@ fn main() -> ExitCode {
 fn run_empty_command() -> ExitCode {
     if io::stdin().is_terminal() && io::stdout().is_terminal() {
         if let Some((project_path, settings)) = current_tui_restore_project_request() {
-            match load_tui_workspace_project(&project_path)
-                .and_then(|project| workspace_from_project_documents(&project))
-            {
-                Ok(workspace) => {
-                    return match run_editor_workspace(workspace, Some(settings)) {
+            match load_tui_workspace_project(&project_path).and_then(|project| {
+                workspace_from_project_documents(&project, env::current_dir().unwrap_or_default())
+            }) {
+                Ok(restored) => {
+                    let status = restored.status_message();
+                    return match run_editor_workspace(restored.workspace, Some(settings), status) {
                         Ok(()) => ExitCode::SUCCESS,
                         Err(error) => {
                             eprintln!("kfnotepad: terminal error: {error}");
@@ -217,12 +218,13 @@ fn current_managed_notes_dir() -> Result<PathBuf, kfnotepad::ManagedNotesError> 
 
 fn run_editor(document: &mut TextDocument) -> io::Result<()> {
     let workspace = EditorWorkspace::from_document(document);
-    run_editor_workspace(workspace, None)
+    run_editor_workspace(workspace, None, None)
 }
 
 fn run_editor_workspace(
     mut workspace: EditorWorkspace<'_>,
     loaded_settings: Option<EditorSettings>,
+    initial_status: Option<String>,
 ) -> io::Result<()> {
     let highlighter = SyntaxHighlighter::default();
     let config_path = current_editor_config_path();
@@ -243,6 +245,9 @@ fn run_editor_workspace(
         workspace_projects_dir,
         ..EditorRuntime::default()
     };
+    if let Some(status) = initial_status {
+        runtime.status = status;
+    }
     let mut terminal = TerminalSession::enter()?;
     let mut redraw = true;
     let mut current_visible_rows = visible_editor_rows(0);
@@ -2914,9 +2919,12 @@ fn replace_workspace_from_project(
     runtime: &mut EditorRuntime,
     project: &GuiWorkspaceProject,
 ) {
-    match workspace_from_project_documents(project) {
-        Ok(next_workspace) => {
-            *workspace = next_workspace;
+    match workspace_from_project_documents(project, env::current_dir().unwrap_or_default()) {
+        Ok(restored) => {
+            let status = restored
+                .status_message()
+                .unwrap_or_else(|| format!("Opened workspace: {}", project.name));
+            *workspace = restored.workspace;
             runtime.workspace_prompt = None;
             runtime.workspace_query.clear();
             runtime.workspace_pending_open = None;
@@ -2931,7 +2939,7 @@ fn replace_workspace_from_project(
             runtime.quit_confirmation_pending = false;
             runtime.close_tab_confirmation_pending = false;
             stop_reader_mode(runtime, "Reader mode stopped for workspace open");
-            runtime.status = format!("Opened workspace: {}", project.name);
+            runtime.status = status;
             autosave_tui_current_workspace(workspace, runtime);
         }
         Err(error) => {
@@ -2954,23 +2962,85 @@ fn load_tui_workspace_project(path: &Path) -> Result<GuiWorkspaceProject, String
         .ok_or_else(|| format!("invalid workspace project {}", path.display()))
 }
 
+struct RestoredTuiWorkspace {
+    project_name: String,
+    workspace: EditorWorkspace<'static>,
+    skipped_files: Vec<String>,
+    created_blank: bool,
+}
+
+impl RestoredTuiWorkspace {
+    fn status_message(&self) -> Option<String> {
+        if self.skipped_files.is_empty() {
+            return Some(format!("Opened workspace: {}", self.project_name));
+        }
+
+        let first = self
+            .skipped_files
+            .first()
+            .map(String::as_str)
+            .unwrap_or("unknown path");
+        let loaded = if self.created_blank {
+            "opened blank tab".to_string()
+        } else {
+            format!("loaded {} file(s)", self.workspace.tabs.len())
+        };
+        Some(format!(
+            "Opened workspace: {}; skipped {} missing/unavailable file(s), {loaded}; first: {first}",
+            self.project_name,
+            self.skipped_files.len()
+        ))
+    }
+}
+
 fn workspace_from_project_documents(
     project: &GuiWorkspaceProject,
-) -> Result<EditorWorkspace<'static>, String> {
+    current_dir: PathBuf,
+) -> Result<RestoredTuiWorkspace, String> {
     let mut tabs = Vec::new();
-    for path in &project.files {
-        let document =
-            open_text_file(path).map_err(|error| format!("{}: {error}", path.display()))?;
+    let mut active = 0usize;
+    let mut active_loaded = false;
+    let mut skipped_files = Vec::new();
+
+    for (ordinal, path) in project.files.iter().enumerate() {
+        let document = match open_text_file(path) {
+            Ok(document) => document,
+            Err(error) => {
+                skipped_files.push(format!("{}: {error}", path.display()));
+                continue;
+            }
+        };
+        if ordinal == project.active_ordinal {
+            active = tabs.len();
+            active_loaded = true;
+        }
         tabs.push(EditorTab {
             document: EditorTabDocument::Owned(document),
             state: EditorTabState::default(),
         });
     }
+
+    let created_blank = tabs.is_empty();
     if tabs.is_empty() {
-        return Err(String::from("workspace project has no files"));
+        tabs.push(EditorTab {
+            document: EditorTabDocument::Owned(TextDocument {
+                path: current_dir.join("untitled.txt"),
+                buffer: kfnotepad::TextBuffer::from_text(""),
+            }),
+            state: EditorTabState::default(),
+        });
+        active_loaded = true;
     }
-    let active = project.active_ordinal.min(tabs.len() - 1);
-    Ok(EditorWorkspace { tabs, active })
+    if !active_loaded {
+        active = tabs.len() - 1;
+    }
+    active = active.min(tabs.len() - 1);
+    Ok(RestoredTuiWorkspace {
+        project_name: project.name.clone(),
+        workspace: EditorWorkspace { tabs, active },
+        skipped_files,
+        created_blank,
+    })
 }
 
 fn undo_document(document: &mut TextDocument, cursor: &mut Cursor, runtime: &mut EditorRuntime) {
@@ -7861,18 +7931,61 @@ gui_ui_font_size = 500
     }
 
     #[test]
-    fn tui_workspace_project_open_validates_before_replacing_clean_tabs() {
-        let temp = TempArea::new("tui-workspace-open-invalid");
+    fn tui_workspace_project_open_skips_missing_files_and_loads_available_tabs() {
+        let temp = TempArea::new("tui-workspace-open-partial");
+        let original_path = temp.path("original.txt");
+        let available_path = temp.path("available.txt");
+        let missing_path = temp.path("missing.txt");
+        fs::write(&original_path, "original\n").expect("write original");
+        fs::write(&available_path, "available\n").expect("write available");
+        let projects_dir = temp.path("workspaces");
+        let project_path =
+            gui_workspace_project_path(&projects_dir, "Partial").expect("project path");
+        save_gui_workspace_project(
+            &project_path,
+            &GuiWorkspaceProject {
+                name: "Partial".to_string(),
+                files: vec![missing_path.clone(), available_path.clone()],
+                active_ordinal: 1,
+                layout: None,
+            },
+        )
+        .expect("save broken project");
+        let mut original = open_text_file(&original_path).expect("open original");
+        let mut workspace = EditorWorkspace::from_document(&mut original);
+        let mut runtime = EditorRuntime {
+            workspace_projects_dir: Some(projects_dir),
+            ..EditorRuntime::default()
+        };
+
+        open_workspace_project_named(&mut workspace, &mut runtime, "Partial");
+
+        assert_eq!(workspace.tabs.len(), 1);
+        assert_eq!(
+            workspace.active_tab().document.as_ref().path,
+            available_path
+        );
+        assert!(runtime.status.contains("Opened workspace: Partial"));
+        assert!(runtime
+            .status
+            .contains("skipped 1 missing/unavailable file(s)"));
+        assert!(runtime.status.contains(&missing_path.display().to_string()));
+        assert_ne!(workspace.active_tab().document.as_ref().path, original_path);
+    }
+
+    #[test]
+    fn tui_workspace_project_open_uses_blank_tab_when_no_files_load() {
+        let temp = TempArea::new("tui-workspace-open-all-missing");
         let original_path = temp.path("original.txt");
         let missing_path = temp.path("missing.txt");
         fs::write(&original_path, "original\n").expect("write original");
         let projects_dir = temp.path("workspaces");
         let project_path =
-            gui_workspace_project_path(&projects_dir, "Broken").expect("project path");
+            gui_workspace_project_path(&projects_dir, "Missing").expect("project path");
         save_gui_workspace_project(
             &project_path,
             &GuiWorkspaceProject {
-                name: "Broken".to_string(),
+                name: "Missing".to_string(),
                 files: vec![missing_path],
                 active_ordinal: 0,
                 layout: None,
@@ -7886,11 +7999,18 @@ gui_ui_font_size = 500
             ..EditorRuntime::default()
         };
 
-        open_workspace_project_named(&mut workspace, &mut runtime, "Broken");
+        open_workspace_project_named(&mut workspace, &mut runtime, "Missing");
 
         assert_eq!(workspace.tabs.len(), 1);
-        assert_eq!(workspace.active_tab().document.as_ref().path, original_path);
-        assert!(runtime.status.starts_with("Workspace open failed: "));
+        assert_eq!(
+            workspace.active_tab().document.as_ref().path.file_name(),
+            Some(std::ffi::OsStr::new("untitled.txt"))
+        );
+        assert_eq!(
+            workspace.active_tab().document.as_ref().buffer.to_text(),
+            ""
+        );
+        assert!(runtime.status.contains("opened blank tab"));
     }
 
     #[test]

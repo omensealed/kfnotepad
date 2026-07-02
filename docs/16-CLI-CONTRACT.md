@@ -17,8 +17,10 @@ kfnotepad --notes
 - `--help`: prints usage, current behavior, and editor keys to stdout; exits 0.
 - `--version`: prints `kfnotepad VERSION` to stdout; exits 0.
 - no arguments: prints a launch-ready message to stdout and exits 0 unless `gui_restore_last_workspace = true` is
-  set and a valid TUI `current-workspace.v1` exists. With that explicit restore preference in an interactive
-  terminal, the TUI restores that workspace through the same project parser and file-open validation used by the GUI.
+  set and a TUI `current-workspace.v1` exists. With that explicit restore preference in an interactive terminal,
+  the TUI restores loadable files from that workspace through the same project parser and file-open validation used
+  by the GUI. Missing or unavailable workspace files are skipped with a status message; if no workspace files can be
+  loaded, the TUI starts with a clean `untitled.txt` tab.
 - `FILE` with interactive stdin and stdout: opens the terminal editor for a regular, non-symlink UTF-8 file up to
   8 MiB.
 - `FILE` in a non-interactive context: prints a read-only file summary to stdout; exits 0.
@@ -207,12 +209,14 @@ kfnotepad --notes
 - Workspace -> Manage projects opens a visible workspace-manager panel. Up/Down/PageUp/PageDown/Home/End move the
   selection; Enter opens the selected project; `S` saves the current tab set over the selected project; `D` or Delete
   starts the typed `yes` delete confirmation; `N` starts the save-named prompt; Esc closes the panel.
-- Workspace -> Open project prompts for a project name, validates every file through the normal open adapter, and
-  replaces the current tab set only after validation succeeds. Up/Down in the prompt cycles saved project names.
+- Workspace -> Open project prompts for a project name, loads each file through the normal open adapter, reports
+  missing or unavailable files in the status bar, and replaces the current tab set with the files that can be
+  opened. If no project files can be loaded, it opens a clean `untitled.txt` tab instead. Up/Down in the prompt
+  cycles saved project names.
 - Workspace -> Delete project prompts for a saved project name, supports Up/Down cycling, and removes only the saved
   workspace project snapshot after typed `yes` confirmation.
 - Opening a workspace while any current tab is modified requires typing `yes` in a confirmation prompt. Canceling or
-  failing validation leaves the current tabs unchanged.
+  failing to read the project snapshot leaves the current tabs unchanged.
 - Workspace -> Restore last toggles the shared `gui_restore_last_workspace` preference. When enabled, TUI launch and
   later TUI tab open/focus/switch/close flows refresh the TUI `current-workspace.v1` snapshot. An argument-free
   interactive `kfnotepad` launch attempts to restore that TUI snapshot; explicit file and note launches keep their
