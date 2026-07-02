@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/kfnotepad-logo.png" alt="kfnotepad logo" width="260">
+</p>
+
 # kfnotepad
 
 Local UTF-8 text-file editor with a modern terminal UI and a separate Iced GUI review path.

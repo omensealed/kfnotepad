@@ -8861,6 +8861,7 @@ fn gui_editor_read_only_view(
                 container(line_text)
                     .width(Length::Fill)
                     .height(Length::Fixed(row_height))
+                    .clip(true)
                     .style(move |_theme| container::Style {
                         text_color: Some(palette.text),
                         background: Some(palette.background.into()),
@@ -8934,6 +8935,7 @@ fn gui_editor_read_only_view(
             container(editor_rows)
                 .width(Length::Fill)
                 .height(Length::Fill)
+                .clip(true)
                 .style(move |_theme| container::Style {
                     text_color: Some(palette.text),
                     background: Some(palette.background.into()),
