@@ -104,6 +104,7 @@ pub(super) fn apply_gui_editor_replacement_input_with_mode(
             *cursor = end;
             *selection = GuiEditorReplacementSelection::new(start, end);
         }
+        #[cfg(test)]
         GuiEditorReplacementInput::SelectRange { anchor, focus } => {
             if gui_editor_replacement_cursor_is_valid(&document.buffer, anchor)
                 && gui_editor_replacement_cursor_is_valid(&document.buffer, focus)

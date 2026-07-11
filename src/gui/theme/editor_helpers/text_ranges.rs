@@ -58,7 +58,6 @@ pub(super) fn char_suffix(value: &str, start_column: usize) -> String {
     value.chars().skip(start_column).collect()
 }
 
-#[allow(dead_code)]
 pub(super) fn char_slice(value: &str, start_column: usize, end_column: usize) -> String {
     value
         .chars()

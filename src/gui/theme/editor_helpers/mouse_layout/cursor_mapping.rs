@@ -1,4 +1,3 @@
-#[allow(dead_code)]
 pub(super) fn gui_editor_replacement_cursor_from_mouse_point(
     buffer: &TextBuffer,
     viewport: GuiEditorViewportState,

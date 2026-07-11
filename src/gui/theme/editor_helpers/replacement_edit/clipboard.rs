@@ -1,4 +1,4 @@
-#[allow(dead_code)]
+#[cfg(test)]
 pub(super) fn gui_editor_replacement_copy_selection(
     document: &TextDocument,
     selection: Option<GuiEditorReplacementSelection>,
@@ -7,7 +7,7 @@ pub(super) fn gui_editor_replacement_copy_selection(
     (!selected.is_empty()).then_some(selected)
 }
 
-#[allow(dead_code)]
+#[cfg(test)]
 pub(super) fn gui_editor_replacement_cut_selection(
     document: &mut TextDocument,
     cursor: &mut DocumentCursor,
@@ -20,7 +20,6 @@ pub(super) fn gui_editor_replacement_cut_selection(
     Some(selected)
 }
 
-#[allow(dead_code)]
 pub(super) fn gui_editor_replacement_paste_text(
     document: &mut TextDocument,
     cursor: &mut DocumentCursor,

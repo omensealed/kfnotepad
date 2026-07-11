@@ -1,4 +1,3 @@
-#[allow(dead_code)]
 pub(super) fn gui_editor_replacement_mouse_click(
     document: &TextDocument,
     cursor: &mut DocumentCursor,
@@ -10,7 +9,6 @@ pub(super) fn gui_editor_replacement_mouse_click(
     *selection = None;
 }
 
-#[allow(dead_code)]
 pub(super) fn gui_editor_replacement_mouse_drag(
     document: &TextDocument,
     cursor: &mut DocumentCursor,

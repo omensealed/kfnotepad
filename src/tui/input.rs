@@ -18,26 +18,23 @@ use crate::tui::menu::{
 };
 use crate::tui::theme::EditorTheme;
 
-#[allow(unused_imports)]
 use kfnotepad::{
     delete_gui_workspace_project, delete_next_word as shared_delete_next_word,
     delete_previous_word as shared_delete_previous_word,
     delete_to_line_end as shared_delete_to_line_end,
     go_to_document_end as shared_go_to_document_end,
     go_to_document_start as shared_go_to_document_start, go_to_line as shared_go_to_line,
-    gui_workspace_project_path, help_text, list_gui_workspace_projects, list_managed_notes,
-    load_editor_settings, managed_notes_dir, move_document_cursor, move_path_to_trash,
-    open_or_create_managed_note, open_text_file, page_down as shared_page_down,
-    page_up as shared_page_up, parse_args, parse_gui_workspace_project, redo_document_edit,
+    gui_workspace_project_path, list_gui_workspace_projects, load_editor_settings,
+    move_document_cursor, move_path_to_trash, open_text_file, page_down as shared_page_down,
+    page_up as shared_page_up, parse_gui_workspace_project, redo_document_edit,
     repeat_search_next_with_mode, repeat_search_previous_with_mode, save_editor_settings,
-    save_gui_workspace_project, save_text_document, summarize_path, summarize_text,
-    tui_help_document_text, undo_document_edit, BufferError, CloseActiveTabResult, Command, Cursor,
-    CursorMove, EditResult, EditorSettings, EditorTab, EditorTabDocument, EditorTabState,
-    EditorWorkspace, FileSidebarEntry, FileSidebarEntryKind, FileSidebarState, GoToLineResult,
-    GuiWorkspaceProject, GuiWorkspaceProjectDeleteResult, SearchMode, SearchRepeatResult,
-    SyntaxHighlighter, TabStripItem, TextDocument, UndoRedoResult,
+    save_gui_workspace_project, save_text_document, tui_help_document_text, undo_document_edit,
+    BufferError, CloseActiveTabResult, Cursor, CursorMove, EditResult, EditorSettings, EditorTab,
+    EditorTabDocument, EditorTabState, EditorWorkspace, FileSidebarEntry, FileSidebarEntryKind,
+    FileSidebarState, GoToLineResult, GuiWorkspaceProject, GuiWorkspaceProjectDeleteResult,
+    SearchMode, SearchRepeatResult, TabStripItem, TextDocument, UndoRedoResult,
     DEFAULT_GUI_READER_LINES_PER_MINUTE, MAX_GUI_READER_LINES_PER_MINUTE,
-    MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
+    MIN_GUI_READER_LINES_PER_MINUTE,
 };
 
 const TAB_WIDTH: usize = 4;

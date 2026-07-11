@@ -1,6 +1,6 @@
 impl TextBuffer {
     pub fn from_text(text: &str) -> Self {
-        #[cfg(test)]
+        #[cfg(all(test, feature = "gui"))]
         FROM_TEXT_CALL_COUNT.with(|count| count.set(count.get() + 1));
 
         let mut lines: Vec<String> = text.lines().map(ToString::to_string).collect();
@@ -79,7 +79,7 @@ impl TextBuffer {
     }
 
     pub fn to_text(&self) -> String {
-        #[cfg(test)]
+        #[cfg(all(test, feature = "gui"))]
         TO_TEXT_CALL_COUNT.with(|count| count.set(count.get() + 1));
 
         let mut text = self.lines.join("\n");

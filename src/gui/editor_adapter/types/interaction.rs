@@ -56,7 +56,7 @@ pub(crate) enum GuiEditorReplacementInput {
     MoveLineEnd,
     ScrollViewportLines(i32),
     SelectAll,
-    #[allow(dead_code)]
+    #[cfg(test)]
     SelectRange {
         anchor: DocumentCursor,
         focus: DocumentCursor,
