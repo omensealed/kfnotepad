@@ -4,7 +4,8 @@
 
 - Current target and support:
   - Tier 1: Linux desktop (validated in local workflows and package tooling).
-  - Tier 2: macOS and Windows (feature-gated builds in CI; runtime behavior is available but not packaged yet).
+  - Tier 2: macOS and Windows (native feature-gated builds and tests run in CI; unsigned alpha packages are produced
+    for tagged releases).
 - CLI/GUI build paths:
   - TUI path: `--no-default-features --features tui` can build terminal-only.
   - GUI path: `--no-default-features --features gui` builds GUI dependencies.
@@ -96,12 +97,12 @@ The script builds release binaries, stages `bin/kfnotepad`, `bin/kfnotepad-gui`,
 Linux package artifacts:
 
 ```text
-dist/kfnotepad-0.1.0-cachyos-linux-x86_64.tar.gz
-dist/kfnotepad-0.1.0-cachyos-linux-x86_64.tar.gz.sha256
-dist/kfnotepad_0.1.0_amd64.deb
-dist/kfnotepad_0.1.0_amd64.deb.sha256
-dist/kfnotepad-0.1.0-x86_64.AppImage
-dist/kfnotepad-0.1.0-x86_64.AppImage.sha256
+dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz
+dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz.sha256
+dist/kfnotepad_0.1.1_amd64.deb
+dist/kfnotepad_0.1.1_amd64.deb.sha256
+dist/kfnotepad-0.1.1-x86_64.AppImage
+dist/kfnotepad-0.1.1-x86_64.AppImage.sha256
 dist/SHA256SUMS
 ```
 
@@ -117,9 +118,9 @@ Verify the artifact before install testing:
 
 ```bash
 sha256sum -c dist/SHA256SUMS
-tar -tzf dist/kfnotepad-0.1.0-cachyos-linux-x86_64.tar.gz
-dpkg-deb --info dist/kfnotepad_0.1.0_amd64.deb
-dpkg-deb --contents dist/kfnotepad_0.1.0_amd64.deb
+tar -tzf dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz
+dpkg-deb --info dist/kfnotepad_0.1.1_amd64.deb
+dpkg-deb --contents dist/kfnotepad_0.1.1_amd64.deb
 ```
 
 `dist/` is ignored because these files are generated local artifacts.
@@ -127,8 +128,8 @@ dpkg-deb --contents dist/kfnotepad_0.1.0_amd64.deb
 The AppImage launches the GUI by default. For the terminal editor, pass `--cli`:
 
 ```bash
-dist/kfnotepad-0.1.0-x86_64.AppImage --help
-dist/kfnotepad-0.1.0-x86_64.AppImage --cli --help
+dist/kfnotepad-0.1.1-x86_64.AppImage --help
+dist/kfnotepad-0.1.1-x86_64.AppImage --cli --help
 ```
 
 If FUSE is unavailable in the test environment, extract and run `AppRun` directly:
@@ -136,7 +137,7 @@ If FUSE is unavailable in the test environment, extract and run `AppRun` directl
 ```bash
 tmpdir=$(mktemp -d)
 cd "$tmpdir"
-/path/to/kfnotepad-0.1.0-x86_64.AppImage --appimage-extract
+/path/to/kfnotepad-0.1.1-x86_64.AppImage --appimage-extract
 squashfs-root/AppRun --help
 squashfs-root/AppRun --cli --help
 ```
@@ -148,9 +149,9 @@ The tarball is portable as a user-owned prefix install. Do not use `sudo` for th
 Fresh install:
 
 ```bash
-prefix="$HOME/.local/kfnotepad-0.1.0"
+prefix="$HOME/.local/kfnotepad-0.1.1"
 mkdir -p "$prefix"
-tar -xzf dist/kfnotepad-0.1.0-cachyos-linux-x86_64.tar.gz -C "$prefix" --strip-components=1
+tar -xzf dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz -C "$prefix" --strip-components=1
 "$prefix/bin/kfnotepad" --version
 "$prefix/bin/kfnotepad-gui" --version
 "$prefix/bin/kfnotepad-gui" --describe
@@ -162,7 +163,7 @@ previous binary as a rollback copy, then replacing the old prefix contents:
 ```bash
 cp "$prefix/bin/kfnotepad" "$prefix/bin/kfnotepad.previous"
 cp "$prefix/bin/kfnotepad-gui" "$prefix/bin/kfnotepad-gui.previous"
-tar -xzf dist/kfnotepad-0.1.0-cachyos-linux-x86_64.tar.gz -C "$prefix" --strip-components=1
+tar -xzf dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz -C "$prefix" --strip-components=1
 "$prefix/bin/kfnotepad" --version
 "$prefix/bin/kfnotepad-gui" --version
 ```
@@ -190,7 +191,21 @@ upgrade, uninstall cleanup, and rollback were verified on 2026-06-24.
 
 ## Current alpha upload manifest
 
-Upload only the artifacts listed in `dist/SHA256SUMS` from the same packaging run. The human reported a Linux Mint
+Version tags matching the Cargo version (`v0.1.1`, for example) trigger `.github/workflows/release.yml`. The workflow
+builds on native GitHub-hosted runners and publishes:
+
+- Linux x86-64 tarball, `.deb`, and AppImage.
+- Standalone Windows x86-64 `kfnotepad.exe` and `kfnotepad-gui.exe`, plus a ZIP containing both and documentation.
+- A macOS arm64 `.dmg` containing `kfnotepad.app`, the standalone terminal binary, and documentation.
+- One `SHA256SUMS` covering every uploaded package.
+
+The release workflow can also be dispatched manually for an existing `vX.Y.Z` tag. It refuses a tag whose version
+does not match `Cargo.toml`. GitHub-hosted runners already contain the native Windows and macOS packaging tools; no
+developer workstation tools are required for normal releases. The macOS bundle is ad-hoc signed but not Apple
+notarized, so Gatekeeper may require an explicit user approval. Public notarized distribution requires an Apple
+Developer ID certificate and App Store Connect credentials stored as GitHub Actions secrets.
+
+Upload only the artifacts listed in `dist/SHA256SUMS` from the same local packaging run. The human reported a Linux Mint
 package smoke passing on 2026-07-02. Do not upload older local artifacts unless `dist/SHA256SUMS` is intentionally
 regenerated for them. Debian 11 package compatibility remains unclaimed until a working Bullseye build container or
 runner verifies it.

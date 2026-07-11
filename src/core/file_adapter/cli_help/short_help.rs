@@ -1,5 +1,5 @@
 pub fn help_text() -> &'static str {
-    r#"kfnotepad 0.1.0
+    r#"kfnotepad 0.1.1
 
 Usage:
   kfnotepad [FILE]

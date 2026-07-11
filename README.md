@@ -49,6 +49,10 @@ Local release artifact:
 This writes a tarball, Linux `.deb`, AppImage, and SHA-256 files under ignored `dist/` with both `kfnotepad` and
 `kfnotepad-gui`. Packaging and verification notes are in [`docs/13-OPERATIONS.md`](docs/13-OPERATIONS.md).
 
+Version tags matching `vX.Y.Z` run the native GitHub release workflow. Releases include Linux packages, standalone
+Windows TUI/GUI `.exe` files plus a combined ZIP, and an unsigned macOS `.dmg` containing `kfnotepad.app` and the
+terminal binary. Published artifacts are covered by a consolidated `SHA256SUMS` file.
+
 ## Selected direction
 
 - Type: cli plus separate GUI binary
@@ -57,7 +61,7 @@ This writes a tarball, Linux `.deb`, AppImage, and SHA-256 files under ignored `
 - Database: none; normal files on disk
 - Support tiers:
   - Supported: Linux (primary; CI + local packaging documented).
-  - Windows/macOS: source compiles and tests are now included in CI matrix planning for broader support.
+  - Windows/macOS: native builds and tests run in CI; unsigned alpha packages are produced by the release workflow.
 - License: AGPL-3.0-or-later
 
 ### Build features

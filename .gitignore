@@ -19,4 +19,5 @@ tmp/
 temp/
 target/
 dist/
+*.dmg
 **/*.rs.bk
