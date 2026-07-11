@@ -1,3 +1,7 @@
+use super::*;
+use crate::tui::input::*;
+use crate::tui::menu::*;
+
 #[test]
 fn file_sidebar_lists_parent_dirs_and_files_in_order() {
     let temp = TempArea::new("sidebar-list");

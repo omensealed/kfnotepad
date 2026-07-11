@@ -1,10 +1,5 @@
 use super::*;
 
-use crate::tui::input::*;
-use crate::tui::menu::*;
-use crate::tui::render::*;
-use crate::tui::sidebar::*;
-use crate::tui::theme::*;
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
 use crossterm::style::Color;
 use kfnotepad::*;
@@ -49,9 +44,24 @@ fn assert_no_temp_files(directory: &Path) {
     );
 }
 
-include!("tests/settings_and_preferences.rs");
-include!("tests/editor_workspace_tabs.rs");
-include!("tests/sidebar_and_projects.rs");
-include!("tests/rendering.rs");
-include!("tests/menu_input_and_wrap.rs");
-include!("tests/editor_commands.rs");
+fn left_click(column: u16, row: u16) -> MouseEvent {
+    MouseEvent {
+        kind: MouseEventKind::Down(MouseButton::Left),
+        column,
+        row,
+        modifiers: KeyModifiers::NONE,
+    }
+}
+
+#[path = "tests/editor_commands.rs"]
+mod editor_commands;
+#[path = "tests/editor_workspace_tabs.rs"]
+mod editor_workspace_tabs;
+#[path = "tests/menu_input_and_wrap.rs"]
+mod menu_input_and_wrap;
+#[path = "tests/rendering.rs"]
+mod rendering;
+#[path = "tests/settings_and_preferences.rs"]
+mod settings_and_preferences;
+#[path = "tests/sidebar_and_projects.rs"]
+mod sidebar_and_projects;

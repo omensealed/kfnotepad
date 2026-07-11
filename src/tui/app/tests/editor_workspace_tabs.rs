@@ -1,3 +1,8 @@
+use super::*;
+use crate::tui::input::*;
+use crate::tui::menu::*;
+use crate::tui::render::*;
+
 #[test]
 fn mouse_click_moves_cursor_in_editor_body() {
     let mut document = TextDocument {

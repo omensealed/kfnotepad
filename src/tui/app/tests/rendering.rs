@@ -1,3 +1,9 @@
+use super::*;
+use crate::tui::input::*;
+use crate::tui::menu::*;
+use crate::tui::render::*;
+use crate::tui::sidebar::*;
+
 #[test]
 fn file_sidebar_delete_refuses_open_dirty_file_and_symlink() {
     #[cfg(unix)]
@@ -290,15 +296,6 @@ fn editor_body_mouse_wheel_ignores_header_and_active_menu() {
         InputResult::Ignored
     );
     assert_eq!(cursor, Cursor { row: 1, column: 0 });
-}
-
-fn left_click(column: u16, row: u16) -> MouseEvent {
-    MouseEvent {
-        kind: MouseEventKind::Down(MouseButton::Left),
-        column,
-        row,
-        modifiers: KeyModifiers::NONE,
-    }
 }
 
 fn mouse_event(kind: MouseEventKind, column: u16, row: u16) -> MouseEvent {
@@ -1344,8 +1341,17 @@ fn render_command_palette_overlay_shows_matching_commands() {
     };
     let mut output = Vec::new();
 
-    write_command_palette_overlay(&mut output, &palette, 10, 0, 90, 1, EditorTheme::default(), false)
-        .expect("render command palette");
+    write_command_palette_overlay(
+        &mut output,
+        &palette,
+        10,
+        0,
+        90,
+        1,
+        EditorTheme::default(),
+        false,
+    )
+    .expect("render command palette");
 
     let output = String::from_utf8(output).expect("rendered output is UTF-8");
     assert!(output.contains("Command: reader"));
@@ -1401,14 +1407,8 @@ fn render_file_sidebar_without_colors_skips_color_escapes() {
     };
     let mut output = Vec::new();
 
-    render_file_sidebar(
-        &mut output,
-        &sidebar,
-        8,
-        EditorTheme::default(),
-        true,
-    )
-    .expect("render file sidebar");
+    render_file_sidebar(&mut output, &sidebar, 8, EditorTheme::default(), true)
+        .expect("render file sidebar");
 
     let output = String::from_utf8(output).expect("rendered output is UTF-8");
     assert!(!output.contains("\x1b[38;"));

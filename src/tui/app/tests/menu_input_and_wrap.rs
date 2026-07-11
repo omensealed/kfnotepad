@@ -1,3 +1,7 @@
+use super::*;
+use crate::tui::input::*;
+use crate::tui::menu::*;
+
 #[test]
 fn horizontal_viewport_follows_cursor_left_and_right() {
     let settings = EditorSettings::default();

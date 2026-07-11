@@ -1,3 +1,6 @@
+use super::*;
+use crate::tui::input::*;
+
 #[test]
 fn editor_config_path_prefers_xdg_config_home() {
     let temp = TempArea::new("config-path-xdg");

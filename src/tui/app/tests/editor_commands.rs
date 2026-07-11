@@ -1,3 +1,9 @@
+use super::*;
+use crate::tui::input::*;
+use crate::tui::menu::*;
+use crate::tui::render::*;
+use crate::tui::theme::*;
+
 #[test]
 fn page_up_and_down_move_by_visible_page() {
     let mut document = TextDocument {
