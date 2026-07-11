@@ -36,6 +36,18 @@ pub(super) fn check_external_file_changes(
 ) -> Vec<GuiExternalFileCheckResult> {
     let mut results = Vec::new();
     for candidate in candidates {
+        let metadata_snapshot = match snapshot_text_file_metadata(&candidate.path) {
+            Ok(Some(snapshot)) => snapshot,
+            _ => continue,
+        };
+        if !external_file_snapshot_requires_deep_check(
+            &metadata_snapshot,
+            candidate.previous_snapshot.as_ref(),
+            candidate.force_deep_check,
+        ) {
+            continue;
+        }
+
         let current_snapshot = match gui_file_snapshot(&candidate.path) {
             Ok(Some(snapshot)) => snapshot,
             _ => continue,
@@ -79,6 +91,16 @@ pub(super) fn check_external_file_changes(
     }
 
     results
+}
+
+pub(super) fn external_file_snapshot_requires_deep_check(
+    metadata: &FileMetadataSnapshot,
+    previous_snapshot: Option<&GuiFileSnapshot>,
+    force_deep_check: bool,
+) -> bool {
+    force_deep_check
+        || previous_snapshot
+            .is_none_or(|previous| !metadata.matches_file_snapshot(previous))
 }
 
 pub(super) async fn check_external_file_changes_async(

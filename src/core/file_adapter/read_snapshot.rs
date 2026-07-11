@@ -105,3 +105,19 @@ pub fn snapshot_text_file(path: &Path) -> io::Result<Option<FileSnapshot>> {
         Err(error) => Err(error),
     }
 }
+
+pub fn snapshot_text_file_metadata(path: &Path) -> io::Result<Option<FileMetadataSnapshot>> {
+    match fs::symlink_metadata(path) {
+        Ok(metadata) => {
+            if metadata.file_type().is_symlink() || !metadata.file_type().is_file() {
+                return Ok(None);
+            }
+            Ok(Some(FileMetadataSnapshot {
+                bytes: metadata.len(),
+                modified: metadata.modified().ok(),
+            }))
+        }
+        Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(None),
+        Err(error) => Err(error),
+    }
+}

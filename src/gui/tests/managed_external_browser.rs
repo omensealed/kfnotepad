@@ -263,6 +263,40 @@ fn gui_external_file_check_does_not_overlap_in_flight_scan() {
 }
 
 #[test]
+fn gui_external_file_check_uses_metadata_before_deep_snapshot() {
+    let metadata = FileMetadataSnapshot {
+        bytes: 12,
+        modified: Some(UNIX_EPOCH + Duration::from_secs(10)),
+    };
+    let snapshot = FileSnapshot {
+        bytes: 12,
+        modified: metadata.modified,
+        fingerprint: 42,
+    };
+
+    assert!(!external_file_snapshot_requires_deep_check(
+        &metadata,
+        Some(&snapshot),
+        false,
+    ));
+    assert!(external_file_snapshot_requires_deep_check(
+        &metadata,
+        Some(&snapshot),
+        true,
+    ));
+
+    let changed_metadata = FileMetadataSnapshot {
+        bytes: 13,
+        modified: metadata.modified,
+    };
+    assert!(external_file_snapshot_requires_deep_check(
+        &changed_metadata,
+        Some(&snapshot),
+        false,
+    ));
+}
+
+#[test]
 fn gui_external_file_unlock_allows_editing_again() {
     let temp = TempArea::new("gui-external-unlock");
     let file = temp.path("watched.txt");

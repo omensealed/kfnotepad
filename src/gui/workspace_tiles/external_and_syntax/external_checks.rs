@@ -28,7 +28,10 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn external_file_check_candidates(&self) -> Vec<GuiExternalFileCheckCandidate> {
+    pub(super) fn external_file_check_candidates(
+        &self,
+        force_deep_check: bool,
+    ) -> Vec<GuiExternalFileCheckCandidate> {
         self.workspace
             .tiles
             .iter()
@@ -37,6 +40,7 @@ impl KfnotepadGui {
                 path: tile.document.path.clone(),
                 dirty: tile.document.buffer.is_dirty(),
                 previous_snapshot: self.file_snapshots.get(&tile.id).cloned(),
+                force_deep_check,
             })
             .collect()
     }
@@ -46,7 +50,9 @@ impl KfnotepadGui {
             return Task::none();
         }
 
-        let candidates = self.external_file_check_candidates();
+        self.external_file_check_tick = self.external_file_check_tick.wrapping_add(1);
+        let force_deep_check = self.external_file_check_tick.is_multiple_of(60);
+        let candidates = self.external_file_check_candidates(force_deep_check);
         if candidates.is_empty() {
             return Task::none();
         }
@@ -112,7 +118,7 @@ impl KfnotepadGui {
 
     #[cfg(test)]
     pub(super) fn poll_external_file_changes(&mut self) {
-        let candidates = self.external_file_check_candidates();
+        let candidates = self.external_file_check_candidates(true);
         let results = check_external_file_changes(candidates);
         for result in results {
             self.apply_external_file_check_result(result);

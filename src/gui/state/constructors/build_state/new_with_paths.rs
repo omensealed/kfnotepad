@@ -87,6 +87,7 @@ impl KfnotepadGui {
             pending_managed_note_delete: None,
             file_snapshots: HashMap::new(),
             external_file_check_in_flight: false,
+            external_file_check_tick: 0,
             external_edit_locks: HashSet::new(),
             syntax_caches: HashMap::new(),
             replacement_pointer_point: None,

@@ -41,14 +41,15 @@ use kfnotepad::{
     open_text_file, parse_gui_layout, parse_gui_workspace_project, redo_document_edit,
     repeat_search_next, repeat_search_previous, save_editor_settings, save_gui_layout,
     save_gui_workspace_project, save_text_buffer, save_text_document, snapshot_text_file,
-    undo_document_edit, Cursor as DocumentCursor, EditorSettings, EditorTabState, EditorThemeId,
-    FileSidebarEntry, FileSidebarEntryKind, FileSnapshot, GoToLineResult, GuiCloseTileResult,
-    GuiFileBrowser, GuiFontFamily, GuiLayout, GuiLayoutAxis, GuiLayoutNode, GuiLeftPanelMode,
-    GuiLeftPanelState, GuiTileId, GuiTileSaveStatus, GuiWorkspace, GuiWorkspaceProject,
-    GuiWorkspaceProjectDeleteResult, GuiWorkspaceProjectEntry, ManagedNoteDeleteResult,
-    ManagedNoteEntry, SearchRepeatResult, SyntaxHighlightCacheState, SyntaxHighlighter, TextBuffer,
-    TextDocument, UndoRedoResult, MAX_GUI_FONT_SIZE, MAX_GUI_READER_LINES_PER_MINUTE,
-    MIN_GUI_FONT_SIZE, MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
+    snapshot_text_file_metadata, undo_document_edit, Cursor as DocumentCursor, EditorSettings,
+    EditorTabState, EditorThemeId, FileMetadataSnapshot, FileSidebarEntry, FileSidebarEntryKind,
+    FileSnapshot, GoToLineResult, GuiCloseTileResult, GuiFileBrowser, GuiFontFamily, GuiLayout,
+    GuiLayoutAxis, GuiLayoutNode, GuiLeftPanelMode, GuiLeftPanelState, GuiTileId,
+    GuiTileSaveStatus, GuiWorkspace, GuiWorkspaceProject, GuiWorkspaceProjectDeleteResult,
+    GuiWorkspaceProjectEntry, ManagedNoteDeleteResult, ManagedNoteEntry, SearchRepeatResult,
+    SyntaxHighlightCacheState, SyntaxHighlighter, TextBuffer, TextDocument, UndoRedoResult,
+    MAX_GUI_FONT_SIZE, MAX_GUI_READER_LINES_PER_MINUTE, MIN_GUI_FONT_SIZE,
+    MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
 };
 use nerd_font_symbols as nf;
 use syntect::highlighting::Style as SyntectStyle;

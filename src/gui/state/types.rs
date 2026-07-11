@@ -25,6 +25,7 @@ struct KfnotepadGui {
     pending_managed_note_delete: Option<PathBuf>,
     file_snapshots: HashMap<GuiTileId, GuiFileSnapshot>,
     external_file_check_in_flight: bool,
+    external_file_check_tick: u32,
     external_edit_locks: HashSet<GuiTileId>,
     syntax_caches: HashMap<GuiTileId, GuiSyntaxCache>,
     replacement_pointer_point: Option<(pane_grid::Pane, GuiEditorReplacementMousePoint)>,
@@ -79,6 +80,7 @@ struct GuiExternalFileCheckCandidate {
     path: PathBuf,
     dirty: bool,
     previous_snapshot: Option<GuiFileSnapshot>,
+    force_deep_check: bool,
 }
 
 #[derive(Debug, Clone)]
