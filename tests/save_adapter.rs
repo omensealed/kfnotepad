@@ -2,12 +2,33 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use kfnotepad::{
-    open_text_file, save_text_buffer, save_text_document, SaveError, TextBuffer,
-    MAX_TEXT_FILE_BYTES,
+    open_text_file, save_text_buffer, save_text_document, save_text_snapshot, snapshot_text_file,
+    SaveError, TextBuffer, MAX_TEXT_FILE_BYTES,
 };
 
 struct TempArea {
     root: PathBuf,
+}
+
+#[test]
+fn text_snapshot_save_returns_final_snapshot_without_document_clone() {
+    let temp = TempArea::new("save-text-snapshot");
+    let path = temp.path("note.txt");
+    fs::write(&path, "before\n").expect("seed file");
+    let document = open_text_file(&path).expect("open seed file");
+
+    let snapshot = save_text_snapshot(&path, "after\n", document.buffer.file_snapshot())
+        .expect("save text snapshot");
+
+    assert_eq!(
+        fs::read_to_string(&path).expect("read saved file"),
+        "after\n"
+    );
+    assert_eq!(snapshot.bytes, 6);
+    assert_eq!(
+        snapshot_text_file(&path).expect("snapshot file"),
+        Some(snapshot)
+    );
 }
 
 impl TempArea {

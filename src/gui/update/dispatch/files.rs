@@ -19,29 +19,18 @@ fn handle_open_dialog_completed(
 fn handle_save_active_tile_completed(
     state: &mut KfnotepadGui,
     tile_id: GuiTileId,
-    expected_text: String,
-    result: Result<(), String>,
+    result: Result<GuiSaveResult, String>,
 ) {
-    state.apply_save_active_tile_completion(tile_id, expected_text, result);
+    state.apply_save_active_tile_completion(tile_id, result);
 }
 
 fn handle_save_active_tile_as_completed(
     state: &mut KfnotepadGui,
     tile_id: GuiTileId,
-    original_path: PathBuf,
     requested_path: PathBuf,
-    expected_text: String,
-    clear_snapshot: bool,
-    result: Result<(), String>,
+    result: Result<GuiSaveResult, String>,
 ) {
-    state.apply_save_active_tile_as_completion(
-        tile_id,
-        original_path,
-        requested_path,
-        expected_text,
-        clear_snapshot,
-        result,
-    );
+    state.apply_save_active_tile_as_completion(tile_id, requested_path, result);
 }
 
 fn handle_external_file_check_completed(

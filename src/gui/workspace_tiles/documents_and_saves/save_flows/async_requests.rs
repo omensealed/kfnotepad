@@ -1,47 +1,47 @@
 impl KfnotepadGui {
     pub(super) fn request_save_active_tile_async(&mut self) -> Task<Message> {
-        self.sync_active_editor_to_document();
-        let Some(tile_id) = self
-            .panes
-            .get(self.active_pane)
-            .map(|pane_state| pane_state.tile_id)
-        else {
+        let Some((tile_id, text)) = self.sync_active_editor_to_document_text() else {
             self.status_message = "save failed: no active pane".to_string();
             return Task::none();
         };
 
-        let Some(document) = self
+        let Some((path, source_revision, expected_snapshot)) = self
             .workspace
             .tile(tile_id)
-            .map(|tile| tile.document.clone())
+            .map(|tile| {
+                (
+                    tile.document.path.clone(),
+                    tile.document.buffer.edit_revision(),
+                    tile.document.buffer.file_snapshot().cloned(),
+                )
+            })
         else {
             self.status_message = "save failed: no active tile".to_string();
             return Task::none();
         };
 
-        let expected_text = document.buffer.to_text();
-        self.status_message = format!("saving {}", gui_file_name_label(&document.path));
+        self.status_message = format!("saving {}", gui_file_name_label(&path));
 
         Task::perform(
             async move {
-                let mut document = document;
-                save_text_document(&mut document).map_err(|error| error.to_string())
+                tokio::task::spawn_blocking(move || {
+                    save_text_snapshot(&path, &text, expected_snapshot.as_ref()).map(|snapshot| {
+                        GuiSaveResult {
+                            source_revision,
+                            snapshot,
+                        }
+                    })
+                })
+                .await
+                .map_err(|error| format!("save worker failed: {error}"))?
+                .map_err(|error| error.to_string())
             },
-            move |result| Message::SaveActiveTileCompleted {
-                tile_id,
-                expected_text,
-                result,
-            },
+            move |result| Message::SaveActiveTileCompleted { tile_id, result },
         )
     }
 
     pub(super) fn request_save_active_tile_as(&mut self, path: PathBuf) -> Task<Message> {
-        self.sync_active_editor_to_document();
-        let Some(tile_id) = self
-            .panes
-            .get(self.active_pane)
-            .map(|pane_state| pane_state.tile_id)
-        else {
+        let Some((tile_id, text)) = self.sync_active_editor_to_document_text() else {
             self.status_message = "save as failed: no active pane".to_string();
             return Task::none();
         };
@@ -57,38 +57,44 @@ impl KfnotepadGui {
             }
         }
 
-        let Some(document) = self
+        let Some((original_path, source_revision, current_snapshot)) = self
             .workspace
             .tile(tile_id)
-            .map(|tile| tile.document.clone())
+            .map(|tile| {
+                (
+                    tile.document.path.clone(),
+                    tile.document.buffer.edit_revision(),
+                    tile.document.buffer.file_snapshot().cloned(),
+                )
+            })
         else {
             self.status_message = "save as failed: no active tile".to_string();
             return Task::none();
         };
 
-        let original_path = document.path.clone();
-        let mut document = document;
         let clear_snapshot = !gui_paths_refer_to_same_file(&original_path, &path);
-        let expected_text = document.buffer.to_text();
-
-        document.path = path.clone();
-        if clear_snapshot {
-            document.buffer.set_file_snapshot(None);
-        }
+        let expected_snapshot = (!clear_snapshot).then_some(current_snapshot).flatten();
 
         self.status_message = format!("saving as {}", gui_file_name_label(&path));
+        let save_path = path.clone();
 
         Task::perform(
             async move {
-                let mut document = document;
-                save_text_document(&mut document).map_err(|error| error.to_string())
+                tokio::task::spawn_blocking(move || {
+                    save_text_snapshot(&save_path, &text, expected_snapshot.as_ref()).map(
+                        |snapshot| GuiSaveResult {
+                            source_revision,
+                            snapshot,
+                        },
+                    )
+                })
+                .await
+                .map_err(|error| format!("save worker failed: {error}"))?
+                .map_err(|error| error.to_string())
             },
             move |result| Message::SaveActiveTileAsCompleted {
                 tile_id,
-                original_path,
                 requested_path: path,
-                expected_text,
-                clear_snapshot,
                 result,
             },
         )

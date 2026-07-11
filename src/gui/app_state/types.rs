@@ -113,3 +113,9 @@ pub(super) struct GuiBrowserLoadResult {
     pub(super) selected_path: Option<PathBuf>,
     pub(super) expanded_paths: HashSet<PathBuf>,
 }
+
+#[derive(Clone, Debug)]
+pub(super) struct GuiSaveResult {
+    pub(super) source_revision: u64,
+    pub(super) snapshot: kfnotepad::FileSnapshot,
+}

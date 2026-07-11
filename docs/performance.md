@@ -53,3 +53,11 @@ Root navigation and explicit refresh run the core sidebar's single-directory loa
 recursive row construction. Create and delete flows propagate the refresh task instead of dropping it. Production
 startup now constructs an empty browser placeholder and schedules that worker through Iced's initial Task, so no
 directory scan is required before the first window state exists.
+
+## GUI save preparation improvement
+
+GUI Save and Save As no longer clone `TextDocument`, `TextBuffer`, or undo/redo histories. Preparation reuses one
+editor text snapshot and records the buffer edit revision plus expected disk snapshot. A blocking worker writes that
+text through the existing conflict-checked atomic adapter and returns the final `FileSnapshot`. Completion compares
+revisions instead of complete strings, does not reopen the file, and performs no redundant snapshot refresh. If edits
+occur during the write, the returned disk snapshot is retained and the newer buffer remains dirty.

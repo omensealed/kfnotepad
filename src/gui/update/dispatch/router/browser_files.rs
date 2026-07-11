@@ -51,27 +51,20 @@ fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> Gui
         }
         Message::SaveActiveTileCompleted {
             tile_id,
-            expected_text,
             result,
         } => {
-            handle_save_active_tile_completed(state, tile_id, expected_text, result);
+            handle_save_active_tile_completed(state, tile_id, result);
             handled_none()
         }
         Message::SaveActiveTileAsCompleted {
             tile_id,
-            original_path,
             requested_path,
-            expected_text,
-            clear_snapshot,
             result,
         } => {
             handle_save_active_tile_as_completed(
                 state,
                 tile_id,
-                original_path,
                 requested_path,
-                expected_text,
-                clear_snapshot,
                 result,
             );
             handled_none()

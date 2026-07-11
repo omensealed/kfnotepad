@@ -315,6 +315,29 @@ fn gui_edit_cursor_move_does_not_reconstruct_full_text() {
 }
 
 #[test]
+fn gui_save_preparation_serializes_once_without_reconstructing_document() {
+    let temp = TempArea::new("gui-save-single-snapshot");
+    let path = temp.path("note.txt");
+    fs::write(&path, "alpha\n").expect("write file");
+    let mut state = KfnotepadGui::new(GuiLaunch {
+        requested_paths: vec![path],
+    });
+    state
+        .panes
+        .get_mut(state.active_pane)
+        .expect("active pane")
+        .editor = GuiEditorAdapter::from_text("changed\n");
+    state.sync_active_editor_to_document();
+
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
+    let _task = state.request_save_active_tile_async();
+
+    assert_eq!(kfnotepad::to_text_call_count(), 1);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
+}
+
+#[test]
 fn gui_edit_scroll_does_not_reconstruct_full_text() {
     let temp = TempArea::new("gui-edit-scroll-no-full-rebuild");
     let path = temp.path("note.txt");

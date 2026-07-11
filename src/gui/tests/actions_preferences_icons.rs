@@ -149,13 +149,19 @@ fn gui_menu_file_and_view_commands_route_existing_actions() {
     let save_tile_id = state.workspace.active_tile().id;
 
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Save));
+    let source_revision = state.workspace.active_tile().document.buffer.edit_revision();
     fs::write(&second, "saved by menu\n").expect("simulate async menu save");
+    let snapshot = gui_file_snapshot(&second)
+        .expect("snapshot menu save")
+        .expect("menu save file");
     let _ = update(
         &mut state,
         Message::SaveActiveTileCompleted {
             tile_id: save_tile_id,
-            expected_text: "saved by menu\n".to_string(),
-            result: Ok(()),
+            result: Ok(GuiSaveResult {
+                source_revision,
+                snapshot,
+            }),
         },
     );
 

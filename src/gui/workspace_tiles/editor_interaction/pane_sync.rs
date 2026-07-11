@@ -12,15 +12,21 @@ impl KfnotepadGui {
     }
 
     pub(super) fn sync_pane_to_document(&mut self, pane: pane_grid::Pane) {
-        let Some(pane_state) = self.panes.get(pane) else {
-            return;
-        };
+        let _ = self.sync_pane_to_document_text(pane);
+    }
+
+    pub(super) fn sync_pane_to_document_text(
+        &mut self,
+        pane: pane_grid::Pane,
+    ) -> Option<(GuiTileId, String)> {
+        let pane_state = self.panes.get(pane)?;
         let text = pane_state.editor.text();
         let tile_id = pane_state.tile_id;
         if let Some(tile) = self.workspace.tile_mut(tile_id) {
             tile.document.buffer.replace_text(&text);
             tile.state.cursor = pane_state.editor.document_cursor();
         }
+        Some((tile_id, text))
     }
 
     pub(super) fn sync_pane_cursor_to_document(&mut self, pane: pane_grid::Pane) {
@@ -35,6 +41,10 @@ impl KfnotepadGui {
 
     pub(super) fn sync_active_editor_to_document(&mut self) {
         self.sync_pane_to_document(self.active_pane);
+    }
+
+    pub(super) fn sync_active_editor_to_document_text(&mut self) -> Option<(GuiTileId, String)> {
+        self.sync_pane_to_document_text(self.active_pane)
     }
 
     pub(super) fn perform_active_editor_command(

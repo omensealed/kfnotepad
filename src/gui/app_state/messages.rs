@@ -34,16 +34,12 @@ pub(crate) enum Message {
     },
     SaveActiveTileCompleted {
         tile_id: GuiTileId,
-        expected_text: String,
-        result: Result<(), String>,
+        result: Result<GuiSaveResult, String>,
     },
     SaveActiveTileAsCompleted {
         tile_id: GuiTileId,
-        original_path: PathBuf,
         requested_path: PathBuf,
-        expected_text: String,
-        clear_snapshot: bool,
-        result: Result<(), String>,
+        result: Result<GuiSaveResult, String>,
     },
     ManagedNoteClicked(usize),
     ManagedNoteDeleteClicked(usize),

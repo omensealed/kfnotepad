@@ -325,16 +325,20 @@ fn gui_window_close_pending_confirmation_clears_after_save() {
     );
     assert!(state.pending_app_quit);
     let tile_id = state.workspace.active_tile().id;
-    let expected_text = "saved before close\n".to_string();
-
     let _ = update(&mut state, Message::SaveRequested);
+    let source_revision = state.workspace.active_tile().document.buffer.edit_revision();
     fs::write(&file, "saved before close\n").expect("simulate async save");
+    let snapshot = gui_file_snapshot(&file)
+        .expect("snapshot saved file")
+        .expect("saved file");
     let _ = update(
         &mut state,
         Message::SaveActiveTileCompleted {
             tile_id,
-            expected_text,
-            result: Ok(()),
+            result: Ok(GuiSaveResult {
+                source_revision,
+                snapshot,
+            }),
         },
     );
 
@@ -362,7 +366,11 @@ fn gui_save_async_completion_keeps_dirty_when_text_changed_before_finish() {
         .editor = GuiEditorAdapter::from_text("queued save text\n");
 
     let _task = update(&mut state, Message::SaveRequested);
+    let source_revision = state.workspace.active_tile().document.buffer.edit_revision();
     fs::write(&path, "queued save text\n").expect("simulate async save");
+    let snapshot = gui_file_snapshot(&path)
+        .expect("snapshot queued save")
+        .expect("queued save file");
 
     state
         .workspace
@@ -375,8 +383,10 @@ fn gui_save_async_completion_keeps_dirty_when_text_changed_before_finish() {
         &mut state,
         Message::SaveActiveTileCompleted {
             tile_id,
-            expected_text: "queued save text\n".to_string(),
-            result: Ok(()),
+            result: Ok(GuiSaveResult {
+                source_revision,
+                snapshot,
+            }),
         },
     );
 
@@ -387,7 +397,7 @@ fn gui_save_async_completion_keeps_dirty_when_text_changed_before_finish() {
     );
     assert_eq!(
         state.status_message,
-        "save completed after edits; reopen save to persist latest text"
+        "save completed after edits; save again to persist latest text"
     );
 }
 

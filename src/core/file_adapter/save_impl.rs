@@ -11,6 +11,14 @@ fn save_text_buffer_inner(
     expected_snapshot: Option<&FileSnapshot>,
 ) -> Result<FileSnapshot, SaveError> {
     let text = buffer.to_text();
+    save_text_snapshot(path, &text, expected_snapshot)
+}
+
+pub fn save_text_snapshot(
+    path: &Path,
+    text: &str,
+    expected_snapshot: Option<&FileSnapshot>,
+) -> Result<FileSnapshot, SaveError> {
     if text.len() as u64 > MAX_TEXT_FILE_BYTES {
         return Err(SaveError::TooLarge {
             path: path.to_path_buf(),
@@ -51,8 +59,13 @@ fn save_text_buffer_inner(
     }
 
     save_result?;
-    file_snapshot(path).map_err(|source| SaveError::Metadata {
+    let metadata = fs::symlink_metadata(path).map_err(|source| SaveError::Metadata {
         path: path.to_path_buf(),
         source,
+    })?;
+    Ok(FileSnapshot {
+        bytes: metadata.len(),
+        modified: metadata.modified().ok(),
+        fingerprint: fingerprint_bytes(text.as_bytes()),
     })
 }
