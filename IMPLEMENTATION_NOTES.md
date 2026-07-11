@@ -4275,3 +4275,8 @@ to compile under the current `iced` API.
 - Made explicit non-empty `XDG_CONFIG_HOME` and `XDG_DATA_HOME` values override platform-native `dirs` results on every
   OS. This preserves the documented/tested override contract on macOS while retaining standard macOS and Windows
   directories when no XDG override is supplied.
+- Canonicalized the shared core and GUI temporary-test roots after creation. On macOS this normalizes `/var/...` to
+  `/private/var/...` once, so browser paths, tree-selection matching, status text, and expected document paths use the
+  same spelling throughout GUI-only tests.
+- Updated native open/save-dialog routing tests to accept the documented path-prompt fallback in headless Linux CI while
+  still requiring native-dialog task routing when a desktop session is available.

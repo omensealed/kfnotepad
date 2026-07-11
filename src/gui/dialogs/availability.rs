@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    fn gui_file_dialog_unavailable_reason() -> Option<&'static str> {
+    pub(crate) fn gui_file_dialog_unavailable_reason() -> Option<&'static str> {
         if env::var_os("KFNOTEPAD_DISABLE_NATIVE_FILE_DIALOG").is_some_and(|value| {
             matches!(
                 value.to_string_lossy().as_ref(),

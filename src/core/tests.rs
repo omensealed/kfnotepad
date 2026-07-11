@@ -19,6 +19,7 @@ impl TempArea {
                 .as_nanos()
         ));
         fs::create_dir_all(&root).expect("create temp area");
+        let root = root.canonicalize().expect("canonicalize temp area");
         Self { root }
     }
 

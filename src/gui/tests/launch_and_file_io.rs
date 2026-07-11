@@ -761,7 +761,7 @@ fn gui_save_refuses_external_modification_since_open() {
 }
 
 #[test]
-fn gui_native_open_request_uses_dialog_without_showing_path_prompt() {
+fn gui_open_request_uses_native_dialog_or_documented_fallback() {
     let temp = TempArea::new("gui-native-open-request");
     let initial = temp.path("initial.txt");
     fs::write(&initial, "initial\n").expect("write initial");
@@ -772,11 +772,23 @@ fn gui_native_open_request_uses_dialog_without_showing_path_prompt() {
         temp.root.clone(),
     );
 
+    let unavailable_reason = KfnotepadGui::gui_file_dialog_unavailable_reason();
     let _task = update(&mut state, Message::MenuCommand(GuiMenuCommand::Open));
 
-    assert_eq!(state.path_prompt, None);
-    assert_eq!(state.path_prompt_value, "");
-    assert_eq!(state.status_message, "open dialog");
+    match unavailable_reason {
+        Some(reason) => {
+            assert_eq!(state.path_prompt, Some(GuiPathPrompt::Open));
+            assert_eq!(
+                state.status_message,
+                format!("open dialog unavailable ({reason}); using path prompt")
+            );
+        }
+        None => {
+            assert_eq!(state.path_prompt, None);
+            assert_eq!(state.path_prompt_value, "");
+            assert_eq!(state.status_message, "open dialog");
+        }
+    }
 }
 
 #[test]
@@ -825,7 +837,7 @@ fn gui_native_open_dialog_cancel_is_noop() {
 }
 
 #[test]
-fn gui_native_save_as_request_uses_dialog_without_showing_path_prompt() {
+fn gui_save_as_request_uses_native_dialog_or_documented_fallback() {
     let temp = TempArea::new("gui-native-save-as-request");
     let original = temp.path("original.txt");
     fs::write(&original, "original\n").expect("write original");
@@ -836,11 +848,23 @@ fn gui_native_save_as_request_uses_dialog_without_showing_path_prompt() {
         temp.root.clone(),
     );
 
+    let unavailable_reason = KfnotepadGui::gui_file_dialog_unavailable_reason();
     let _task = update(&mut state, Message::MenuCommand(GuiMenuCommand::SaveAs));
 
-    assert_eq!(state.path_prompt, None);
-    assert_eq!(state.path_prompt_value, "");
-    assert_eq!(state.status_message, "save as dialog");
+    match unavailable_reason {
+        Some(reason) => {
+            assert_eq!(state.path_prompt, Some(GuiPathPrompt::SaveAs));
+            assert_eq!(
+                state.status_message,
+                format!("save as dialog unavailable ({reason}); using path prompt")
+            );
+        }
+        None => {
+            assert_eq!(state.path_prompt, None);
+            assert_eq!(state.path_prompt_value, "");
+            assert_eq!(state.status_message, "save as dialog");
+        }
+    }
 }
 
 #[test]

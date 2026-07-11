@@ -54,6 +54,7 @@ impl TempArea {
         let root =
             env::temp_dir().join(format!("kfnotepad-{label}-{}-{nanos}", std::process::id()));
         fs::create_dir_all(&root).expect("create temp dir");
+        let root = root.canonicalize().expect("canonicalize temp dir");
         Self { root }
     }
 
