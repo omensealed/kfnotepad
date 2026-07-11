@@ -4252,3 +4252,23 @@ to compile under the current `iced` API.
 ### Remaining release checks
 - GitHub-hosted Linux, macOS, and Windows CI still requires a pushed branch or pull request.
 - Live GUI, native-dialog, accessibility, and real-terminal smoke checks remain manual platform checks.
+
+## Cross-platform CI follow-up: canonical temporary paths on macOS
+
+### Changes made
+- Updated two core GUI file-browser tests to compare activation and opened-document paths against canonical file paths.
+- This accounts for macOS resolving temporary paths from `/var/...` to `/private/var/...` while preserving the runtime
+  browser behavior shared by all platforms.
+
+### Trigger
+- GitHub Actions run `29156653165` passed macOS formatting and all-feature clippy, then failed the default test step
+  only in the two noncanonical path expectations.
+- The same run exposed two additional clean-run portability defects: default-feature tests attempted to execute the
+  feature-gated GUI binary, and Windows could not compile Crossterm with its required `windows` feature disabled.
+
+### Additional fixes
+- Declared the `gui_smoke` integration test with `required-features = ["gui"]` so default/TUI-only test runs do not
+  execute a binary Cargo intentionally does not build.
+- Enabled Crossterm's target-aware `windows` feature while keeping its default features disabled.
+- Marked the newly-created sidebar file handle as deliberately consumed on non-Unix targets; only Unix uses it to set
+  mode `0600`, and Windows all-feature clippy otherwise reports the binding as unused.

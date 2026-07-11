@@ -13,11 +13,13 @@ pub(crate) fn create_sidebar_file(runtime: &mut EditorRuntime) {
     let path = parent.join(&name);
 
     match OpenOptions::new().write(true).create_new(true).open(&path) {
-        Ok(file) => {
+        Ok(created_file) => {
+            #[cfg(not(unix))]
+            let _ = &created_file;
             #[cfg(unix)]
             {
                 use std::os::unix::fs::PermissionsExt;
-                let _ = file.set_permissions(fs::Permissions::from_mode(0o600));
+                let _ = created_file.set_permissions(fs::Permissions::from_mode(0o600));
             }
             refresh_sidebar_after_path_in_dir(runtime, &parent, &path);
             runtime.sidebar_prompt = None;

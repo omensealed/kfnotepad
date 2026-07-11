@@ -26,7 +26,7 @@ syntax = [
 
 [dependencies]
 dirs = "6.0.0"
-crossterm = { version = "0.29.0", default-features = false, features = ["events", "bracketed-paste"], optional = true }
+crossterm = { version = "0.29.0", default-features = false, features = ["events", "bracketed-paste", "windows"], optional = true }
 iced = { version = "0.14.0", features = ["advanced", "highlighter", "tokio"], optional = true }
 iced_aw = { version = "0.14.1", default-features = false, features = ["menu", "drop_down"], optional = true }
 iced_fonts = { version = "0.3.0", default-features = false, features = ["nerd"], optional = true }
@@ -47,3 +47,8 @@ required-features = ["gui"]
 name = "kfnotepad"
 path = "src/main.rs"
 required-features = ["tui"]
+
+[[test]]
+name = "gui_smoke"
+path = "tests/gui_smoke.rs"
+required-features = ["gui"]

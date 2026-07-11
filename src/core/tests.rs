@@ -1959,6 +1959,7 @@ fn gui_file_browser_file_activation_opens_new_tile_through_existing_adapter() {
     };
     let next_path = temp.path("next.txt");
     fs::write(&next_path, "next\n").expect("write next file");
+    let canonical_next_path = next_path.canonicalize().expect("canonicalize next file");
     let mut browser = GuiFileBrowser::load(temp.root.clone()).expect("load browser");
     let mut workspace = GuiWorkspace::from_document(first);
 
@@ -1973,7 +1974,7 @@ fn gui_file_browser_file_activation_opens_new_tile_through_existing_adapter() {
     assert_eq!(
         activation,
         GuiFileBrowserActivation::OpenTile {
-            path: next_path.clone(),
+            path: canonical_next_path.clone(),
         }
     );
 
@@ -1985,7 +1986,7 @@ fn gui_file_browser_file_activation_opens_new_tile_through_existing_adapter() {
         .expect("open validated tile");
     assert_eq!(tile_id, GuiTileId(1));
     assert_eq!(workspace.tiles.len(), 2);
-    assert_eq!(workspace.active_tile().document.path, next_path);
+    assert_eq!(workspace.active_tile().document.path, canonical_next_path);
     assert_eq!(
         workspace.active_tile().document.buffer.lines(),
         &["next".to_string()]
@@ -2081,7 +2082,10 @@ fn gui_file_browser_mouse_row_activation_selects_visible_file() {
     assert_eq!(
         browser.activate_mouse_row(2).expect("activate row"),
         Some(GuiFileBrowserActivation::OpenTile {
-            path: temp.path("second.txt"),
+            path: temp
+                .path("second.txt")
+                .canonicalize()
+                .expect("canonicalize second file"),
         })
     );
     assert_eq!(
