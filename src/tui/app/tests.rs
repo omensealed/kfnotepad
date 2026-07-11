@@ -56,14 +56,35 @@ fn left_click(column: u16, row: u16) -> MouseEvent {
     }
 }
 
+fn sidebar_fixture(count: usize) -> FileSidebarState {
+    FileSidebarState {
+        current_dir: PathBuf::from("."),
+        entries: (0..count)
+            .map(|index| FileSidebarEntry {
+                label: format!("file-{index}.txt"),
+                path: PathBuf::from(format!("file-{index}.txt")),
+                kind: FileSidebarEntryKind::File,
+            })
+            .collect(),
+        selected: 0,
+        scroll: 0,
+    }
+}
+
 #[path = "tests/editor_commands.rs"]
 mod editor_commands;
 #[path = "tests/editor_workspace_tabs.rs"]
 mod editor_workspace_tabs;
 #[path = "tests/menu_input_and_wrap.rs"]
 mod menu_input_and_wrap;
-#[path = "tests/rendering.rs"]
-mod rendering;
+#[path = "tests/render_chrome_layout.rs"]
+mod render_chrome_layout;
+#[path = "tests/render_interactions.rs"]
+mod render_interactions;
+#[path = "tests/render_overlays.rs"]
+mod render_overlays;
+#[path = "tests/render_unicode_wrap.rs"]
+mod render_unicode_wrap;
 #[path = "tests/settings_and_preferences.rs"]
 mod settings_and_preferences;
 #[path = "tests/sidebar_and_projects.rs"]

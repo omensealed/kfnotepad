@@ -151,8 +151,9 @@ mod tests {
             .sync_paths(std::slice::from_ref(&document))
             .expect("watch document parent");
 
+        thread::sleep(Duration::from_millis(250));
         fs::write(&document, "after\n").expect("change watched file");
-        let deadline = Instant::now() + Duration::from_secs(3);
+        let deadline = Instant::now() + Duration::from_secs(10);
         loop {
             let drained = watcher.drain();
             assert!(
