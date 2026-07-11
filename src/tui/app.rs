@@ -15,3 +15,7 @@ include!("app/exports.rs");
 include!("app/run.rs");
 include!("app/commands.rs");
 include!("app/helpers.rs");
+
+#[cfg(test)]
+#[path = "app/tests.rs"]
+mod tests;

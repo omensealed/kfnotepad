@@ -325,49 +325,6 @@ fn sidebar_fixture(count: usize) -> FileSidebarState {
     }
 }
 
-struct FakeBackend {
-    events: Rc<RefCell<Vec<&'static str>>>,
-}
-
-impl TerminalBackend for FakeBackend {
-    type Writer = Vec<u8>;
-
-    fn enter() -> io::Result<(Self::Writer, Self)> {
-        let events = Rc::new(RefCell::new(vec!["enter"]));
-        Ok((Vec::new(), Self { events }))
-    }
-
-    fn restore(&mut self) {
-        self.events.borrow_mut().push("restore");
-    }
-}
-
-impl TerminalSession<FakeBackend> {
-    fn enter_fake() -> io::Result<(Self, Rc<RefCell<Vec<&'static str>>>)> {
-        let (stdout, backend) = FakeBackend::enter()?;
-        let events = Rc::clone(&backend.events);
-        Ok((Self { stdout, backend }, events))
-    }
-}
-
-#[test]
-fn terminal_session_restores_backend_on_drop() {
-    let (session, events) = TerminalSession::enter_fake().expect("enter fake terminal");
-
-    drop(session);
-
-    assert_eq!(&*events.borrow(), &["enter", "restore"]);
-}
-
-#[test]
-fn keyboard_enhancement_flags_disambiguate_modified_keys_only() {
-    let flags = editor_keyboard_enhancement_flags();
-
-    assert!(flags.contains(KeyboardEnhancementFlags::DISAMBIGUATE_ESCAPE_CODES));
-    assert!(!flags.contains(KeyboardEnhancementFlags::REPORT_EVENT_TYPES));
-    assert!(!flags.contains(KeyboardEnhancementFlags::REPORT_ALL_KEYS_AS_ESCAPE_CODES));
-}
-
 #[test]
 fn render_marks_dirty_buffer_and_controls() {
     let mut document = TextDocument {

@@ -1,4 +1,4 @@
-pub(crate) fn run() -> ExitCode {
+pub fn run() -> ExitCode {
     let args: Vec<String> = env::args().skip(1).collect();
 
     match parse_args(&args) {

@@ -1,8 +1,6 @@
 #![forbid(unsafe_code)]
 
-mod tui;
-
-use tui::app;
+use kfnotepad::tui::app;
 
 pub fn main() -> std::process::ExitCode {
     app::run()

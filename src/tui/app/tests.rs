@@ -1,10 +1,15 @@
 use super::*;
 
-use kfnotepad::{EditorTab, EditorTabDocument, EditorTabState};
-use std::cell::RefCell;
+use crate::tui::input::*;
+use crate::tui::menu::*;
+use crate::tui::render::*;
+use crate::tui::sidebar::*;
+use crate::tui::theme::*;
+use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent, MouseEventKind};
+use crossterm::style::Color;
+use kfnotepad::*;
 use std::fs;
 use std::path::PathBuf;
-use std::rc::Rc;
 
 struct TempArea {
     root: PathBuf,
