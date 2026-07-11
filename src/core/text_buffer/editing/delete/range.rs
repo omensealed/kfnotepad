@@ -1,5 +1,23 @@
 impl TextBuffer {
-    fn delete_range(&mut self, start: Cursor, end: Cursor) -> Result<(), BufferError> {
+    pub fn delete_range(&mut self, start: Cursor, end: Cursor) -> Result<(), BufferError> {
+        self.delete_range_with_trailing_newline_policy(start, end, false)
+    }
+
+    #[cfg(feature = "gui")]
+    pub(crate) fn delete_replacement_range(
+        &mut self,
+        start: Cursor,
+        end: Cursor,
+    ) -> Result<(), BufferError> {
+        self.delete_range_with_trailing_newline_policy(start, end, true)
+    }
+
+    fn delete_range_with_trailing_newline_policy(
+        &mut self,
+        start: Cursor,
+        end: Cursor,
+        remove_trailing_newline: bool,
+    ) -> Result<(), BufferError> {
         self.validate_cursor(start)?;
         self.validate_cursor(end)?;
         let start = self.range_start_boundary_cursor(start)?;
@@ -24,6 +42,9 @@ impl TextBuffer {
             let start_byte = byte_index_for_char_column(line, start.column)?;
             let end_byte = byte_index_for_char_column(line, end.column)?;
             line.replace_range(start_byte..end_byte, "");
+            if remove_trailing_newline {
+                self.trailing_newline = false;
+            }
             self.mark_changed();
             return Ok(());
         }
@@ -50,6 +71,9 @@ impl TextBuffer {
 
         self.lines[start.row] = format!("{start_prefix}{end_suffix}");
         self.lines.drain((start.row + 1)..=end.row);
+        if remove_trailing_newline {
+            self.trailing_newline = false;
+        }
         self.mark_changed();
         Ok(())
     }

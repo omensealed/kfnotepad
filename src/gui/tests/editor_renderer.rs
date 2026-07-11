@@ -1588,6 +1588,9 @@ fn gui_editor_replacement_clipboard_paste_replaces_selection_and_handles_newline
     assert_eq!(document.buffer.to_text(), "hello there\nfriend");
     assert_eq!(cursor, DocumentCursor { row: 1, column: 6 });
     assert_eq!(selection, None);
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), "hello world");
+    assert!(!document.buffer.undo_last_edit());
 }
 
 #[test]

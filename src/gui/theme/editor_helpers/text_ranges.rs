@@ -13,45 +13,7 @@ pub(super) fn gui_editor_replacement_delete_range(
     validate_gui_editor_replacement_cursor(buffer, end)?;
     let (start, end) = gui_editor_replacement_grapheme_range(buffer, start, end)?;
 
-    let lines = buffer.lines();
-    let mut replacement_lines = Vec::new();
-    replacement_lines.extend(lines[..start.row].iter().cloned());
-
-    if start.row == end.row {
-        let line = lines
-            .get(start.row)
-            .ok_or(kfnotepad::BufferError::RowOutOfBounds {
-                row: start.row,
-                rows: lines.len(),
-            })?;
-        replacement_lines.push(format!(
-            "{}{}",
-            char_prefix(line, start.column),
-            char_suffix(line, end.column)
-        ));
-    } else {
-        let start_line = lines
-            .get(start.row)
-            .ok_or(kfnotepad::BufferError::RowOutOfBounds {
-                row: start.row,
-                rows: lines.len(),
-            })?;
-        let end_line = lines
-            .get(end.row)
-            .ok_or(kfnotepad::BufferError::RowOutOfBounds {
-                row: end.row,
-                rows: lines.len(),
-            })?;
-        replacement_lines.push(format!(
-            "{}{}",
-            char_prefix(start_line, start.column),
-            char_suffix(end_line, end.column)
-        ));
-    }
-
-    replacement_lines.extend(lines[(end.row + 1)..].iter().cloned());
-    buffer.replace_text(&replacement_lines.join("\n"));
-    Ok(())
+    buffer.delete_replacement_range(start, end)
 }
 
 pub(super) fn gui_editor_replacement_grapheme_range(

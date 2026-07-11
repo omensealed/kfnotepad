@@ -32,14 +32,14 @@ pub(super) fn gui_editor_replacement_paste_text(
         return;
     }
 
-    document.buffer.break_undo_group();
-
-    for character in text.chars() {
-        let input = if character == '\n' {
-            GuiEditorReplacementInput::InsertNewline
-        } else {
-            GuiEditorReplacementInput::InsertChar(character)
-        };
-        apply_gui_editor_replacement_input(document, cursor, viewport, selection, input);
-    }
+    document.with_compound_edit(|document| {
+        for character in text.chars() {
+            let input = if character == '\n' {
+                GuiEditorReplacementInput::InsertNewline
+            } else {
+                GuiEditorReplacementInput::InsertChar(character)
+            };
+            apply_gui_editor_replacement_input(document, cursor, viewport, selection, input);
+        }
+    });
 }

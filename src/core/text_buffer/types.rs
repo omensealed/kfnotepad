@@ -9,6 +9,7 @@ pub struct TextBuffer {
     pub(crate) undo_bytes: usize,
     pub(crate) redo_bytes: usize,
     pub(crate) insert_undo_group: Option<InsertUndoGroup>,
+    pub(crate) compound_edit: CompoundEditState,
     pub(crate) file_snapshot: Option<FileSnapshot>,
 }
 
@@ -31,6 +32,18 @@ pub(crate) struct BufferSnapshot {
     pub(crate) lines: Vec<String>,
     pub(crate) trailing_newline: bool,
     pub(crate) byte_size: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum CompoundEditState {
+    Inactive,
+    Pending {
+        depth: usize,
+        snapshot: Box<BufferSnapshot>,
+    },
+    Recorded {
+        depth: usize,
+    },
 }
 
 #[derive(Debug, PartialEq, Eq)]

@@ -27,7 +27,7 @@ pub(crate) fn workspace_from_project_documents(
             active_loaded = true;
         }
         tabs.push(EditorTab {
-            document: EditorTabDocument::Owned(document),
+            document: EditorTabDocument::Owned(Box::new(document)),
             state: EditorTabState::default(),
         });
     }
@@ -35,10 +35,10 @@ pub(crate) fn workspace_from_project_documents(
     let created_blank = tabs.is_empty();
     if tabs.is_empty() {
         tabs.push(EditorTab {
-            document: EditorTabDocument::Owned(TextDocument {
+            document: EditorTabDocument::Owned(Box::new(TextDocument {
                 path: current_dir.join("untitled.txt"),
                 buffer: kfnotepad::TextBuffer::from_text(""),
-            }),
+            })),
             state: EditorTabState::default(),
         });
         active_loaded = true;

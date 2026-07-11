@@ -75,11 +75,11 @@ fn mouse_click_on_tab_strip_switches_workspace_tab() {
     let mut workspace = EditorWorkspace {
         tabs: vec![
             EditorTab {
-                document: EditorTabDocument::Owned(first),
+                document: EditorTabDocument::Owned(Box::new(first)),
                 state: EditorTabState::default(),
             },
             EditorTab {
-                document: EditorTabDocument::Owned(second),
+                document: EditorTabDocument::Owned(Box::new(second)),
                 state: EditorTabState::default(),
             },
         ],

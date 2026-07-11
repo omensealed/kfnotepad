@@ -66,6 +66,9 @@ fn paste_text_inserts_multiple_characters() {
     assert_eq!(document.buffer.lines(), vec!["ab", "cdhello"]);
     assert_eq!(cursor, Cursor { row: 1, column: 2 });
     assert_eq!(runtime.status, "Modified");
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), "hello");
+    assert!(!document.buffer.undo_last_edit());
 }
 
 #[test]

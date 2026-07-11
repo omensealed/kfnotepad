@@ -254,11 +254,11 @@ fn workspace_sidebar_open_focuses_existing_file_tab_without_duplicate() {
     let mut workspace = EditorWorkspace {
         tabs: vec![
             EditorTab {
-                document: EditorTabDocument::Owned(current),
+                document: EditorTabDocument::Owned(Box::new(current)),
                 state: EditorTabState::default(),
             },
             EditorTab {
-                document: EditorTabDocument::Owned(next),
+                document: EditorTabDocument::Owned(Box::new(next)),
                 state: EditorTabState::default(),
             },
         ],
@@ -333,11 +333,11 @@ fn tui_workspace_project_save_current_writes_path_only_project() {
     let mut workspace = EditorWorkspace {
         tabs: vec![
             EditorTab {
-                document: EditorTabDocument::Owned(first),
+                document: EditorTabDocument::Owned(Box::new(first)),
                 state: EditorTabState::default(),
             },
             EditorTab {
-                document: EditorTabDocument::Owned(second),
+                document: EditorTabDocument::Owned(Box::new(second)),
                 state: EditorTabState::default(),
             },
         ],

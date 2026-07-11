@@ -2181,6 +2181,49 @@ fn coalescing_timeout_breaks_typed_insert_undo_group() {
 }
 
 #[test]
+fn compound_edit_records_one_snapshot_for_multiple_edit_kinds() {
+    let mut document = TextDocument {
+        path: PathBuf::from("compound.txt"),
+        buffer: TextBuffer::from_text("hello world"),
+    };
+
+    document.with_compound_edit(|document| {
+        document
+            .buffer
+            .delete_range(Cursor { row: 0, column: 5 }, Cursor { row: 0, column: 11 })
+            .expect("delete selection");
+        document
+            .buffer
+            .insert_newline(0, 5)
+            .expect("insert newline");
+        document
+            .buffer
+            .insert_char(1, 0, 'x')
+            .expect("insert character");
+    });
+
+    assert_eq!(document.buffer.to_text(), "hello\nx");
+    assert_eq!(document.buffer.undo_history.len(), 1);
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), "hello world");
+    assert!(!document.buffer.undo_last_edit());
+}
+
+#[test]
+fn compound_edit_without_buffer_changes_does_not_create_undo_history() {
+    let mut document = TextDocument {
+        path: PathBuf::from("unchanged.txt"),
+        buffer: TextBuffer::from_text("unchanged"),
+    };
+
+    document.with_compound_edit(|_| {});
+
+    assert!(document.buffer.undo_history.is_empty());
+    assert_eq!(document.buffer.undo_bytes, 0);
+    assert!(!document.buffer.is_dirty());
+}
+
+#[test]
 fn large_file_undo_history_uses_byte_budget_and_remains_responsive() {
     let base_size = usize::try_from(MAX_TEXT_FILE_BYTES.saturating_sub(1024))
         .expect("max text byte limit fits in usize");

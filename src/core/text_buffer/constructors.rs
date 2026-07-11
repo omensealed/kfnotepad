@@ -18,6 +18,7 @@ impl TextBuffer {
             undo_bytes: 0,
             redo_bytes: 0,
             insert_undo_group: None,
+            compound_edit: CompoundEditState::Inactive,
             file_snapshot: None,
         }
     }
@@ -53,6 +54,7 @@ impl TextBuffer {
         self.undo_bytes = 0;
         self.redo_bytes = 0;
         self.insert_undo_group = None;
+        self.compound_edit = CompoundEditState::Inactive;
     }
 
     pub fn file_snapshot(&self) -> Option<&FileSnapshot> {

@@ -7,6 +7,15 @@ pub fn clamp_cursor_to_document(document: &TextDocument, cursor: &mut Cursor) {
         .min(document.buffer.line_char_count(cursor.row).unwrap_or(0));
 }
 
+impl TextDocument {
+    pub fn with_compound_edit<R>(&mut self, edit: impl FnOnce(&mut Self) -> R) -> R {
+        self.buffer.begin_compound_edit();
+        let result = edit(self);
+        self.buffer.end_compound_edit();
+        result
+    }
+}
+
 pub fn move_document_cursor(document: &TextDocument, cursor: &mut Cursor, direction: CursorMove) {
     if let Ok(moved) = document.buffer.move_cursor(*cursor, direction) {
         *cursor = moved;

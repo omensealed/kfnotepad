@@ -19,7 +19,7 @@ impl<'a> EditorWorkspace<'a> {
 
     pub fn push_owned_tab(&mut self, document: TextDocument) {
         self.tabs.push(EditorTab {
-            document: EditorTabDocument::Owned(document),
+            document: EditorTabDocument::Owned(Box::new(document)),
             state: EditorTabState::default(),
         });
         self.active = self.tabs.len() - 1;

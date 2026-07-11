@@ -1,6 +1,6 @@
 pub enum EditorTabDocument<'a> {
     Borrowed(&'a mut TextDocument),
-    Owned(TextDocument),
+    Owned(Box<TextDocument>),
 }
 
 impl AsRef<TextDocument> for EditorTabDocument<'_> {
