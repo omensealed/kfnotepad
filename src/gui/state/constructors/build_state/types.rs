@@ -13,6 +13,6 @@ struct GuiPaneBuild {
 
 struct GuiBrowserBuild {
     browser: Option<GuiFileBrowser>,
-    browser_tree: Option<DirectoryTree>,
+    browser_tree_rows: Vec<GuiFileTreeRowModel>,
     browser_expanded_paths: HashSet<PathBuf>,
 }

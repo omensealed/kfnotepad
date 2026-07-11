@@ -1,7 +1,6 @@
 #[derive(Debug, Clone)]
 pub(crate) enum Message {
     Edit(pane_grid::Pane, text_editor::Action),
-    BrowserTreeEvent(DirectoryTreeEvent),
     BrowserLocalTreeToggle(PathBuf),
     BrowserLocalTreeSelected(PathBuf, bool),
     BrowserLocalTreeActivated(PathBuf, bool),

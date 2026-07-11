@@ -1,9 +1,3 @@
-pub(super) fn gui_directory_tree(root: PathBuf) -> DirectoryTree {
-    DirectoryTree::new(root)
-        .with_filter(DirectoryFilter::FilesAndFolders)
-        .with_icon_theme(Arc::new(GuiTreeIconTheme))
-}
-
 pub(super) fn resolve_browser_child_path(
     base_directory: &Path,
     raw_name: &str,

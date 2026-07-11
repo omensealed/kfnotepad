@@ -9,7 +9,6 @@ use std::path::PathBuf;
 use iced::advanced::input_method;
 use iced::widget::{pane_grid, text_editor};
 use iced::{window, Size};
-use iced_swdir_tree::DirectoryTreeEvent;
 use kfnotepad::{GuiLeftPanelMode, GuiTileId, TextDocument};
 use nerd_font_symbols as nf;
 

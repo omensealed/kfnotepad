@@ -5,18 +5,7 @@ fn gui_files_panel<'a>(
     match &state.browser {
         Some(browser) => {
             let current_dir = &browser.sidebar.current_dir;
-            let selected_path = state.browser_selected_path.as_deref().or_else(|| {
-                browser
-                    .sidebar
-                    .selected_entry()
-                    .map(|entry| entry.path.as_path())
-            });
-            let tree_view = gui_file_tree_view(
-                current_dir,
-                &state.browser_expanded_paths,
-                selected_path,
-                state.settings,
-            );
+            let tree_view = gui_file_tree_view(&state.browser_tree_rows, state.settings);
             widget::column![
                 panel_tabs,
                 row![

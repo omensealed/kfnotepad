@@ -50,8 +50,8 @@ pub(super) fn delete_selected_browser_entry(&mut self) -> Task<Message> {
         self.pending_browser_delete = None;
         match delete_browser_path(&entry.path, entry.kind) {
             Ok(()) => {
-                let refresh_task = self.refresh_file_browser();
                 self.browser_selected_path = None;
+                let refresh_task = self.refresh_file_browser();
                 self.status_message = match entry.kind {
                     FileSidebarEntryKind::Directory => {
                         format!("moved directory to trash {}", entry.path.display())

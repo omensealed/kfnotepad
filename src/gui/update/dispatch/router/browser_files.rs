@@ -1,8 +1,5 @@
 fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> GuiDispatchResult {
     match message {
-        Message::BrowserTreeEvent(event) => {
-            GuiDispatchResult::Handled(state.handle_browser_tree_event(event))
-        }
         Message::BrowserLocalTreeToggle(path) => {
             state.toggle_local_browser_tree_path(path);
             handled_none()

@@ -16,7 +16,6 @@ pub(super) fn navigate_browser_parent(&mut self) -> Task<Message> {
         match browser.refresh() {
             Ok(()) => {
                 let current_dir = browser.sidebar.current_dir.clone();
-                self.browser_tree = Some(gui_directory_tree(current_dir.clone()));
                 self.browser_expanded_paths.insert(current_dir.clone());
                 if self
                     .browser_selected_path
@@ -25,8 +24,9 @@ pub(super) fn navigate_browser_parent(&mut self) -> Task<Message> {
                 {
                     self.browser_selected_path = None;
                 }
+                self.refresh_cached_file_tree_rows();
                 self.status_message = format!("refreshed {}", current_dir.display());
-                self.expand_browser_tree_root()
+                Task::none()
             }
             Err(error) => {
                 self.status_message = format!("file browser error: {error}");

@@ -1,11 +1,11 @@
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct GuiFileTreeRowModel {
-    path: PathBuf,
+pub(super) struct GuiFileTreeRowModel {
+    pub(super) path: PathBuf,
     label: String,
     kind: FileSidebarEntryKind,
     depth: usize,
     expanded: bool,
-    selected: bool,
+    pub(super) selected: bool,
     error: bool,
 }
 

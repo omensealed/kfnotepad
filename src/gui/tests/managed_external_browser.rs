@@ -473,11 +473,7 @@ fn gui_browser_tree_file_selection_does_not_open_tile() {
 
     let _ = update(
         &mut state,
-        Message::BrowserTreeEvent(DirectoryTreeEvent::Selected(
-            file.clone(),
-            false,
-            iced_swdir_tree::SelectionMode::Replace,
-        )),
+        Message::BrowserLocalTreeSelected(file.clone(), false),
     );
 
     assert_eq!(state.workspace.tiles.len(), 1);
@@ -542,11 +538,7 @@ fn gui_browser_tree_directory_selection_does_not_reset_root() {
 
     let _ = update(
         &mut state,
-        Message::BrowserTreeEvent(DirectoryTreeEvent::Selected(
-            subdir.clone(),
-            true,
-            iced_swdir_tree::SelectionMode::Replace,
-        )),
+        Message::BrowserLocalTreeSelected(subdir.clone(), true),
     );
 
     assert_eq!(state.workspace.tiles.len(), 1);
@@ -600,12 +592,7 @@ fn gui_browser_tree_directory_double_click_resets_root_without_opening_tile() {
         subdir.canonicalize().expect("canonical subdir")
     );
     assert_eq!(
-        state
-            .browser_tree
-            .as_ref()
-            .expect("tree")
-            .root_path()
-            .to_path_buf(),
+        state.browser_tree_rows.first().expect("tree root").path.clone(),
         subdir.canonicalize().expect("canonical tree subdir")
     );
     assert!(state
@@ -638,12 +625,7 @@ fn gui_browser_parent_request_resets_tree_root_to_parent_directory() {
         parent
     );
     assert_eq!(
-        state
-            .browser_tree
-            .as_ref()
-            .expect("tree")
-            .root_path()
-            .to_path_buf(),
+        state.browser_tree_rows.first().expect("tree root").path.clone(),
         parent
     );
 }
@@ -685,6 +667,31 @@ fn gui_browser_refresh_picks_up_external_file_creation() {
             temp.root.canonicalize().expect("canonical root").display()
         )
     );
+}
+
+#[test]
+fn gui_file_tree_view_uses_cached_rows_until_refresh() {
+    let temp = TempArea::new("gui-browser-cached-view");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: Vec::new(),
+        },
+        temp.root.clone(),
+    );
+    let external = temp.path("external.txt");
+    fs::write(&external, "external\n").expect("write external file");
+
+    let _view = gui_file_tree_view(&state.browser_tree_rows, state.settings);
+    assert!(!state
+        .browser_tree_rows
+        .iter()
+        .any(|row| row.path() == external));
+
+    let _ = state.refresh_file_browser();
+    assert!(state
+        .browser_tree_rows
+        .iter()
+        .any(|row| row.path() == external));
 }
 
 #[test]

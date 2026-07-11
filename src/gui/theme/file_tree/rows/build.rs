@@ -1,4 +1,4 @@
-fn gui_file_tree_rows(
+pub(super) fn gui_file_tree_rows(
     root: &Path,
     expanded_paths: &HashSet<PathBuf>,
     selected_path: Option<&Path>,

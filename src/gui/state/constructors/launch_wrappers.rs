@@ -1,8 +1,6 @@
 impl KfnotepadGui {
     fn new_with_task(launch: GuiLaunch) -> (Self, Task<Message>) {
-        let mut state = Self::new(launch);
-        let task = state.expand_browser_tree_root();
-        (state, task)
+        (Self::new(launch), Task::none())
     }
 
     #[cfg(not(test))]

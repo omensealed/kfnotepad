@@ -1602,22 +1602,3 @@ fn gui_primary_icons_come_from_nerd_font_symbol_constants() {
     assert_eq!(ICON_CLOSE, nf::cod::COD_CHROME_CLOSE);
     assert_eq!(ICON_DELETE, nf::fa::FA_TRASH);
 }
-
-#[test]
-fn gui_file_tree_icons_use_nerd_font_symbol_constants() {
-    let cases = [
-        (IconRole::FolderClosed, nf::cod::COD_FOLDER),
-        (IconRole::FolderOpen, nf::cod::COD_FOLDER_OPENED),
-        (IconRole::File, nf::cod::COD_FILE),
-        (IconRole::Error, nf::cod::COD_ERROR),
-        (IconRole::CaretRight, nf::oct::OCT_CHEVRON_RIGHT),
-        (IconRole::CaretDown, nf::oct::OCT_CHEVRON_DOWN),
-    ];
-
-    for (role, glyph) in cases {
-        let spec = gui_tree_icon_spec(role);
-        assert_eq!(spec.glyph.as_ref(), glyph);
-        assert_eq!(spec.size, Some(13.0));
-        assert_eq!(spec.font, None);
-    }
-}

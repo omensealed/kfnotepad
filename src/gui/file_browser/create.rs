@@ -36,9 +36,9 @@ pub(super) fn create_browser_file_named(&mut self, raw_name: &str) -> bool {
 
         match fs::create_dir(&path) {
             Ok(()) => {
+                self.browser_expanded_paths.insert(path.clone());
                 let _refresh_task = self.refresh_file_browser();
                 self.select_browser_path(&path);
-                self.browser_expanded_paths.insert(path.clone());
                 self.status_message = format!("created directory {}", path.display());
                 true
             }

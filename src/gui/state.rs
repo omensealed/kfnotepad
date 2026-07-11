@@ -29,9 +29,6 @@ use iced::{
     Vector,
 };
 use iced_aw::{menu, Menu, MenuBar};
-use iced_swdir_tree::{
-    DirectoryFilter, DirectoryTree, DirectoryTreeEvent, IconRole, IconSpec, IconTheme,
-};
 use kfnotepad::{
     delete_gui_workspace_project, delete_managed_note, delete_next_word, delete_previous_word,
     delete_to_line_end, expand_range_to_grapheme_boundaries, find_case_insensitive_range,

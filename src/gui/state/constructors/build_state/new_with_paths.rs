@@ -47,7 +47,7 @@ impl KfnotepadGui {
         );
         let GuiBrowserBuild {
             browser,
-            browser_tree,
+            browser_tree_rows,
             browser_expanded_paths,
         } = build_gui_browser(&current_dir, &mut status_messages);
         let left_panel = GuiLeftPanelState {
@@ -80,7 +80,7 @@ impl KfnotepadGui {
             active_pane,
             minimized_panes,
             browser,
-            browser_tree,
+            browser_tree_rows,
             browser_expanded_paths,
             browser_selected_path: None,
             browser_visible,

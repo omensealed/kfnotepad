@@ -41,3 +41,10 @@ documents non-recursively and drains events without blocking the GUI. Only match
 strong snapshot validation. While the watcher is healthy, a 60-second metadata-only fallback check guards lifecycle
 mistakes without rereading unchanged files. Watcher failure restores one-second metadata polling and periodic deep
 verification. Save-time conflict validation remains independent and authoritative.
+
+## File-tree rendering improvement
+
+The GUI now owns one cached custom file-tree row model. Iced view construction renders only that cache and performs no
+directory reads. Root changes, expansion, explicit refresh, create, and delete rebuild the cache; selection only
+updates cached flags. The unused parallel `iced-swdir-tree` state and dependency were removed. Directory loading is
+still synchronous in command handling and is the next boundary to move to a cancellable worker for very large folders.

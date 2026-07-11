@@ -7,14 +7,13 @@ pub(super) fn gui_file_tree_icon_size(settings: EditorSettings) -> u32 {
 }
 
 pub(super) fn gui_file_tree_view<'a>(
-    root: &Path,
-    expanded_paths: &HashSet<PathBuf>,
-    selected_path: Option<&Path>,
+    cached_rows: &[GuiFileTreeRowModel],
     settings: EditorSettings,
 ) -> Element<'a, Message> {
     let palette = gui_theme_palette(settings.theme_id);
-    let rows = gui_file_tree_rows(root, expanded_paths, selected_path)
-        .into_iter()
+    let rows = cached_rows
+        .iter()
+        .cloned()
         .map(|row| gui_file_tree_row(row, settings, palette))
         .collect::<Vec<_>>();
 

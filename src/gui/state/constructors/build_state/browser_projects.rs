@@ -7,9 +7,10 @@ fn build_gui_browser(
             let root = browser.sidebar.current_dir.clone();
             let mut expanded = HashSet::new();
             expanded.insert(root.clone());
+            let browser_tree_rows = gui_file_tree_rows(&root, &expanded, Some(&root));
             GuiBrowserBuild {
                 browser: Some(browser),
-                browser_tree: Some(gui_directory_tree(root)),
+                browser_tree_rows,
                 browser_expanded_paths: expanded,
             }
         }
@@ -20,7 +21,7 @@ fn build_gui_browser(
             ));
             GuiBrowserBuild {
                 browser: None,
-                browser_tree: None,
+                browser_tree_rows: Vec::new(),
                 browser_expanded_paths: HashSet::new(),
             }
         }

@@ -1,40 +1,11 @@
 impl KfnotepadGui {
-pub(super) fn handle_browser_tree_event(&mut self, event: DirectoryTreeEvent) -> Task<Message> {
-        if !self.browser_visible || self.left_panel.mode != GuiLeftPanelMode::Files {
-            return Task::none();
-        }
-
-        match &event {
-            DirectoryTreeEvent::Selected(path, is_dir, _) => {
-                if *is_dir {
-                    self.select_browser_path(path);
-                    self.status_message = format!("selected folder {}", path.display());
-                } else {
-                    self.select_browser_path(path);
-                    self.status_message = format!("selected file {}", path.display());
-                }
-            }
-            DirectoryTreeEvent::DragCompleted { .. } => {
-                self.status_message = "file browser drag is view-only".to_string();
-            }
-            DirectoryTreeEvent::Toggled(_)
-            | DirectoryTreeEvent::Drag(_)
-            | DirectoryTreeEvent::Loaded(_) => {}
-        }
-
-        let Some(tree) = self.browser_tree.as_mut() else {
-            self.status_message = "file tree unavailable".to_string();
-            return Task::none();
-        };
-        tree.update(event).map(Message::BrowserTreeEvent)
-    }
-
     pub(super) fn toggle_local_browser_tree_path(&mut self, path: PathBuf) {
         if self.browser_expanded_paths.contains(&path) {
             self.browser_expanded_paths.remove(&path);
         } else {
             self.browser_expanded_paths.insert(path);
         }
+        self.refresh_cached_file_tree_rows();
     }
 
     pub(super) fn select_local_browser_tree_path(
@@ -80,8 +51,9 @@ pub(super) fn handle_browser_tree_event(&mut self, event: DirectoryTreeEvent) ->
         }
     }
 
-pub(super) fn select_browser_path(&mut self, path: &Path) {
+    pub(super) fn select_browser_path(&mut self, path: &Path) {
         self.browser_selected_path = Some(path.to_path_buf());
+        self.update_cached_file_tree_selection(path);
         let Some(browser) = self.browser.as_mut() else {
             return;
         };
@@ -94,6 +66,28 @@ pub(super) fn select_browser_path(&mut self, path: &Path) {
             browser.sidebar.selected = index;
             browser.sidebar.keep_selection_visible(1);
         }
-    self.pending_browser_delete = None;
-}
+        self.pending_browser_delete = None;
+    }
+
+    pub(super) fn refresh_cached_file_tree_rows(&mut self) {
+        let Some(root) = self
+            .browser
+            .as_ref()
+            .map(|browser| browser.sidebar.current_dir.clone())
+        else {
+            self.browser_tree_rows.clear();
+            return;
+        };
+        self.browser_tree_rows = gui_file_tree_rows(
+            &root,
+            &self.browser_expanded_paths,
+            self.browser_selected_path.as_deref(),
+        );
+    }
+
+    fn update_cached_file_tree_selection(&mut self, selected_path: &Path) {
+        for row in &mut self.browser_tree_rows {
+            row.selected = row.path == selected_path;
+        }
+    }
 }
