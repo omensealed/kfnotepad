@@ -1,3 +1,7 @@
+//! Runtime configuration paths, workspace restore requests, and settings persistence.
+
+use super::*;
+
 pub(crate) fn current_editor_config_path() -> Option<PathBuf> {
     kfnotepad::current_editor_config_path()
 }

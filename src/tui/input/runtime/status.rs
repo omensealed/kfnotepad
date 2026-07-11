@@ -1,3 +1,7 @@
+//! Active-tab and path status formatting.
+
+use super::*;
+
 pub(crate) fn active_tab_status(workspace: &EditorWorkspace<'_>) -> String {
     let tab = workspace.active_tab();
     format!(
