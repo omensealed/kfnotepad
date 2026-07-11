@@ -1,4 +1,6 @@
-// TUI keyboard, mouse, menu, palette, and save/quit event helpers.
+//! Keyboard, mouse, menu, command-palette, save, and quit event dispatch.
+
+use super::*;
 
 include!("events/keyboard.rs");
 include!("events/mouse.rs");
