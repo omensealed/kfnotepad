@@ -95,5 +95,11 @@ mod render_overlays;
 mod render_unicode_wrap;
 #[path = "tests/settings_and_preferences.rs"]
 mod settings_and_preferences;
-#[path = "tests/sidebar_and_projects.rs"]
-mod sidebar_and_projects;
+#[path = "tests/sidebar_file_operations.rs"]
+mod sidebar_file_operations;
+#[path = "tests/workspace_manager.rs"]
+mod workspace_manager;
+#[path = "tests/workspace_persistence.rs"]
+mod workspace_persistence;
+#[path = "tests/workspace_restore.rs"]
+mod workspace_restore;
