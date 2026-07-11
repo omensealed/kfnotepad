@@ -33,13 +33,10 @@ pub(super) fn gui_editor_replacement_paste_text(
     }
 
     document.with_compound_edit(|document| {
-        for character in text.chars() {
-            let input = if character == '\n' {
-                GuiEditorReplacementInput::InsertNewline
-            } else {
-                GuiEditorReplacementInput::InsertChar(character)
-            };
-            apply_gui_editor_replacement_input(document, cursor, viewport, selection, input);
+        delete_gui_editor_replacement_selection(document, cursor, selection);
+        if let Ok(next_cursor) = document.buffer.insert_text(*cursor, text) {
+            *cursor = next_cursor;
         }
+        viewport.keep_cursor_visible(*cursor, document.buffer.line_count());
     });
 }

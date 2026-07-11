@@ -2224,6 +2224,49 @@ fn compound_edit_without_buffer_changes_does_not_create_undo_history() {
 }
 
 #[test]
+fn bulk_insert_text_updates_lines_cursor_revision_and_undo_once() {
+    let mut buffer = TextBuffer::from_text("hello world");
+    let initial_revision = buffer.edit_revision();
+
+    let cursor = buffer
+        .insert_text(Cursor { row: 0, column: 5 }, " there\nfriend\n")
+        .expect("insert multiline text");
+
+    assert_eq!(buffer.to_text(), "hello there\nfriend\n world");
+    assert_eq!(cursor, Cursor { row: 2, column: 0 });
+    assert_eq!(buffer.edit_revision(), initial_revision.wrapping_add(1));
+    assert_eq!(buffer.undo_history.len(), 1);
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "hello world");
+}
+
+#[test]
+fn bulk_insert_text_advances_to_combining_grapheme_end() {
+    let mut buffer = TextBuffer::from_text("e");
+
+    let cursor = buffer
+        .insert_text(Cursor { row: 0, column: 1 }, "\u{301}")
+        .expect("insert combining mark");
+
+    assert_eq!(buffer.to_text(), "e\u{301}");
+    assert_eq!(cursor, Cursor { row: 0, column: 2 });
+}
+
+#[test]
+fn bulk_insert_empty_text_is_unchanged() {
+    let mut buffer = TextBuffer::from_text("unchanged");
+
+    let cursor = buffer
+        .insert_text(Cursor { row: 0, column: 4 }, "")
+        .expect("accept empty insert");
+
+    assert_eq!(cursor, Cursor { row: 0, column: 4 });
+    assert_eq!(buffer.to_text(), "unchanged");
+    assert!(!buffer.is_dirty());
+    assert!(buffer.undo_history.is_empty());
+}
+
+#[test]
 fn large_file_undo_history_uses_byte_budget_and_remains_responsive() {
     let base_size = usize::try_from(MAX_TEXT_FILE_BYTES.saturating_sub(1024))
         .expect("max text byte limit fits in usize");

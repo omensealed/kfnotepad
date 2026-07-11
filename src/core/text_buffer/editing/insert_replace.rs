@@ -1,4 +1,52 @@
 impl TextBuffer {
+    pub fn insert_text(&mut self, cursor: Cursor, text: &str) -> Result<Cursor, BufferError> {
+        self.validate_cursor(cursor)?;
+        if text.is_empty() {
+            return Ok(cursor);
+        }
+
+        let byte_index = {
+            let line = &self.lines[cursor.row];
+            byte_index_for_char_column(line, cursor.column)?
+        };
+        let segments = text.split('\n').collect::<Vec<_>>();
+
+        self.break_undo_group();
+        self.record_undo();
+
+        let next_cursor = if segments.len() == 1 {
+            self.lines[cursor.row].insert_str(byte_index, text);
+            Cursor {
+                row: cursor.row,
+                column: cursor.column.saturating_add(text.chars().count()),
+            }
+        } else {
+            let remainder = self.lines[cursor.row].split_off(byte_index);
+            self.lines[cursor.row].push_str(segments[0]);
+
+            let last_index = segments.len() - 1;
+            let mut inserted_lines = Vec::with_capacity(last_index);
+            inserted_lines.extend(segments[1..last_index].iter().map(|line| (*line).to_string()));
+            inserted_lines.push(format!("{}{remainder}", segments[last_index]));
+            self.lines
+                .splice((cursor.row + 1)..(cursor.row + 1), inserted_lines);
+
+            Cursor {
+                row: cursor.row.saturating_add(last_index),
+                column: segments[last_index].chars().count(),
+            }
+        };
+
+        self.mark_changed();
+        let column = self
+            .grapheme_range_end_boundary_column(next_cursor.row, next_cursor.column)
+            .unwrap_or(next_cursor.column);
+        Ok(Cursor {
+            column,
+            ..next_cursor
+        })
+    }
+
     pub fn insert_char(
         &mut self,
         row: usize,
