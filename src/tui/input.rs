@@ -71,7 +71,9 @@ include!("input/events.rs");
 include!("input/sidebar.rs");
 include!("input/workspaces.rs");
 include!("input/editor_commands.rs");
-include!("input/runtime.rs");
+mod runtime;
+
+pub(crate) use runtime::*;
 
 #[cfg(test)]
 mod tests {
