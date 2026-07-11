@@ -4272,3 +4272,6 @@ to compile under the current `iced` API.
 - Enabled Crossterm's target-aware `windows` feature while keeping its default features disabled.
 - Marked the newly-created sidebar file handle as deliberately consumed on non-Unix targets; only Unix uses it to set
   mode `0600`, and Windows all-feature clippy otherwise reports the binding as unused.
+- Made explicit non-empty `XDG_CONFIG_HOME` and `XDG_DATA_HOME` values override platform-native `dirs` results on every
+  OS. This preserves the documented/tested override contract on macOS while retaining standard macOS and Windows
+  directories when no XDG override is supplied.
