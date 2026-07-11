@@ -85,7 +85,11 @@ fn gui_files_panel<'a>(
         None => widget::column![
             panel_tabs,
             text(LABEL_FILES).size(gui_ui_heading_text_size(state.settings)),
-            text("file browser unavailable").size(gui_ui_text_size(state.settings)),
+            if state.browser_tree_loading {
+                text("Loading files...").size(gui_ui_text_size(state.settings))
+            } else {
+                text("file browser unavailable").size(gui_ui_text_size(state.settings))
+            },
         ]
         .into(),
     }

@@ -1,3 +1,4 @@
+#[cfg(test)]
 fn build_gui_browser(
     current_dir: &std::path::Path,
     status_messages: &mut Vec<String>,
@@ -25,6 +26,18 @@ fn build_gui_browser(
                 browser_expanded_paths: HashSet::new(),
             }
         }
+    }
+}
+
+#[cfg(not(test))]
+fn build_gui_browser(
+    _current_dir: &std::path::Path,
+    _status_messages: &mut Vec<String>,
+) -> GuiBrowserBuild {
+    GuiBrowserBuild {
+        browser: None,
+        browser_tree_rows: Vec::new(),
+        browser_expanded_paths: HashSet::new(),
     }
 }
 

@@ -1,4 +1,13 @@
 impl KfnotepadGui {
+    #[cfg(not(test))]
+    fn new_with_task(launch: GuiLaunch) -> (Self, Task<Message>) {
+        let mut state = Self::new(launch);
+        let directory = state.current_dir.clone();
+        let task = state.request_browser_load(directory, true);
+        (state, task)
+    }
+
+    #[cfg(test)]
     fn new_with_task(launch: GuiLaunch) -> (Self, Task<Message>) {
         (Self::new(launch), Task::none())
     }
