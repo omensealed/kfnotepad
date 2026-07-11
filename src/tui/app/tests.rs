@@ -81,8 +81,6 @@ mod editor_save_conflicts;
 mod editor_search_undo;
 #[path = "tests/editor_themes_preferences.rs"]
 mod editor_themes_preferences;
-#[path = "tests/editor_workspace_tabs.rs"]
-mod editor_workspace_tabs;
 #[path = "tests/input_paste_modes.rs"]
 mod input_paste_modes;
 #[path = "tests/input_viewport_wrap.rs"]
@@ -101,9 +99,17 @@ mod render_unicode_wrap;
 mod settings_and_preferences;
 #[path = "tests/sidebar_file_operations.rs"]
 mod sidebar_file_operations;
+#[path = "tests/workspace_dirty_close.rs"]
+mod workspace_dirty_close;
 #[path = "tests/workspace_manager.rs"]
 mod workspace_manager;
+#[path = "tests/workspace_mouse_interactions.rs"]
+mod workspace_mouse_interactions;
 #[path = "tests/workspace_persistence.rs"]
 mod workspace_persistence;
 #[path = "tests/workspace_restore.rs"]
 mod workspace_restore;
+#[path = "tests/workspace_switching.rs"]
+mod workspace_switching;
+#[path = "tests/workspace_tab_lifecycle.rs"]
+mod workspace_tab_lifecycle;
