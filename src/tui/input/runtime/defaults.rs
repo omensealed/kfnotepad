@@ -1,3 +1,7 @@
+//! Runtime construction and transient-state reset behavior.
+
+use super::*;
+
 impl Default for EditorRuntime {
     fn default() -> Self {
         Self {

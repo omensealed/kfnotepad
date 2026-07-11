@@ -1,3 +1,7 @@
+//! Tab selection and close actions.
+
+use super::*;
+
 pub(crate) fn select_previous_tab(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

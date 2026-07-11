@@ -1,3 +1,7 @@
+//! Runtime state and active prompt variants.
+
+use super::*;
+
 #[derive(Debug, PartialEq, Eq)]
 pub(crate) struct EditorRuntime {
     pub(crate) status: String,
