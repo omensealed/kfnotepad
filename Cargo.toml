@@ -15,6 +15,7 @@ gui = [
     "dep:iced-swdir-tree",
     "dep:iced_fonts",
     "dep:nerd-font-symbols",
+    "dep:notify-debouncer-mini",
     "dep:rfd",
     "dep:syntect",
     "dep:unicode-width",
@@ -32,6 +33,7 @@ iced_aw = { version = "0.14.1", default-features = false, features = ["menu", "d
 iced_fonts = { version = "0.3.0", default-features = false, features = ["nerd"], optional = true }
 iced-swdir-tree = { version = "0.9.1", default-features = false, optional = true }
 nerd-font-symbols = { version = "0.3.0", optional = true }
+notify-debouncer-mini = { version = "0.7.0", optional = true }
 rfd = { version = "0.17.2", default-features = false, features = ["xdg-portal", "wayland"], optional = true }
 syntect = { version = "5.3.0", default-features = false, features = ["default-syntaxes", "default-themes", "regex-fancy"], optional = true }
 unicode-width = { version = "0.2.2", optional = true }

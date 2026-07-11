@@ -88,7 +88,8 @@ cargo build --locked --no-default-features --features gui
 cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- --describe
 ```
 
-External file changes are detected by conservative polling and save-time conflict checks. A filesystem watcher feature is intentionally not exposed until it can be implemented as a long-lived, nonblocking watcher.
+External file changes are detected by a long-lived, debounced native watcher. Watcher events are revalidated through
+the conservative snapshot adapter; metadata-first polling remains the fallback when watching is unavailable.
 
 ## Documentation
 

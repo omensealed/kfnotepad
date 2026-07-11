@@ -36,15 +36,15 @@ kfnotepad-gui FILE1 FILE2
   directory and other non-regular save-target rejection, private new-file mode on Unix, and best-effort temp cleanup
   on failure.
 - Save refuses to overwrite a document if its on-disk file changed or disappeared since open or the last successful
-  save. This save-time check is independent of the GUI's one-second external-change polling and reports a conflict
+  save. This save-time check is independent of the GUI's external-change watcher and reports a conflict
   instead of silently replacing external edits.
 - Saved text is normalized to LF line endings. CRLF input opens as text and writes back as LF after a save.
 - Save As refuses to retarget a tile to a path already open in another tile; the already-open tile is focused or
   restored and remains the only authoritative tile for that path.
-- Open GUI document tiles poll their existing on-disk file metadata once per second while the GUI is running. If an
-  already-open clean file changes externally, the tile refreshes in place through the same safe open path and enters
-  an external-edit lock. Filesystem watcher support is intentionally not exposed until it can be implemented as a
-  long-lived, nonblocking watcher with polling fallback.
+- Open GUI document tiles register their parent directories with one long-lived, debounced native watcher. Events for
+  an open document trigger strong snapshot validation; clean tiles refresh in place through the same safe open path
+  and enter an external-edit lock. Watcher failures visibly degrade to metadata-first polling. Directory watches are
+  non-recursive and update as tile paths change.
   Locked tiles still allow scrolling and later external refreshes, but text edits are refused until the Unlock
   titlebar control is clicked. Dirty local buffers are never overwritten by external refresh; the status message reports
   the conflict for explicit user resolution.

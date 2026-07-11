@@ -33,8 +33,11 @@ the focused benchmark harness before changing the snapshot/save implementations.
 
 ## External-change polling improvement
 
-The first polling correction keeps the one-second responsiveness contract but compares symlink-safe file metadata
-before requesting a full snapshot. Unchanged files are read and fingerprinted only on a 60-tick deep-verification
-interval; changed length or modification time triggers strong validation immediately. An in-flight guard prevents
-overlapping scans. The deep check remains necessary for same-size edits on coarse-timestamp filesystems until the
-long-lived watcher service is available.
+The first polling correction kept the one-second responsiveness contract but compared symlink-safe file metadata
+before requesting a full snapshot. It also added an in-flight guard to prevent overlapping scans.
+
+The next correction adds one long-lived `notify-debouncer-mini` service. It watches the parent directories of open
+documents non-recursively and drains events without blocking the GUI. Only matching open paths receive immediate
+strong snapshot validation. While the watcher is healthy, a 60-second metadata-only fallback check guards lifecycle
+mistakes without rereading unchanged files. Watcher failure restores one-second metadata polling and periodic deep
+verification. Save-time conflict validation remains independent and authoritative.

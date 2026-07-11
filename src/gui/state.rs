@@ -59,6 +59,7 @@ use unicode_width::UnicodeWidthChar;
 mod app_state;
 mod dialogs;
 mod editor_adapter;
+mod external_watcher;
 mod file_browser;
 mod layout;
 mod preferences;
@@ -66,6 +67,7 @@ mod theme;
 mod workspace_tiles;
 use app_state::*;
 use editor_adapter::*;
+use external_watcher::*;
 use layout::*;
 use theme::*;
 

@@ -9,7 +9,8 @@
 - CLI/GUI build paths:
   - TUI path: `--no-default-features --features tui` can build terminal-only.
   - GUI path: `--no-default-features --features gui` builds GUI dependencies.
-  - GUI external-change checks use conservative polling plus save-time conflict detection. Filesystem watcher support is not exposed until it can be long-lived and nonblocking.
+  - GUI external-change checks use a long-lived debounced native watcher, metadata-first fallback polling, and
+    independent save-time conflict detection.
 - CI runs checks for all supported platforms and the feature matrix described in `scripts/feature-check.sh`.
 
 ## Development runbook

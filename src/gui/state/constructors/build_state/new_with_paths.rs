@@ -59,6 +59,20 @@ impl KfnotepadGui {
             workspace_projects_dir.as_deref(),
             &mut status_messages,
         );
+        let watcher_result = if cfg!(test) {
+            Ok(None)
+        } else {
+            GuiExternalFileWatcher::new().map(Some)
+        };
+        let (external_file_watcher, external_file_watcher_error) = match watcher_result {
+            Ok(watcher) => (watcher, None),
+            Err(error) => {
+                status_messages.push(format!(
+                    "file watcher unavailable; using metadata polling: {error}"
+                ));
+                (None, Some(error))
+            }
+        };
 
         let mut state = Self {
             workspace,
@@ -88,6 +102,8 @@ impl KfnotepadGui {
             file_snapshots: HashMap::new(),
             external_file_check_in_flight: false,
             external_file_check_tick: 0,
+            external_file_watcher,
+            external_file_watcher_error,
             external_edit_locks: HashSet::new(),
             syntax_caches: HashMap::new(),
             replacement_pointer_point: None,
@@ -114,6 +130,7 @@ impl KfnotepadGui {
             show_startup_help_panel,
         };
         state.refresh_all_file_snapshots();
+        state.sync_external_file_watcher();
         state.refresh_visible_syntax_caches();
         state.persist_last_workspace_if_enabled();
         state

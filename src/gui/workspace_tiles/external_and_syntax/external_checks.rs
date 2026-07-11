@@ -51,8 +51,24 @@ impl KfnotepadGui {
         }
 
         self.external_file_check_tick = self.external_file_check_tick.wrapping_add(1);
-        let force_deep_check = self.external_file_check_tick.is_multiple_of(60);
-        let candidates = self.external_file_check_candidates(force_deep_check);
+        self.sync_external_file_watcher();
+
+        let fallback_tick = self.external_file_check_tick.is_multiple_of(60);
+        let watcher_paths = self.drain_external_file_watcher();
+        let watcher_active = self.external_file_watcher.is_some();
+        if watcher_active && watcher_paths.is_empty() && !fallback_tick {
+            return Task::none();
+        }
+
+        let force_deep_check = !watcher_paths.is_empty() || (!watcher_active && fallback_tick);
+        let mut candidates = self.external_file_check_candidates(force_deep_check);
+        if !watcher_paths.is_empty() {
+            candidates.retain(|candidate| {
+                watcher_paths
+                    .iter()
+                    .any(|event_path| watcher_event_matches_path(event_path, &candidate.path))
+            });
+        }
         if candidates.is_empty() {
             return Task::none();
         }
@@ -62,6 +78,39 @@ impl KfnotepadGui {
             async move { check_external_file_changes_async(candidates).await },
             Message::ExternalFileCheckCompleted,
         )
+    }
+
+    pub(super) fn sync_external_file_watcher(&mut self) {
+        let paths = self
+            .workspace
+            .tiles
+            .iter()
+            .map(|tile| tile.document.path.clone())
+            .collect::<Vec<_>>();
+        let result = self
+            .external_file_watcher
+            .as_mut()
+            .map(|watcher| watcher.sync_paths(&paths));
+        if let Some(Err(error)) = result {
+            self.external_file_watcher = None;
+            self.external_file_watcher_error = Some(error.clone());
+            self.status_message =
+                format!("file watcher unavailable; using metadata polling: {error}");
+        }
+    }
+
+    fn drain_external_file_watcher(&mut self) -> HashSet<PathBuf> {
+        let Some(watcher) = self.external_file_watcher.as_ref() else {
+            return HashSet::new();
+        };
+        let drained = watcher.drain();
+        if let Some(error) = drained.error {
+            self.external_file_watcher = None;
+            self.external_file_watcher_error = Some(error.clone());
+            self.status_message =
+                format!("file watcher unavailable; using metadata polling: {error}");
+        }
+        drained.changed_paths
     }
 
     pub(super) fn complete_external_file_check(

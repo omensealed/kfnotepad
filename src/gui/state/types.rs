@@ -26,6 +26,8 @@ struct KfnotepadGui {
     file_snapshots: HashMap<GuiTileId, GuiFileSnapshot>,
     external_file_check_in_flight: bool,
     external_file_check_tick: u32,
+    external_file_watcher: Option<GuiExternalFileWatcher>,
+    external_file_watcher_error: Option<String>,
     external_edit_locks: HashSet<GuiTileId>,
     syntax_caches: HashMap<GuiTileId, GuiSyntaxCache>,
     replacement_pointer_point: Option<(pane_grid::Pane, GuiEditorReplacementMousePoint)>,
