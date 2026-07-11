@@ -41,6 +41,8 @@ struct KfnotepadGui {
     replacement_overwrite_mode: bool,
     pending_project_open: Option<usize>,
     pending_close_tile: Option<GuiTileId>,
+    save_in_flight: HashSet<GuiTileId>,
+    save_requested_after_in_flight: HashSet<GuiTileId>,
     pending_app_quit: bool,
     search_query: String,
     search_history: Vec<String>,

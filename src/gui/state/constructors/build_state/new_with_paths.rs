@@ -117,6 +117,8 @@ impl KfnotepadGui {
             replacement_overwrite_mode: false,
             pending_project_open: None,
             pending_close_tile: None,
+            save_in_flight: HashSet::new(),
+            save_requested_after_in_flight: HashSet::new(),
             pending_app_quit: false,
             search_query: String::new(),
             search_history: Vec::new(),

@@ -53,21 +53,19 @@ fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> Gui
             tile_id,
             result,
         } => {
-            handle_save_active_tile_completed(state, tile_id, result);
-            handled_none()
+            GuiDispatchResult::Handled(handle_save_active_tile_completed(state, tile_id, result))
         }
         Message::SaveActiveTileAsCompleted {
             tile_id,
             requested_path,
             result,
         } => {
-            handle_save_active_tile_as_completed(
+            GuiDispatchResult::Handled(handle_save_active_tile_as_completed(
                 state,
                 tile_id,
                 requested_path,
                 result,
-            );
-            handled_none()
+            ))
         }
         Message::SaveAsPromptRequested => GuiDispatchResult::Handled(state.request_save_as_dialog()),
         Message::SaveAsDialogSelected(path) => {

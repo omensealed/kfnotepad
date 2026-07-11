@@ -402,6 +402,65 @@ fn gui_save_async_completion_keeps_dirty_when_text_changed_before_finish() {
 }
 
 #[test]
+fn gui_repeated_save_requests_coalesce_to_one_follow_up_per_tile() {
+    let temp = TempArea::new("gui-save-coalescing");
+    let path = temp.path("note.txt");
+    fs::write(&path, "original\n").expect("write original");
+    let mut state = KfnotepadGui::new(GuiLaunch {
+        requested_paths: vec![path.clone()],
+    });
+    state
+        .panes
+        .get_mut(state.active_pane)
+        .expect("active pane")
+        .editor = GuiEditorAdapter::from_text("saved\n");
+    let tile_id = state.workspace.active_tile().id;
+
+    let _first = update(&mut state, Message::SaveRequested);
+    let source_revision = state.workspace.active_tile().document.buffer.edit_revision();
+    let _second = update(&mut state, Message::SaveRequested);
+    let _third = update(&mut state, Message::SaveRequested);
+
+    assert!(state.save_in_flight.contains(&tile_id));
+    assert!(state.save_requested_after_in_flight.contains(&tile_id));
+    assert_eq!(state.save_in_flight.len(), 1);
+
+    fs::write(&path, "saved\n").expect("simulate first save");
+    let snapshot = gui_file_snapshot(&path)
+        .expect("snapshot first save")
+        .expect("first saved file");
+    let _follow_up = update(
+        &mut state,
+        Message::SaveActiveTileCompleted {
+            tile_id,
+            result: Ok(GuiSaveResult {
+                source_revision,
+                snapshot,
+            }),
+        },
+    );
+
+    assert!(state.save_in_flight.contains(&tile_id));
+    assert!(!state.save_requested_after_in_flight.contains(&tile_id));
+
+    let follow_up_revision = state.workspace.active_tile().document.buffer.edit_revision();
+    let snapshot = gui_file_snapshot(&path)
+        .expect("snapshot follow-up")
+        .expect("follow-up file");
+    let _ = update(
+        &mut state,
+        Message::SaveActiveTileCompleted {
+            tile_id,
+            result: Ok(GuiSaveResult {
+                source_revision: follow_up_revision,
+                snapshot,
+            }),
+        },
+    );
+    assert!(!state.save_in_flight.contains(&tile_id));
+}
+
+#[test]
 fn gui_search_next_and_previous_update_shared_and_editor_cursor() {
     let temp = TempArea::new("gui-search-next-prev");
     let file = temp.path("search.txt");

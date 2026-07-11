@@ -61,3 +61,7 @@ editor text snapshot and records the buffer edit revision plus expected disk sna
 text through the existing conflict-checked atomic adapter and returns the final `FileSnapshot`. Completion compares
 revisions instead of complete strings, does not reopen the file, and performs no redundant snapshot refresh. If edits
 occur during the write, the returned disk snapshot is retained and the newer buffer remains dirty.
+
+Each GUI tile now permits at most one save worker. Repeated Save commands set one coalesced follow-up bit; completion
+launches exactly one save of that tile's latest state without changing focus. Save As refuses to race an existing save
+for the same tile.
