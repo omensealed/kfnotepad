@@ -83,8 +83,12 @@ mod editor_search_undo;
 mod editor_themes_preferences;
 #[path = "tests/editor_workspace_tabs.rs"]
 mod editor_workspace_tabs;
-#[path = "tests/menu_input_and_wrap.rs"]
-mod menu_input_and_wrap;
+#[path = "tests/input_paste_modes.rs"]
+mod input_paste_modes;
+#[path = "tests/input_viewport_wrap.rs"]
+mod input_viewport_wrap;
+#[path = "tests/menu_commands.rs"]
+mod menu_commands;
 #[path = "tests/render_chrome_layout.rs"]
 mod render_chrome_layout;
 #[path = "tests/render_interactions.rs"]
