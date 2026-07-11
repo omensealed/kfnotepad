@@ -68,14 +68,15 @@ pub(crate) struct MouseContext {
 }
 
 include!("input/events.rs");
-mod sidebar;
-include!("input/workspaces.rs");
 mod editor_commands;
 mod runtime;
+mod sidebar;
+mod workspaces;
 
 pub(crate) use editor_commands::*;
 pub(crate) use runtime::*;
 pub(crate) use sidebar::*;
+pub(crate) use workspaces::*;
 
 #[cfg(test)]
 mod tests {
