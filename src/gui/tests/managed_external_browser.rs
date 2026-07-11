@@ -241,6 +241,28 @@ fn gui_external_file_change_detects_same_size_coarse_mtime_rewrite() {
 }
 
 #[test]
+fn gui_external_file_check_does_not_overlap_in_flight_scan() {
+    let temp = TempArea::new("gui-external-in-flight");
+    let file = temp.path("watched.txt");
+    fs::write(&file, "one\n").expect("write file");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: vec![file],
+        },
+        temp.root.clone(),
+    );
+
+    assert!(!state.external_file_check_in_flight);
+    let _first = state.request_external_file_check();
+    assert!(state.external_file_check_in_flight);
+    let _second = state.request_external_file_check();
+    assert!(state.external_file_check_in_flight);
+
+    state.complete_external_file_check(Vec::new());
+    assert!(!state.external_file_check_in_flight);
+}
+
+#[test]
 fn gui_external_file_unlock_allows_editing_again() {
     let temp = TempArea::new("gui-external-unlock");
     let file = temp.path("watched.txt");

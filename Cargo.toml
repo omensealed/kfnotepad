@@ -2,7 +2,7 @@
 name = "kfnotepad"
 version = "0.1.1"
 edition = "2021"
-description = "Terminal notepad for local UTF-8 text files."
+description = "Local UTF-8 text editor with terminal and desktop front ends."
 license = "AGPL-3.0-or-later"
 publish = false
 

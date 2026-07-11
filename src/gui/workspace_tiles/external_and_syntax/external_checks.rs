@@ -41,12 +41,31 @@ impl KfnotepadGui {
             .collect()
     }
 
-    pub(super) fn request_external_file_check(&self) -> Task<Message> {
+    pub(super) fn request_external_file_check(&mut self) -> Task<Message> {
+        if self.external_file_check_in_flight {
+            return Task::none();
+        }
+
         let candidates = self.external_file_check_candidates();
+        if candidates.is_empty() {
+            return Task::none();
+        }
+
+        self.external_file_check_in_flight = true;
         Task::perform(
             async move { check_external_file_changes_async(candidates).await },
             Message::ExternalFileCheckCompleted,
         )
+    }
+
+    pub(super) fn complete_external_file_check(
+        &mut self,
+        results: Vec<GuiExternalFileCheckResult>,
+    ) {
+        self.external_file_check_in_flight = false;
+        for result in results {
+            self.apply_external_file_check_result(result);
+        }
     }
 
     pub(super) fn apply_external_file_check_result(&mut self, result: GuiExternalFileCheckResult) {

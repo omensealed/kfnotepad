@@ -48,7 +48,5 @@ fn handle_external_file_check_completed(
     state: &mut KfnotepadGui,
     results: Vec<GuiExternalFileCheckResult>,
 ) {
-    for result in results {
-        state.apply_external_file_check_result(result);
-    }
+    state.complete_external_file_check(results);
 }
