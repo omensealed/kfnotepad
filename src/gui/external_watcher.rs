@@ -142,6 +142,10 @@ mod tests {
     }
 
     #[test]
+    #[cfg_attr(
+        target_os = "macos",
+        ignore = "hosted macOS FSEvents does not reliably deliver file notifications"
+    )]
     fn watcher_service_reports_changed_file_without_recreation() {
         let temp = WatcherTempArea::new();
         let document = temp.root.join("watched.txt");

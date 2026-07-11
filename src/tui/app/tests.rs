@@ -71,8 +71,16 @@ fn sidebar_fixture(count: usize) -> FileSidebarState {
     }
 }
 
-#[path = "tests/editor_commands.rs"]
-mod editor_commands;
+#[path = "tests/editor_navigation_editing.rs"]
+mod editor_navigation_editing;
+#[path = "tests/editor_reader.rs"]
+mod editor_reader;
+#[path = "tests/editor_save_conflicts.rs"]
+mod editor_save_conflicts;
+#[path = "tests/editor_search_undo.rs"]
+mod editor_search_undo;
+#[path = "tests/editor_themes_preferences.rs"]
+mod editor_themes_preferences;
 #[path = "tests/editor_workspace_tabs.rs"]
 mod editor_workspace_tabs;
 #[path = "tests/menu_input_and_wrap.rs"]
