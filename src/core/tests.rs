@@ -2267,6 +2267,67 @@ fn bulk_insert_empty_text_is_unchanged() {
 }
 
 #[test]
+fn insert_operations_reject_growth_beyond_text_limit_without_mutation() {
+    let limit = usize::try_from(MAX_TEXT_FILE_BYTES).expect("text limit fits usize");
+    let original = "x".repeat(limit);
+    let mut buffer = TextBuffer::from_text(&original);
+
+    assert_eq!(
+        buffer.insert_char(0, limit, 'y'),
+        Err(BufferError::TooLarge {
+            bytes: limit + 1,
+            limit,
+        })
+    );
+    assert_eq!(
+        buffer.insert_newline(0, limit),
+        Err(BufferError::TooLarge {
+            bytes: limit + 1,
+            limit,
+        })
+    );
+    assert_eq!(
+        buffer.insert_text(
+            Cursor {
+                row: 0,
+                column: limit
+            },
+            "yz"
+        ),
+        Err(BufferError::TooLarge {
+            bytes: limit + 2,
+            limit,
+        })
+    );
+
+    assert_eq!(buffer.to_text(), original);
+    assert!(!buffer.is_dirty());
+    assert!(buffer.undo_history.is_empty());
+}
+
+#[test]
+fn overwrite_at_text_limit_allows_equal_bytes_and_rejects_growth() {
+    let limit = usize::try_from(MAX_TEXT_FILE_BYTES).expect("text limit fits usize");
+    let mut buffer = TextBuffer::from_text(&"x".repeat(limit));
+
+    buffer
+        .replace_char(0, 0, 'y')
+        .expect("equal-byte overwrite remains within limit");
+    assert_eq!(buffer.byte_len(), limit);
+    assert_eq!(
+        buffer.replace_char(0, 1, '界'),
+        Err(BufferError::TooLarge {
+            bytes: limit + 2,
+            limit,
+        })
+    );
+    assert_eq!(
+        buffer.line(0).and_then(|line| line.chars().nth(1)),
+        Some('x')
+    );
+}
+
+#[test]
 fn large_file_undo_history_uses_byte_budget_and_remains_responsive() {
     let base_size = usize::try_from(MAX_TEXT_FILE_BYTES.saturating_sub(1024))
         .expect("max text byte limit fits in usize");

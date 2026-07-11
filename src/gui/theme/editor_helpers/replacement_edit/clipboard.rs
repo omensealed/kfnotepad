@@ -32,6 +32,18 @@ pub(super) fn gui_editor_replacement_paste_text(
         return;
     }
 
+    let selected_bytes = selection
+        .and_then(|selection| gui_editor_replacement_selected_text(document, selection))
+        .map_or(0, |selected| selected.len());
+    let projected_bytes = document
+        .buffer
+        .byte_len()
+        .saturating_sub(selected_bytes)
+        .saturating_add(text.len());
+    if document.buffer.ensure_byte_len(projected_bytes).is_err() {
+        return;
+    }
+
     document.with_compound_edit(|document| {
         delete_gui_editor_replacement_selection(document, cursor, selection);
         if let Ok(next_cursor) = document.buffer.insert_text(*cursor, text) {

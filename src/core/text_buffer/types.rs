@@ -50,5 +50,6 @@ pub(crate) enum CompoundEditState {
 pub enum BufferError {
     RowOutOfBounds { row: usize, rows: usize },
     ColumnOutOfBounds { column: usize, columns: usize },
+    TooLarge { bytes: usize, limit: usize },
     UseInsertNewline,
 }

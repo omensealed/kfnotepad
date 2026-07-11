@@ -11,10 +11,16 @@ pub(crate) fn insert_paste(
     }
     if can_bulk_insert_paste(runtime) {
         runtime.quit_confirmation_pending = false;
-        if let Ok(next_cursor) = document.buffer.insert_text(*cursor, &normalized) {
-            *cursor = next_cursor;
-            stop_reader_mode_for_edit(runtime);
-            runtime.status = String::from("Modified");
+        match document.buffer.insert_text(*cursor, &normalized) {
+            Ok(next_cursor) => {
+                *cursor = next_cursor;
+                stop_reader_mode_for_edit(runtime);
+                runtime.status = String::from("Modified");
+            }
+            Err(BufferError::TooLarge { limit, .. }) => {
+                runtime.status = format!("Paste exceeds {limit} byte limit");
+            }
+            Err(_) => {}
         }
         return false;
     }

@@ -35,12 +35,13 @@ use kfnotepad::{
     page_up as shared_page_up, parse_args, parse_gui_workspace_project, redo_document_edit,
     repeat_search_next_with_mode, repeat_search_previous_with_mode, save_editor_settings,
     save_gui_workspace_project, save_text_document, summarize_path, summarize_text,
-    tui_help_document_text, undo_document_edit, CloseActiveTabResult, Command, Cursor, CursorMove,
-    EditResult, EditorSettings, EditorTab, EditorTabDocument, EditorTabState, EditorWorkspace,
-    FileSidebarEntry, FileSidebarEntryKind, FileSidebarState, GoToLineResult, GuiWorkspaceProject,
-    GuiWorkspaceProjectDeleteResult, SearchMode, SearchRepeatResult, SyntaxHighlighter,
-    TabStripItem, TextDocument, UndoRedoResult, DEFAULT_GUI_READER_LINES_PER_MINUTE,
-    MAX_GUI_READER_LINES_PER_MINUTE, MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
+    tui_help_document_text, undo_document_edit, BufferError, CloseActiveTabResult, Command, Cursor,
+    CursorMove, EditResult, EditorSettings, EditorTab, EditorTabDocument, EditorTabState,
+    EditorWorkspace, FileSidebarEntry, FileSidebarEntryKind, FileSidebarState, GoToLineResult,
+    GuiWorkspaceProject, GuiWorkspaceProjectDeleteResult, SearchMode, SearchRepeatResult,
+    SyntaxHighlighter, TabStripItem, TextDocument, UndoRedoResult,
+    DEFAULT_GUI_READER_LINES_PER_MINUTE, MAX_GUI_READER_LINES_PER_MINUTE,
+    MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
 };
 
 const TAB_WIDTH: usize = 4;
@@ -105,5 +106,27 @@ mod tests {
             cursor_at_mouse(&document, 7, 1, &runtime, context),
             Some(Cursor { row: 0, column: 2 })
         );
+    }
+
+    #[test]
+    fn paste_rejects_text_beyond_file_limit_without_mutation() {
+        let limit = usize::try_from(kfnotepad::MAX_TEXT_FILE_BYTES).expect("text limit fits usize");
+        let original = "x".repeat(limit);
+        let mut document = TextDocument {
+            path: PathBuf::from("note.txt"),
+            buffer: kfnotepad::TextBuffer::from_text(&original),
+        };
+        let mut cursor = Cursor {
+            row: 0,
+            column: limit,
+        };
+        let mut runtime = EditorRuntime::default();
+
+        insert_paste(&mut document, &mut cursor, &mut runtime, "y");
+
+        assert_eq!(document.buffer.to_text(), original);
+        assert_eq!(cursor.column, limit);
+        assert_eq!(runtime.status, format!("Paste exceeds {limit} byte limit"));
+        assert!(!document.buffer.is_dirty());
     }
 }

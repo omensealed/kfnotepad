@@ -1659,6 +1659,60 @@ fn gui_editor_replacement_paste_advances_cursor_to_combining_grapheme_end() {
 }
 
 #[test]
+fn gui_editor_replacement_paste_rejects_oversized_result_atomically() {
+    let limit = usize::try_from(kfnotepad::MAX_TEXT_FILE_BYTES).expect("text limit fits usize");
+    let original = format!("x\n{}", "x".repeat(limit - 2));
+    let mut document = TextDocument {
+        path: PathBuf::from("oversized-paste.txt"),
+        buffer: TextBuffer::from_text(&original),
+    };
+    let mut cursor = DocumentCursor { row: 0, column: 1 };
+    let mut viewport = GuiEditorViewportState::new(3);
+    let mut selection = Some(GuiEditorReplacementSelection {
+        anchor: DocumentCursor { row: 0, column: 0 },
+        focus: DocumentCursor { row: 0, column: 1 },
+    });
+
+    gui_editor_replacement_paste_text(
+        &mut document,
+        &mut cursor,
+        &mut viewport,
+        &mut selection,
+        "three bytes",
+    );
+
+    assert_eq!(document.buffer.to_text(), original);
+    assert_eq!(cursor, DocumentCursor { row: 0, column: 1 });
+    assert!(selection.is_some());
+    assert!(!document.buffer.is_dirty());
+}
+
+#[test]
+fn gui_editor_replacement_typed_insert_rejects_text_limit_without_cursor_move() {
+    let limit = usize::try_from(kfnotepad::MAX_TEXT_FILE_BYTES).expect("text limit fits usize");
+    let original = format!("x\n{}", "x".repeat(limit - 2));
+    let mut document = TextDocument {
+        path: PathBuf::from("typed-limit.txt"),
+        buffer: TextBuffer::from_text(&original),
+    };
+    let mut cursor = DocumentCursor { row: 0, column: 1 };
+    let mut viewport = GuiEditorViewportState::new(3);
+    let mut selection = None;
+
+    apply_gui_editor_replacement_input(
+        &mut document,
+        &mut cursor,
+        &mut viewport,
+        &mut selection,
+        GuiEditorReplacementInput::InsertChar('y'),
+    );
+
+    assert_eq!(document.buffer.to_text(), original);
+    assert_eq!(cursor, DocumentCursor { row: 0, column: 1 });
+    assert!(!document.buffer.is_dirty());
+}
+
+#[test]
 fn gui_editor_replacement_mouse_point_maps_viewport_to_clamped_cursor() {
     let document = TextDocument {
         path: PathBuf::from("mouse.txt"),

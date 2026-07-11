@@ -21,19 +21,25 @@ fn insert_typed_character_internal(
     } else {
         document.buffer.insert_char(cursor.row, cursor.column, value)
     };
-    if result.is_ok() {
-        let inserted_end = cursor.column.saturating_add(1);
-        cursor.column = document
-            .buffer
-            .grapheme_range_end_boundary_column(cursor.row, inserted_end)
-            .unwrap_or(inserted_end);
-        stop_reader_mode_for_edit(runtime);
-        runtime.status = if runtime.overwrite_mode {
-            String::from("Modified overwrite")
-        } else {
-            String::from("Modified")
-        };
-        return true;
+    match result {
+        Ok(()) => {
+            let inserted_end = cursor.column.saturating_add(1);
+            cursor.column = document
+                .buffer
+                .grapheme_range_end_boundary_column(cursor.row, inserted_end)
+                .unwrap_or(inserted_end);
+            stop_reader_mode_for_edit(runtime);
+            runtime.status = if runtime.overwrite_mode {
+                String::from("Modified overwrite")
+            } else {
+                String::from("Modified")
+            };
+            true
+        }
+        Err(BufferError::TooLarge { limit, .. }) => {
+            runtime.status = format!("Document reached {limit} byte limit");
+            false
+        }
+        Err(_) => false,
     }
-    false
 }

@@ -47,6 +47,19 @@ impl TextBuffer {
         self.edit_revision
     }
 
+    pub fn byte_len(&self) -> usize {
+        buffer_bytes(&self.lines, self.trailing_newline)
+    }
+
+    pub fn ensure_byte_len(&self, bytes: usize) -> Result<(), BufferError> {
+        let limit = usize::try_from(MAX_TEXT_FILE_BYTES).unwrap_or(usize::MAX);
+        if bytes > limit {
+            Err(BufferError::TooLarge { bytes, limit })
+        } else {
+            Ok(())
+        }
+    }
+
     pub fn mark_clean(&mut self) {
         self.dirty = false;
         self.undo_history.clear();

@@ -19,6 +19,7 @@ fn handle_editor_edit(
     if GUI_USE_READ_ONLY_EDITOR_RENDERER {
         if let text_editor::Action::Edit(ref edit) = action {
             if let Some(inputs) = replacement_inputs_from_edit(edit) {
+                state.sync_pane_cursor_to_document(pane);
                 state.apply_replacement_editor_inputs_to_active_tile(inputs);
                 return Task::none();
             }

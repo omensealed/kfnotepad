@@ -22,6 +22,22 @@ impl KfnotepadGui {
             self.status_message = "clipboard is empty".to_string();
             return;
         };
+        let selected_bytes = self
+            .active_editor_selection()
+            .map_or(0, |selection| selection.len());
+        let tile = self.workspace.active_tile();
+        let projected_bytes = tile
+            .document
+            .buffer
+            .byte_len()
+            .saturating_sub(selected_bytes)
+            .saturating_add(contents.len());
+        if let Err(BufferError::TooLarge { limit, .. }) =
+            tile.document.buffer.ensure_byte_len(projected_bytes)
+        {
+            self.status_message = format!("paste exceeds {limit} byte limit");
+            return;
+        }
         self.perform_active_editor_command(GuiEditorCommand::Paste(contents), "pasted clipboard");
     }
 

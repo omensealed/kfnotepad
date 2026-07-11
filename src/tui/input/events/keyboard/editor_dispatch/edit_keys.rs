@@ -32,15 +32,20 @@ fn handle_editor_edit_key(
         }
         (_, KeyCode::Enter) => {
             runtime.quit_confirmation_pending = false;
-            if document
+            match document
                 .buffer
                 .insert_newline(cursor.row, cursor.column)
-                .is_ok()
             {
-                cursor.row += 1;
-                cursor.column = 0;
-                stop_reader_mode_for_edit(runtime);
-                runtime.status = String::from("Modified");
+                Ok(()) => {
+                    cursor.row += 1;
+                    cursor.column = 0;
+                    stop_reader_mode_for_edit(runtime);
+                    runtime.status = String::from("Modified");
+                }
+                Err(BufferError::TooLarge { limit, .. }) => {
+                    runtime.status = format!("Document reached {limit} byte limit");
+                }
+                Err(_) => {}
             }
         }
         (_, KeyCode::BackTab) | (KeyModifiers::SHIFT, KeyCode::Tab) => {

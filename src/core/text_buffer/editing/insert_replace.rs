@@ -4,6 +4,8 @@ impl TextBuffer {
         if text.is_empty() {
             return Ok(cursor);
         }
+        let next_bytes = self.byte_len().saturating_add(text.len());
+        self.ensure_byte_len(next_bytes)?;
 
         let byte_index = {
             let line = &self.lines[cursor.row];
@@ -66,6 +68,9 @@ impl TextBuffer {
             byte_index_for_char_column(line, column)?
         };
 
+        let next_bytes = self.byte_len().saturating_add(value.len_utf8());
+        self.ensure_byte_len(next_bytes)?;
+
         self.record_undo_for_typed_insert(row, column);
         let line = self
             .lines
@@ -114,6 +119,13 @@ impl TextBuffer {
             byte_index_for_char_column(line, end_column)?
         };
 
+        let removed_bytes = end.saturating_sub(start);
+        let next_bytes = self
+            .byte_len()
+            .saturating_sub(removed_bytes)
+            .saturating_add(value.len_utf8());
+        self.ensure_byte_len(next_bytes)?;
+
         self.break_undo_group();
         self.record_undo();
         let line = self
@@ -134,6 +146,9 @@ impl TextBuffer {
                 .ok_or(BufferError::RowOutOfBounds { row, rows })?;
             byte_index_for_char_column(line, column)?
         };
+
+        let next_bytes = self.byte_len().saturating_add(1);
+        self.ensure_byte_len(next_bytes)?;
 
         self.break_undo_group();
         self.record_undo();

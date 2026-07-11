@@ -44,6 +44,8 @@ kfnotepad --notes
   non-note extensions, non-UTF-8 names, and symlinks. A missing managed-notes directory lists as empty.
 - Open rejects missing paths, directories, symlinks, non-regular filesystem targets such as FIFOs, sockets, and
   devices, non-UTF-8 data, and files larger than 8 MiB.
+- Editing cannot grow a document beyond 8 MiB. Typed input, newline insertion, overwrite growth, and paste are rejected
+  before changing text or undo history; the status line reports the limit.
 - Save writes through the tested adapter: temporary sibling file, flush, atomic rename, symlink save-target rejection,
   directory and other non-regular save-target rejection, existing permission preservation, `0o600` new-file mode on
   Unix, and best-effort temp cleanup on failure.

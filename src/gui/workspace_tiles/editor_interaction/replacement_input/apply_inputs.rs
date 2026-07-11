@@ -34,7 +34,9 @@ impl KfnotepadGui {
         let Some(tile) = self.workspace.tile_mut(tile_id) else {
             return;
         };
+        let mut applied_editor_inputs = Vec::with_capacity(inputs.len());
         for input in inputs.iter() {
+            let revision_before = tile.document.buffer.edit_revision();
             apply_gui_editor_replacement_input_with_mode(
                 &mut tile.document,
                 &mut tile.state.cursor,
@@ -43,6 +45,10 @@ impl KfnotepadGui {
                 self.replacement_overwrite_mode,
                 *input,
             );
+            let input_mutates_text = gui_replacement_inputs_mutates_text(std::slice::from_ref(input));
+            if !input_mutates_text || tile.document.buffer.edit_revision() != revision_before {
+                applied_editor_inputs.push(*input);
+            }
         }
         let cursor = tile.state.cursor;
         if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
@@ -50,11 +56,11 @@ impl KfnotepadGui {
                 let can_sync_editor = !self.replacement_overwrite_mode
                     && initial_replacement_selection.is_none()
                     && replacement_selection.is_none()
-                    && inputs
+                    && applied_editor_inputs
                         .iter()
                         .all(Self::gui_editor_replacement_input_has_editor_delta_binding);
                 if can_sync_editor {
-                    for input in inputs.iter() {
+                    for input in applied_editor_inputs.iter() {
                         Self::gui_editor_replacement_input_apply_delta_to_editor(
                             &mut pane_state.editor,
                             input,
