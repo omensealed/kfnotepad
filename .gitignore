@@ -12,6 +12,7 @@ Thumbs.db
 .agent-starter/
 AGENTS.md
 FIRST_PROMPT.md
+IMPLEMENTATION_NOTES.md
 START_AGENT.sh
 .codex-log/
 tmp/
