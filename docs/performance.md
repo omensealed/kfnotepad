@@ -49,4 +49,6 @@ directory reads. Root changes, expansion, explicit refresh, create, and delete r
 updates cached flags. The unused parallel `iced-swdir-tree` state and dependency were removed. Directory loading is
 Recursive cache rebuilding now runs in a blocking worker and carries a monotonic generation; stale results cannot
 replace a newer root or expansion request. The last valid cache remains renderable while a replacement loads. The
-core sidebar's single-directory `load`/`refresh` operation is still synchronous and is the next browser I/O boundary.
+Root navigation and explicit refresh now run the core sidebar's single-directory load in the same blocking worker as
+recursive row construction. Create and delete flows propagate the refresh task instead of dropping it. Startup still
+builds the initial browser model synchronously before the first window and is the remaining browser I/O boundary.

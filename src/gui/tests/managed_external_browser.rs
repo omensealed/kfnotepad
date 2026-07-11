@@ -717,6 +717,32 @@ fn gui_file_tree_rejects_stale_background_rows() {
 }
 
 #[test]
+fn gui_browser_rejects_stale_background_root_load() {
+    let temp = TempArea::new("gui-browser-stale-root");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: Vec::new(),
+        },
+        temp.root.clone(),
+    );
+    let original_root = state.current_browser_dir();
+    let stale = GuiBrowserLoadResult {
+        browser: state.browser.as_ref().expect("browser").clone(),
+        rows: Vec::new(),
+        selected_path: None,
+        expanded_paths: HashSet::new(),
+    };
+    state.browser_tree_generation = 2;
+    state.browser_tree_loading = true;
+
+    state.apply_browser_load(1, Ok(stale));
+
+    assert_eq!(state.current_browser_dir(), original_root);
+    assert!(state.browser_tree_loading);
+    assert!(!state.browser_tree_rows.is_empty());
+}
+
+#[test]
 fn gui_browser_create_file_creates_refreshes_and_opens_new_file() {
     let temp = TempArea::new("gui-browser-create-file");
     let mut state = KfnotepadGui::new_with_paths(

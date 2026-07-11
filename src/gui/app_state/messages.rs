@@ -8,6 +8,10 @@ pub(crate) enum Message {
         generation: u64,
         result: Result<Vec<GuiFileTreeRowModel>, String>,
     },
+    BrowserLoaded {
+        generation: u64,
+        result: Result<GuiBrowserLoadResult, String>,
+    },
     BrowserParentRequested,
     BrowserRefreshRequested,
     BrowserCreateFileRequested,

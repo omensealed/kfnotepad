@@ -13,6 +13,10 @@ fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> Gui
             state.apply_cached_file_tree_rows(generation, result);
             handled_none()
         }
+        Message::BrowserLoaded { generation, result } => {
+            state.apply_browser_load(generation, result);
+            handled_none()
+        }
         Message::BrowserParentRequested => GuiDispatchResult::Handled(state.navigate_browser_parent()),
         Message::BrowserRefreshRequested => GuiDispatchResult::Handled(state.refresh_file_browser()),
         Message::BrowserCreateFileRequested => {

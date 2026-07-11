@@ -25,12 +25,10 @@ impl KfnotepadGui {
                 Task::none()
             }
             GuiPathPrompt::BrowserCreateFile => {
-                self.submit_browser_create_file_prompt(&raw_path);
-                Task::none()
+                self.submit_browser_create_file_prompt(&raw_path)
             }
             GuiPathPrompt::BrowserCreateDirectory => {
-                self.submit_browser_create_directory_prompt(&raw_path);
-                Task::none()
+                self.submit_browser_create_directory_prompt(&raw_path)
             }
         }
     }

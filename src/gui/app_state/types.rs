@@ -105,3 +105,11 @@ impl GuiFileTreeRowModel {
         &self.path
     }
 }
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub(super) struct GuiBrowserLoadResult {
+    pub(super) browser: kfnotepad::GuiFileBrowser,
+    pub(super) rows: Vec<GuiFileTreeRowModel>,
+    pub(super) selected_path: Option<PathBuf>,
+    pub(super) expanded_paths: HashSet<PathBuf>,
+}

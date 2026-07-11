@@ -69,22 +69,6 @@ impl KfnotepadGui {
         self.pending_browser_delete = None;
     }
 
-    pub(super) fn rebuild_cached_file_tree_rows_now(&mut self) {
-        let Some(root) = self
-            .browser
-            .as_ref()
-            .map(|browser| browser.sidebar.current_dir.clone())
-        else {
-            self.browser_tree_rows.clear();
-            return;
-        };
-        self.browser_tree_rows = gui_file_tree_rows(
-            &root,
-            &self.browser_expanded_paths,
-            self.browser_selected_path.as_deref(),
-        );
-    }
-
     pub(super) fn request_cached_file_tree_rows(&mut self) -> Task<Message> {
         let Some(root) = self
             .browser
