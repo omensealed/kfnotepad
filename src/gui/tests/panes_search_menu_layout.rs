@@ -1059,8 +1059,6 @@ fn gui_menu_styles_use_app_theme_palette() {
     assert_eq!(GUI_HEADER_GROUP_SPACING, 6);
     assert_eq!(GUI_HEADER_SPLIT_SPACING, 3);
     assert_eq!(GUI_MENU_ITEM_PADDING, [3, 5]);
-    assert_eq!(GUI_ICON_BUTTON_SIDE, 22.0);
-    assert_eq!(GUI_TILE_CONTROL_BUTTON_SIDE, 24.0);
     assert_eq!(gui_icon_font(), iced_fonts::NERD_FONT);
     assert_eq!(GUI_ICON_LINE_HEIGHT, 1.0);
     assert_eq!(GUI_PANEL_PADDING_LEFT, 2.0);
@@ -1169,9 +1167,6 @@ fn gui_tile_window_chrome_uses_compact_gapped_layout() {
     assert_eq!(GUI_PANEL_SECTION_SPACING, 6);
     assert_eq!(GUI_PANEL_TREE_TOP_PADDING, 4.0);
     assert_eq!(GUI_CHROME_PADDING, [3, 5]);
-    let global_icon_side = GUI_ICON_BUTTON_SIDE;
-    let tile_control_side = GUI_TILE_CONTROL_BUTTON_SIDE;
-    assert!(global_icon_side < tile_control_side);
     assert_eq!(GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES, 32);
     assert_eq!(GUI_LINE_NUMBER_SEPARATOR_WIDTH, 1.0);
     assert_eq!(GUI_EDITOR_SCROLLBAR_WIDTH, 6.0);

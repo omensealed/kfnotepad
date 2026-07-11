@@ -20,8 +20,4 @@ impl<B: TerminalBackend> TerminalSession<B> {
     pub(crate) fn uses_alternate_screen(&self) -> bool {
         self.backend.uses_alternate_screen()
     }
-
-    pub(crate) fn uses_raw_mode(&self) -> bool {
-        self.backend.uses_raw_mode()
-    }
 }

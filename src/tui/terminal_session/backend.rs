@@ -21,9 +21,6 @@ pub(crate) trait TerminalBackend {
     fn uses_alternate_screen(&self) -> bool {
         false
     }
-    fn uses_raw_mode(&self) -> bool {
-        false
-    }
 }
 
 pub(crate) struct CrosstermBackend {
@@ -106,7 +103,4 @@ impl TerminalBackend for CrosstermBackend {
         self.alternate_screen_active
     }
 
-    fn uses_raw_mode(&self) -> bool {
-        true
-    }
 }

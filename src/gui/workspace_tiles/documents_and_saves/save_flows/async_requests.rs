@@ -67,6 +67,7 @@ impl KfnotepadGui {
         )
     }
 
+    #[cfg(not(test))]
     pub(super) fn request_save_active_tile_as(&mut self, path: PathBuf) -> Task<Message> {
         let Some(tile_id) = self
             .panes

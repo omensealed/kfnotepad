@@ -73,18 +73,12 @@ impl KfnotepadGui {
         }
     }
 
+    #[cfg(test)]
     pub(super) fn handle_open_dialog_selected(&mut self, path: Option<PathBuf>) -> Task<Message> {
         match path {
             Some(path) => {
-                #[cfg(test)]
-                {
-                    let _opened = self.open_path_in_new_pane(path);
-                    Task::none()
-                }
-                #[cfg(not(test))]
-                {
-                    self.open_path_in_new_pane_async(path)
-                }
+                let _opened = self.open_path_in_new_pane(path);
+                Task::none()
             }
             None => {
                 self.status_message = "open canceled".to_string();

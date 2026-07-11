@@ -4,10 +4,12 @@ pub(crate) enum Message {
     BrowserLocalTreeToggle(PathBuf),
     BrowserLocalTreeSelected(PathBuf, bool),
     BrowserLocalTreeActivated(PathBuf, bool),
+    #[cfg_attr(test, allow(dead_code))]
     BrowserTreeRowsLoaded {
         generation: u64,
         result: Result<Vec<GuiFileTreeRowModel>, String>,
     },
+    #[cfg_attr(test, allow(dead_code))]
     BrowserLoaded {
         generation: u64,
         result: Result<GuiBrowserLoadResult, String>,
@@ -24,6 +26,7 @@ pub(crate) enum Message {
     PaneDragged(pane_grid::DragEvent),
     NewTileRequested,
     OpenPromptRequested,
+    #[cfg(test)]
     OpenDialogSelected(Option<PathBuf>),
     OpenDialogSelectedAsync(Option<PathBuf>),
     SaveAsPromptRequested,
@@ -36,6 +39,7 @@ pub(crate) enum Message {
         tile_id: GuiTileId,
         result: Result<GuiSaveResult, String>,
     },
+    #[cfg_attr(test, allow(dead_code))]
     SaveActiveTileAsCompleted {
         tile_id: GuiTileId,
         requested_path: PathBuf,

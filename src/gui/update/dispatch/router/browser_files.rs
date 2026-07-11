@@ -39,6 +39,7 @@ fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> Gui
             handled_none()
         }
         Message::OpenPromptRequested => GuiDispatchResult::Handled(state.request_open_dialog()),
+        #[cfg(test)]
         Message::OpenDialogSelected(path) => {
             GuiDispatchResult::Handled(handle_open_dialog_selected(state, path))
         }

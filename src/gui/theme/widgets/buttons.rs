@@ -57,26 +57,6 @@ pub(super) fn gui_icon_font() -> Font {
     iced_fonts::NERD_FONT
 }
 
-pub(super) fn gui_centered_icon<'a>(
-    icon: &'a str,
-    settings: EditorSettings,
-) -> Element<'a, Message> {
-    container(
-        text(gui_icon_only_label(icon))
-            .font(gui_icon_font())
-            .size(gui_ui_icon_text_size(settings))
-            .line_height(GUI_ICON_LINE_HEIGHT)
-            .align_x(iced::alignment::Horizontal::Center)
-            .width(Length::Shrink)
-            .height(Length::Shrink),
-    )
-    .width(Length::Shrink)
-    .height(Length::Shrink)
-    .align_x(iced::alignment::Horizontal::Center)
-    .align_y(iced::alignment::Vertical::Center)
-    .into()
-}
-
 pub(super) fn gui_labeled_icon_button<'a>(
     icon: &'static str,
     _icon_label: &'a str,

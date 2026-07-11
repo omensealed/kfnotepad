@@ -1,3 +1,4 @@
+#[cfg(test)]
 fn render_editor_with_width_and_color(
     writer: &mut impl Write,
     document: &TextDocument,

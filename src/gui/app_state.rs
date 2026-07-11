@@ -2,8 +2,6 @@
 
 // Message/state variants are often constructed by Iced subscriptions, Tasks,
 // or tests in specific targets, so rustc reports false positives elsewhere.
-#![allow(dead_code)]
-
 use std::collections::HashSet;
 use std::path::PathBuf;
 

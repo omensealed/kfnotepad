@@ -2,8 +2,6 @@
 
 // GUI state is binary-driven but compiled through the library target for
 // feature checks and tests, which leaves false dead-code positives per target.
-#![allow(dead_code)]
-
 use std::collections::{HashMap, HashSet};
 use std::ops::Range;
 use std::path::{Component, Path, PathBuf};
@@ -37,17 +35,20 @@ use kfnotepad::{
     list_managed_notes, load_editor_settings, move_path_to_trash, open_or_create_managed_note,
     open_text_file, parse_gui_layout, parse_gui_workspace_project, redo_document_edit,
     repeat_search_next, repeat_search_previous, save_editor_settings, save_gui_layout,
-    save_gui_workspace_project, save_text_buffer, save_text_document, save_text_snapshot,
-    snapshot_text_file, snapshot_text_file_metadata, undo_document_edit, BufferError,
-    Cursor as DocumentCursor, EditorSettings, EditorTabState, EditorThemeId, FileMetadataSnapshot,
-    FileSidebarEntry, FileSidebarEntryKind, FileSnapshot, GoToLineResult, GuiCloseTileResult,
-    GuiFileBrowser, GuiFontFamily, GuiLayout, GuiLayoutAxis, GuiLayoutNode, GuiLeftPanelMode,
-    GuiLeftPanelState, GuiTileId, GuiTileSaveStatus, GuiWorkspace, GuiWorkspaceProject,
+    save_gui_workspace_project, save_text_buffer, save_text_snapshot, snapshot_text_file,
+    snapshot_text_file_metadata, undo_document_edit, BufferError, Cursor as DocumentCursor,
+    EditorSettings, EditorTabState, EditorThemeId, FileMetadataSnapshot, FileSidebarEntry,
+    FileSidebarEntryKind, FileSnapshot, GoToLineResult, GuiCloseTileResult, GuiFileBrowser,
+    GuiFontFamily, GuiLayout, GuiLayoutAxis, GuiLayoutNode, GuiLeftPanelMode, GuiLeftPanelState,
+    GuiTileId, GuiTileSaveStatus, GuiWorkspace, GuiWorkspaceProject,
     GuiWorkspaceProjectDeleteResult, GuiWorkspaceProjectEntry, ManagedNoteDeleteResult,
     ManagedNoteEntry, SearchRepeatResult, SyntaxHighlightCacheState, SyntaxHighlighter, TextBuffer,
     TextDocument, UndoRedoResult, MAX_GUI_FONT_SIZE, MAX_GUI_READER_LINES_PER_MINUTE,
     MIN_GUI_FONT_SIZE, MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
 };
+
+#[cfg(test)]
+use kfnotepad::save_text_document;
 use nerd_font_symbols as nf;
 use syntect::highlighting::Style as SyntectStyle;
 use unicode_width::UnicodeWidthChar;

@@ -43,10 +43,6 @@ impl KfnotepadGui {
         self.sync_pane_to_document(self.active_pane);
     }
 
-    pub(super) fn sync_active_editor_to_document_text(&mut self) -> Option<(GuiTileId, String)> {
-        self.sync_pane_to_document_text(self.active_pane)
-    }
-
     pub(super) fn perform_active_editor_command(
         &mut self,
         command: GuiEditorCommand,

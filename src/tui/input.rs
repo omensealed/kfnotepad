@@ -1,9 +1,5 @@
 //! Keyboard, mouse, menu, sidebar, and editor command handling for the TUI.
 
-// Input helpers are compiled through the library target but driven by the TUI
-// event loop and tests, which leaves false dead-code positives per target.
-#![allow(dead_code)]
-
 use std::env;
 use std::fs;
 use std::fs::OpenOptions;

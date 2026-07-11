@@ -1,3 +1,4 @@
+#[cfg(test)]
 pub(crate) fn render_editor(
     writer: &mut impl Write,
     document: &TextDocument,
@@ -32,6 +33,7 @@ pub(crate) fn render_editor_with_cache(
     )
 }
 
+#[cfg(test)]
 pub(crate) fn render_editor_with_width(
     writer: &mut impl Write,
     document: &TextDocument,

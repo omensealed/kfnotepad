@@ -2,8 +2,6 @@
 
 // Sidebar helpers are compiled through the library target but driven by the
 // TUI binary/runtime tests, which leaves false dead-code positives per target.
-#![allow(dead_code)]
-
 use std::io::{self, Write};
 
 use crossterm::cursor::MoveTo;

@@ -1,3 +1,4 @@
+#[cfg(test)]
 fn handle_open_dialog_selected(
     state: &mut KfnotepadGui,
     path: Option<PathBuf>,

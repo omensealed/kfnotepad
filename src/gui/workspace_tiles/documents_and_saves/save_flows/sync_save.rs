@@ -1,4 +1,5 @@
 impl KfnotepadGui {
+    #[cfg(test)]
     pub(super) fn save_active_tile(&mut self) {
         self.sync_active_editor_to_document();
         let Some(tile_id) = self
