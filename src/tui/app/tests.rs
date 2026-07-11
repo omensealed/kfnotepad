@@ -16,6 +16,9 @@ impl TempArea {
             std::env::temp_dir().join(format!("kfnotepad-main-{name}-{}", std::process::id()));
         let _ = fs::remove_dir_all(&root);
         fs::create_dir(&root).expect("create temp test directory");
+        let root = root
+            .canonicalize()
+            .expect("canonicalize temp test directory");
         Self { root }
     }
 

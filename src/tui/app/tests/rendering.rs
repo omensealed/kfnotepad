@@ -12,6 +12,7 @@ fn file_sidebar_delete_refuses_open_dirty_file_and_symlink() {
     let temp = TempArea::new("sidebar-delete-refuse");
     let dirty_path = temp.path("dirty.txt");
     let target_path = temp.path("target.txt");
+    #[cfg(unix)]
     let link_path = temp.path("link.txt");
     fs::write(&dirty_path, "dirty\n").expect("write dirty file");
     fs::write(&target_path, "target\n").expect("write target file");
