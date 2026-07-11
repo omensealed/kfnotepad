@@ -1691,6 +1691,7 @@ dependencies = [
  "notify-debouncer-mini",
  "rfd",
  "syntect",
+ "tokio",
  "trash",
  "unicode-segmentation",
  "unicode-width",

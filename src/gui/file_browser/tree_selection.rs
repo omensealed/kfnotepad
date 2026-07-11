@@ -1,11 +1,11 @@
 impl KfnotepadGui {
-    pub(super) fn toggle_local_browser_tree_path(&mut self, path: PathBuf) {
+    pub(super) fn toggle_local_browser_tree_path(&mut self, path: PathBuf) -> Task<Message> {
         if self.browser_expanded_paths.contains(&path) {
             self.browser_expanded_paths.remove(&path);
         } else {
             self.browser_expanded_paths.insert(path);
         }
-        self.refresh_cached_file_tree_rows();
+        self.request_cached_file_tree_rows()
     }
 
     pub(super) fn select_local_browser_tree_path(
@@ -69,7 +69,7 @@ impl KfnotepadGui {
         self.pending_browser_delete = None;
     }
 
-    pub(super) fn refresh_cached_file_tree_rows(&mut self) {
+    pub(super) fn rebuild_cached_file_tree_rows_now(&mut self) {
         let Some(root) = self
             .browser
             .as_ref()
@@ -83,6 +83,56 @@ impl KfnotepadGui {
             &self.browser_expanded_paths,
             self.browser_selected_path.as_deref(),
         );
+    }
+
+    pub(super) fn request_cached_file_tree_rows(&mut self) -> Task<Message> {
+        let Some(root) = self
+            .browser
+            .as_ref()
+            .map(|browser| browser.sidebar.current_dir.clone())
+        else {
+            self.browser_tree_rows.clear();
+            self.browser_tree_loading = false;
+            return Task::none();
+        };
+        let expanded_paths = self.browser_expanded_paths.clone();
+        let selected_path = self.browser_selected_path.clone();
+        self.browser_tree_generation = self.browser_tree_generation.wrapping_add(1);
+        let generation = self.browser_tree_generation;
+        self.browser_tree_loading = true;
+
+        #[cfg(test)]
+        {
+            let rows = gui_file_tree_rows(&root, &expanded_paths, selected_path.as_deref());
+            self.apply_cached_file_tree_rows(generation, Ok(rows));
+            Task::none()
+        }
+        #[cfg(not(test))]
+        Task::perform(
+            async move {
+                tokio::task::spawn_blocking(move || {
+                    gui_file_tree_rows(&root, &expanded_paths, selected_path.as_deref())
+                })
+                .await
+                .map_err(|error| format!("file tree worker failed: {error}"))
+            },
+            move |result| Message::BrowserTreeRowsLoaded { generation, result },
+        )
+    }
+
+    pub(super) fn apply_cached_file_tree_rows(
+        &mut self,
+        generation: u64,
+        result: Result<Vec<GuiFileTreeRowModel>, String>,
+    ) {
+        if generation != self.browser_tree_generation {
+            return;
+        }
+        self.browser_tree_loading = false;
+        match result {
+            Ok(rows) => self.browser_tree_rows = rows,
+            Err(error) => self.status_message = error,
+        }
     }
 
     fn update_cached_file_tree_selection(&mut self, selected_path: &Path) {

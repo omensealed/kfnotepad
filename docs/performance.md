@@ -47,4 +47,6 @@ verification. Save-time conflict validation remains independent and authoritativ
 The GUI now owns one cached custom file-tree row model. Iced view construction renders only that cache and performs no
 directory reads. Root changes, expansion, explicit refresh, create, and delete rebuild the cache; selection only
 updates cached flags. The unused parallel `iced-swdir-tree` state and dependency were removed. Directory loading is
-still synchronous in command handling and is the next boundary to move to a cancellable worker for very large folders.
+Recursive cache rebuilding now runs in a blocking worker and carries a monotonic generation; stale results cannot
+replace a newer root or expansion request. The last valid cache remains renderable while a replacement loads. The
+core sidebar's single-directory `load`/`refresh` operation is still synchronous and is the next browser I/O boundary.

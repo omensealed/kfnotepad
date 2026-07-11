@@ -16,6 +16,7 @@ pub(super) fn create_browser_file_named(&mut self, raw_name: &str) -> bool {
         }
 
         let _refresh_task = self.refresh_file_browser();
+        self.rebuild_cached_file_tree_rows_now();
         self.select_browser_path(&path);
         let opened = self.open_path_in_new_pane(path.clone());
         if opened {
@@ -38,6 +39,7 @@ pub(super) fn create_browser_file_named(&mut self, raw_name: &str) -> bool {
             Ok(()) => {
                 self.browser_expanded_paths.insert(path.clone());
                 let _refresh_task = self.refresh_file_browser();
+                self.rebuild_cached_file_tree_rows_now();
                 self.select_browser_path(&path);
                 self.status_message = format!("created directory {}", path.display());
                 true

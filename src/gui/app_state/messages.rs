@@ -4,6 +4,10 @@ pub(crate) enum Message {
     BrowserLocalTreeToggle(PathBuf),
     BrowserLocalTreeSelected(PathBuf, bool),
     BrowserLocalTreeActivated(PathBuf, bool),
+    BrowserTreeRowsLoaded {
+        generation: u64,
+        result: Result<Vec<GuiFileTreeRowModel>, String>,
+    },
     BrowserParentRequested,
     BrowserRefreshRequested,
     BrowserCreateFileRequested,

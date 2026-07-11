@@ -695,6 +695,28 @@ fn gui_file_tree_view_uses_cached_rows_until_refresh() {
 }
 
 #[test]
+fn gui_file_tree_rejects_stale_background_rows() {
+    let temp = TempArea::new("gui-browser-stale-rows");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: Vec::new(),
+        },
+        temp.root.clone(),
+    );
+    let original_rows = state.browser_tree_rows.clone();
+    state.browser_tree_generation = 2;
+    state.browser_tree_loading = true;
+
+    state.apply_cached_file_tree_rows(1, Ok(Vec::new()));
+    assert_eq!(state.browser_tree_rows, original_rows);
+    assert!(state.browser_tree_loading);
+
+    state.apply_cached_file_tree_rows(2, Ok(Vec::new()));
+    assert!(state.browser_tree_rows.is_empty());
+    assert!(!state.browser_tree_loading);
+}
+
+#[test]
 fn gui_browser_create_file_creates_refreshes_and_opens_new_file() {
     let temp = TempArea::new("gui-browser-create-file");
     let mut state = KfnotepadGui::new_with_paths(

@@ -73,6 +73,11 @@ fn gui_files_panel<'a>(
                     bottom: 0.0,
                     left: 0.0,
                 }),
+                if state.browser_tree_loading {
+                    text("Loading files...").size(gui_ui_small_text_size(state.settings))
+                } else {
+                    text("").size(gui_ui_small_text_size(state.settings))
+                },
             ]
             .spacing(GUI_PANEL_SECTION_SPACING)
             .into()

@@ -81,6 +81,8 @@ impl KfnotepadGui {
             minimized_panes,
             browser,
             browser_tree_rows,
+            browser_tree_generation: 0,
+            browser_tree_loading: false,
             browser_expanded_paths,
             browser_selected_path: None,
             browser_visible,

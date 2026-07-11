@@ -87,3 +87,21 @@ pub(crate) struct GuiMenuItem {
     pub(crate) label: &'static str,
     pub(crate) command: GuiMenuCommand,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(super) struct GuiFileTreeRowModel {
+    pub(super) path: PathBuf,
+    pub(super) label: String,
+    pub(super) kind: FileSidebarEntryKind,
+    pub(super) depth: usize,
+    pub(super) expanded: bool,
+    pub(super) selected: bool,
+    pub(super) error: bool,
+}
+
+#[cfg(test)]
+impl GuiFileTreeRowModel {
+    pub(super) fn path(&self) -> &std::path::Path {
+        &self.path
+    }
+}

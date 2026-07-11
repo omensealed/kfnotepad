@@ -7,9 +7,8 @@ pub(super) fn set_browser_root(&mut self, directory: PathBuf) -> Task<Message> {
                 self.browser_expanded_paths.clear();
                 self.browser_expanded_paths.insert(current_dir.clone());
                 self.browser_selected_path = Some(current_dir.clone());
-                self.refresh_cached_file_tree_rows();
                 self.status_message = format!("browser: {}", current_dir.display());
-                Task::none()
+                self.request_cached_file_tree_rows()
             }
             Err(error) => {
                 self.status_message = format!("file browser error: {error}");

@@ -24,9 +24,8 @@ pub(super) fn navigate_browser_parent(&mut self) -> Task<Message> {
                 {
                     self.browser_selected_path = None;
                 }
-                self.refresh_cached_file_tree_rows();
                 self.status_message = format!("refreshed {}", current_dir.display());
-                Task::none()
+                self.request_cached_file_tree_rows()
             }
             Err(error) => {
                 self.status_message = format!("file browser error: {error}");
