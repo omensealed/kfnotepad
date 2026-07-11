@@ -4,8 +4,10 @@ pub struct TextBuffer {
     pub(crate) trailing_newline: bool,
     pub(crate) dirty: bool,
     edit_revision: u64,
-    pub(crate) undo_history: Vec<BufferSnapshot>,
-    pub(crate) redo_history: Vec<BufferSnapshot>,
+    pub(crate) undo_history: VecDeque<BufferSnapshot>,
+    pub(crate) redo_history: VecDeque<BufferSnapshot>,
+    pub(crate) undo_bytes: usize,
+    pub(crate) redo_bytes: usize,
     pub(crate) insert_undo_group: Option<InsertUndoGroup>,
     pub(crate) file_snapshot: Option<FileSnapshot>,
 }

@@ -13,8 +13,10 @@ impl TextBuffer {
             trailing_newline: text.ends_with('\n'),
             dirty: false,
             edit_revision: 0,
-            undo_history: Vec::new(),
-            redo_history: Vec::new(),
+            undo_history: VecDeque::new(),
+            redo_history: VecDeque::new(),
+            undo_bytes: 0,
+            redo_bytes: 0,
             insert_undo_group: None,
             file_snapshot: None,
         }
@@ -48,6 +50,8 @@ impl TextBuffer {
         self.dirty = false;
         self.undo_history.clear();
         self.redo_history.clear();
+        self.undo_bytes = 0;
+        self.redo_bytes = 0;
         self.insert_undo_group = None;
     }
 

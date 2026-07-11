@@ -35,8 +35,15 @@ impl TextBuffer {
 
     fn record_undo(&mut self) {
         self.insert_undo_group = None;
-        self.undo_history.push(BufferSnapshot::from_buffer(self));
-        trim_undo_history(&mut self.undo_history, MAX_UNDO_HISTORY, MAX_UNDO_BYTES);
+        let snapshot = BufferSnapshot::from_buffer(self);
+        push_history_snapshot(
+            &mut self.undo_history,
+            &mut self.undo_bytes,
+            snapshot,
+            MAX_UNDO_HISTORY,
+            MAX_UNDO_BYTES,
+        );
         self.redo_history.clear();
+        self.redo_bytes = 0;
     }
 }

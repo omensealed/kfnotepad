@@ -26,7 +26,11 @@ impl KfnotepadGui {
         let requested_path = path.clone();
 
         Task::perform(
-            async move { open_text_file(&path).map_err(|error| error.to_string()) },
+            async move {
+                open_text_file(&path)
+                    .map(Box::new)
+                    .map_err(|error| error.to_string())
+            },
             move |result| Message::OpenDialogCompleted {
                 path: requested_path.clone(),
                 result,

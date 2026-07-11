@@ -146,7 +146,7 @@ impl KfnotepadGui {
                 snapshot,
                 document,
             } => {
-                self.replace_tile_document_from_external_change(tile_id, document);
+                self.replace_tile_document_from_external_change(tile_id, *document);
                 self.file_snapshots.insert(tile_id, snapshot);
                 self.external_edit_locks.insert(tile_id);
                 self.status_message =

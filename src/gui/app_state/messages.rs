@@ -30,7 +30,7 @@ pub(crate) enum Message {
     SaveAsDialogSelected(Option<PathBuf>),
     OpenDialogCompleted {
         path: PathBuf,
-        result: Result<TextDocument, String>,
+        result: Result<Box<TextDocument>, String>,
     },
     SaveActiveTileCompleted {
         tile_id: GuiTileId,

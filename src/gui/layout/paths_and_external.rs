@@ -78,7 +78,7 @@ pub(super) fn check_external_file_changes(
                 tile_id: candidate.tile_id,
                 path: candidate.path,
                 snapshot: current_snapshot,
-                document,
+                document: Box::new(document),
             }),
             Err(error) => {
                 results.push(GuiExternalFileCheckResult::LoadFailed {

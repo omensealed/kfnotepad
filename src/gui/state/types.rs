@@ -104,7 +104,7 @@ enum GuiExternalFileCheckResult {
         tile_id: GuiTileId,
         path: PathBuf,
         snapshot: GuiFileSnapshot,
-        document: TextDocument,
+        document: Box<TextDocument>,
     },
     LoadFailed {
         tile_id: GuiTileId,

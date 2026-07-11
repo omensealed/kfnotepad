@@ -46,7 +46,7 @@ fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> Gui
             GuiDispatchResult::Handled(state.handle_open_dialog_selected_async(path))
         }
         Message::OpenDialogCompleted { path, result } => {
-            handle_open_dialog_completed(state, path, result);
+            handle_open_dialog_completed(state, path, result.map(|document| *document));
             handled_none()
         }
         Message::SaveActiveTileCompleted {

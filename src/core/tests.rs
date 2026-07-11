@@ -1,5 +1,6 @@
 use super::settings::path_to_hex;
 use super::*;
+use std::collections::VecDeque;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
@@ -2204,6 +2205,7 @@ fn large_file_undo_history_uses_byte_budget_and_remains_responsive() {
         .iter()
         .map(|snapshot| snapshot.byte_size)
         .sum::<usize>();
+    assert_eq!(buffer.undo_bytes, undo_budget);
     assert!(
         undo_budget <= MAX_UNDO_BYTES,
         "undo budget {undo_budget} exceeds hard cap {MAX_UNDO_BYTES}"
@@ -2244,8 +2246,8 @@ fn undo_history_is_bounded_and_redo_still_restores_latest_edit() {
 }
 
 #[test]
-fn trim_undo_history_prefers_latest_entries_when_byte_budget_exceeded() {
-    let mut history = vec![
+fn history_push_prefers_latest_entries_and_tracks_byte_budget() {
+    let snapshots = [
         BufferSnapshot {
             lines: vec!["a".to_string()],
             trailing_newline: false,
@@ -2267,10 +2269,14 @@ fn trim_undo_history_prefers_latest_entries_when_byte_budget_exceeded() {
             byte_size: 60,
         },
     ];
-
-    trim_undo_history(&mut history, 4, 120);
+    let mut history = VecDeque::new();
+    let mut used_bytes = 0;
+    for snapshot in snapshots {
+        push_history_snapshot(&mut history, &mut used_bytes, snapshot, 4, 120);
+    }
 
     assert_eq!(history.len(), 2);
+    assert_eq!(used_bytes, 120);
     assert_eq!(history[0].lines[0], "c");
     assert_eq!(history[1].lines[0], "d");
 }
