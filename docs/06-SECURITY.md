@@ -8,7 +8,7 @@
 - Payments: No
 - Additional notes: do not enter credentials
 
-Phase 2 threat model status: current as of 2026-06-24T17:08:57Z for the arbitrary-file terminal editor journey.
+Threat model status: current as of 2026-07-08 for the arbitrary-file terminal/editor GUI journey.
 
 ## Assets
 
@@ -96,9 +96,8 @@ Phase 2 threat model status: current as of 2026-06-24T17:08:57Z for the arbitrar
 - Workspace snapshots store local file paths only. Restoring a stale snapshot skips missing or unavailable files and
   reports status; it does not recreate, truncate, or overwrite paths that no longer load. If no files can be loaded,
   the editor opens a clean untitled document.
-- Undo history is bounded by count to reduce memory growth while editing within the 8 MiB file limit. It still stores
-  full snapshots for recent edits; a future byte-budget or coalescing pass can reduce memory further if profiling
-  shows it is needed.
+- Undo history is bounded by byte budget and count to reduce memory growth while editing within the 8 MiB file limit.
+  The current limit is 64 MiB and uses full-delta snapshots plus snapshot coalescing around typed insert runs.
 - End-to-end raw-mode cleanup is still manually verified; unit coverage proves the drop path calls restore but does
   not exercise a real pseudo-terminal.
 - No automatic backup/restore feature exists. Recovery depends on the original file remaining untouched for expected
@@ -106,6 +105,8 @@ Phase 2 threat model status: current as of 2026-06-24T17:08:57Z for the arbitrar
 
 ## Baseline controls
 
+- Project crate code is now compiled with `#![forbid(unsafe_code)]` in binary and library roots to prevent accidental
+  `unsafe` introduction without review.
 - Deny by default at permission and authorization boundaries.
 - Validate type, size, range, format, path, and ownership of untrusted input.
 - Parameterize database queries and escape/encode output for its context.
@@ -125,3 +126,5 @@ Phase 2 threat model status: current as of 2026-06-24T17:08:57Z for the arbitrar
 - Dependency and license review complete; lockfiles current.
 - Error messages/logs do not disclose secrets or unnecessary personal data.
 - Backup, migration, rollback, and incident steps documented and exercised where relevant.
+- Security check scripts (`scripts/security-check.sh`) run as part of `scripts/check.sh`; the step executes dependency policy and
+  advisory scans when tooling is installed.

@@ -7,7 +7,8 @@
 Thumbs.db
 .idea/
 .vscode/settings.json
-.codex/
+.codex/*
+!.codex/config.toml
 .agent-starter/
 AGENTS.md
 FIRST_PROMPT.md

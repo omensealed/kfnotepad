@@ -43,32 +43,36 @@ kfnotepad-gui FILE1 FILE2
   restored and remains the only authoritative tile for that path.
 - Open GUI document tiles poll their existing on-disk file metadata once per second while the GUI is running. If an
   already-open clean file changes externally, the tile refreshes in place through the same safe open path and enters
-  an external-edit lock. Locked tiles still allow scrolling and later external refreshes, but text edits are refused
-  until the Unlock titlebar control is clicked. Dirty local buffers are never overwritten by external refresh; the
-  status message reports the conflict for explicit user resolution.
+  an external-edit lock. Filesystem watcher support is intentionally not exposed until it can be implemented as a
+  long-lived, nonblocking watcher with polling fallback.
+  Locked tiles still allow scrolling and later external refreshes, but text edits are refused until the Unlock
+  titlebar control is clicked. Dirty local buffers are never overwritten by external refresh; the status message reports
+  the conflict for explicit user resolution.
 - The GUI does not use a database, network service, account, autosave, backup file, or recent-file list. Workspace
   restore is limited to the explicit `gui_restore_last_workspace` opt-in and the deterministic
   `current-workspace.v1` project snapshot.
-- Managed notes use the same normal-file storage as the TUI: Markdown files under
-  `$XDG_DATA_HOME/kfnotepad/notes`, or `$HOME/.local/share/kfnotepad/notes` when `XDG_DATA_HOME` is unset.
-- Editor display preferences are shared with the TUI through `$XDG_CONFIG_HOME/kfnotepad/config.toml`, or
-  `$HOME/.config/kfnotepad/config.toml` when `XDG_CONFIG_HOME` is unset.
+- Managed notes use the same normal-file storage as the TUI: Markdown files under the platform data directory
+  at `.../kfnotepad/notes`. On Unix this is `$XDG_DATA_HOME/kfnotepad/notes`, or `$HOME/.local/share/kfnotepad/notes`
+  when `XDG_DATA_HOME` is unset.
+- Editor display preferences are shared with the TUI through `.../kfnotepad/config.toml` in the platform config directory.
+  On Unix this is `$XDG_CONFIG_HOME/kfnotepad/config.toml`, or `$HOME/.config/kfnotepad/config.toml` when
+  `XDG_CONFIG_HOME` is unset.
 - `config.toml` persists `theme`, `syntax_theme`, `line_numbers`, `wrap`, `search_case_sensitive`,
   `gui_restore_last_workspace`, `gui_reader_mode_enabled`, `gui_reader_lines_per_minute`, `gui_font_family`,
   `gui_font_size`, and `gui_ui_font_size`. Search defaults to case-insensitive. Reader mode defaults off at
   60 lines/minute and validates speed from 20 through 240 lines/minute. GUI editor font defaults are `monospace`
   and size `16`, and GUI chrome/UI text defaults to size `14`. Older configs without the newer GUI keys continue
   to load with documented defaults.
-- GUI layout persistence uses `$XDG_CONFIG_HOME/kfnotepad/gui-layout.v1`, or
-  `$HOME/.config/kfnotepad/gui-layout.v1` when `XDG_CONFIG_HOME` is unset.
+- GUI layout persistence uses `.../kfnotepad/gui-layout.v1` in the platform config directory. On Unix this is
+  `$XDG_CONFIG_HOME/kfnotepad/gui-layout.v1`, or `$HOME/.config/kfnotepad/gui-layout.v1` when `XDG_CONFIG_HOME` is unset.
 - `gui-layout.v1` stores geometry only: version, browser visibility, browser width, pane split tree and ratios,
   launch/open-order leaf ordinals, and minimized ordinals. It must not contain document text, file paths, search
   queries, cursor positions, recent-file history, credentials, or unsaved buffers.
-- GUI workspace/project snapshots are planned as a separate path-bearing format under
-  `$XDG_CONFIG_HOME/kfnotepad/workspaces/*.v1`, or `$HOME/.config/kfnotepad/workspaces/*.v1` when
-  `XDG_CONFIG_HOME` is unset. Model tests exist for path resolution, parse/serialize, malformed snapshot rejection,
-  layout/file-count mismatch rejection, and private atomic writes. Runtime project saving/listing is wired; project
-  opening is not wired yet.
+- GUI workspace/project snapshots are persisted as path-bearing files under
+  `.../kfnotepad/workspaces/*.v1` in the platform config directory, or
+  `$XDG_CONFIG_HOME/kfnotepad/workspaces/*.v1` when `XDG_CONFIG_HOME` is unset on Unix. Model tests exist for path
+  resolution, parse/serialize, malformed snapshot rejection, layout/file-count mismatch rejection, and private atomic
+  writes. Runtime project saving, listing, and opening are all wired in both current-window and new-window flows.
 - Missing, malformed, unsupported, invalid-width, invalid-ratio, duplicate-ordinal, or pane-count-mismatched layouts
   are ignored and the GUI falls back to launch-time layout defaults. Old layout files without `browser_width_px`
   remain valid and use the default browser width.
@@ -106,8 +110,9 @@ kfnotepad-gui FILE1 FILE2
   `kfnotepad-gui` executable directly and passes the saved project path through an internal launch environment value;
   the child process restores saved files and matching layout through the same project parser and file open
   validation. Delete requires clicking Delete on the same project a second time; deleting `current-workspace.v1`
-  while restore is enabled shows a restore-target warning before the same explicit confirmation. Deletion refreshes
-  the list and rejects paths outside the configured
+  while restore is enabled shows a restore-target warning before the same explicit confirmation. Confirmed deletion
+  moves the project snapshot to the operating system Trash/Recycle Bin where supported, refreshes the list, and
+  rejects paths outside the configured
   workspace-project directory. Preferences mode exposes editor font family, syntax theme, editor font size, GUI UI
   font size, Line numbers, Wrap text, Case-sensitive search, Reader mode, Reader speed, and Restore last workspace
   controls backed by `config.toml`; save failures report status and roll back in-memory settings. The GUI UI
@@ -170,7 +175,11 @@ kfnotepad-gui FILE1 FILE2
   undo/redo, mouse click/drag selection, drag-selection edge auto-scroll, Ctrl-Left/Ctrl-Right word movement, Ctrl-Backspace/Ctrl-Delete word deletion,
   Ctrl-K delete-to-line-end,
   Insert overwrite-mode toggling, Escape selection clearing, search selection, menu/keyboard clipboard operations,
-  and external-edit lock refusal. Document viewports show a thin theme-colored scrollbar when the document has more
+  and external-edit lock refusal. Horizontal cursor movement, Backspace, Delete, and overwrite-mode replacement use
+  shared core grapheme boundaries so combining marks, emoji ZWJ sequences, and regional-indicator flag pairs are not
+  split by normal single-character edit commands. Word movement and word deletion also use shared grapheme-aware
+  word boundaries so keyboard shortcuts do not land inside multi-codepoint characters.
+  Document viewports show a thin theme-colored scrollbar when the document has more
   source lines than the visible viewport; wheel scrolling, scrollbar track clicks, and scrollbar thumb dragging
   route through the same explicit viewport-scroll path and do not dirty the document. Track/thumb scrolling does not
   move the cursor; selection edge auto-scroll moves the cursor only as the active selection focus. IME preedit/open/close events
@@ -182,14 +191,17 @@ kfnotepad-gui FILE1 FILE2
   temporary `Ln current/total` status strip is not shown. Legacy native text-editor scroll actions still map to the
   app-owned viewport without marking the document dirty. Shared syntax highlighting is mapped into per-row colored
   spans in the replacement renderer, with cursor and selection overlays suppressing token color so active cells remain
-  readable. Mouse click events on the replacement text body focus the pane and move the shared cursor without
+  readable. Mouse click events on the replacement text body focus the pane and move the shared cursor, snapping to
+  the nearest grapheme boundary for multi-codepoint characters, without
   changing the viewport when the clicked text is already visible. Mouse drag events set replacement selections
-  without dirtying the document; hit testing is body-local so the line-number gutter does not skew text columns.
+  without dirtying the document; selection copy/delete/replace expands endpoints to grapheme boundaries so partial
+  multi-codepoint characters are not copied or removed. Hit testing is body-local so the line-number gutter does not skew text columns.
   Mouse-wheel and trackpad scroll events over the replacement document body scroll that pane's
   app-owned viewport without dirtying the document or moving the cursor. Keyboard/page viewport commands that
   intentionally move the cursor still keep the cursor visible. When Wrap text is enabled, the replacement renderer
   splits source lines into explicit visual rows using word-boundary wrapping with character fallback for long
-  unbroken spans.
+  unbroken spans while preserving grapheme clusters so combining marks, emoji ZWJ sequences, and regional-indicator
+  flag pairs do not split across visual rows.
   Continuation rows keep the gutter snug, show a blank line-number cell, and carry source-column offsets for cursor
   and pointer mapping. The renderer may build a larger bounded source-line slice than the logical scroll page so
   panes that grow after close/minimize can fill the newly available tile height without changing the app-owned
@@ -202,26 +214,30 @@ kfnotepad-gui FILE1 FILE2
   search results use the same selection model with a stronger search overlay in the
   replacement renderer. Richer visual regression coverage remains follow-up work. The active tile tracks
   dirty/saved/save-failed state.
-- Open: File -> Open and Ctrl-O request a native file dialog through `rfd`. Selecting a path opens through the
-  existing validation. If the workspace still contains only the initial clean empty `untitled.txt` tile, the selected
-  file replaces that blank tile instead of creating a second tile. If the selected file is already open, the existing
-  tile is focused or restored from the minimized tray instead of opening a duplicate tile. Otherwise, successful
-  opens create a new tile. Canceling the dialog is a no-op with status feedback. File -> Open path keeps the in-app
-  path prompt fallback. Relative fallback paths resolve from the current GUI file-browser directory, and fallback
-  failures keep the prompt open and report status.
+- Open: File -> Open and Ctrl-O request a native file dialog through `rfd`. If native dialogs are unavailable in the
+  current runtime (for example, no usable desktop session, or when `KFNOTEPAD_DISABLE_NATIVE_FILE_DIALOG` is set),
+  the app falls back to `File -> Open path` and keeps the open flow in-app. Selecting a path through either path opens
+  through the existing validation. If the workspace still
+  contains only the initial clean empty `untitled.txt` tile, the selected file replaces that blank tile instead of
+  creating a second tile. If the selected file is already open, the existing tile is focused or restored from the minimized
+  tray instead of opening a duplicate tile. Otherwise, successful opens create a new tile. Canceling the dialog is a
+  no-op with status feedback. File -> Open path keeps the in-app path prompt fallback. Relative fallback paths resolve
+  from the current GUI file-browser directory, and fallback failures keep the prompt open and report status.
 - Save: Save button, File -> Save, and Ctrl-S save the active tile only.
-- Save as: File -> Save as and Ctrl-Shift-S request a native save dialog through `rfd`. Selecting a path retargets
-  the active tile through the existing atomic save adapter; canceling the dialog is a no-op with status feedback.
-  File -> Save as path keeps the in-app path prompt fallback. Relative fallback paths resolve from the current GUI
-  file-browser directory, and fallback failures keep the original tile path and prompt open.
+- Save as: File -> Save as and Ctrl-Shift-S request a native save dialog through `rfd`. If native save dialogs are
+  unavailable in the current runtime, the app falls back to `File -> Save as path` and keeps the in-app prompt flow.
+  Selecting a path retargets the active tile through the existing atomic save adapter; canceling the dialog is a
+  no-op with status feedback. File -> Save as path keeps the in-app path prompt fallback. Relative fallback paths
+  resolve from the current GUI file-browser directory, and fallback failures keep the original tile path and prompt open.
 - Managed notes: Notes -> Open note shows an in-app note-title prompt. Successful note titles create or open the
   matching managed Markdown file through the existing managed-notes adapter and open it in a new tile. Notes -> List
   notes shows existing managed notes in deterministic filename order; clicking one opens it in a new tile. Each
   listed note also exposes a Delete control that requires clicking Delete on the same note a second time before
-  removal. Deletion is limited to visible direct `.md` files inside the configured managed-notes directory; outside
-  paths, non-note targets, symlinks, and directories are rejected by the shared adapter. If a note is already open in
-  any tile, GUI deletion is refused until that tile is closed so a later Save cannot silently recreate the removed
-  note. After successful deletion, the notes list refreshes.
+  removal. Confirmed deletion moves the note to the operating system Trash/Recycle Bin where supported and is limited
+  to visible direct `.md` files inside the configured managed-notes directory; outside paths, non-note targets,
+  symlinks, and directories are rejected by the shared adapter. If a note is already open in any tile, GUI deletion is
+  refused until that tile is closed so a later Save cannot silently recreate the removed note. After successful
+  deletion, the notes list refreshes.
 - Close tile: title close button, File -> Close tile, or Ctrl-F4 close the active tile. Closing a dirty tile requires a
   second close request before discarding unsaved changes. Closing the last remaining tile does not leave the
   workspace empty; after any required dirty confirmation it resets that pane to a clean in-memory `untitled.txt` tile
@@ -234,7 +250,9 @@ kfnotepad-gui FILE1 FILE2
   replacement editor selection through kfnotepad's editor model and Iced's public clipboard tasks. Copy/Cut require a
   selection; Cut and Paste update the in-memory document and dirty state but do not save files.
 - Search: active-pane search field, Next/Prev buttons, Edit menu commands, Ctrl-F, F3, and Shift-F3. Successful
-  search moves to the match and selects the matched text using the native Iced editor selection highlight.
+  search moves to the match and selects the matched text using the native Iced editor selection highlight. If a query
+  matches inside a multi-codepoint grapheme cluster, the match selection expands to the whole grapheme so the editor
+  never selects only part of one visual character.
 - Navigation: Document start/end buttons, Nav menu commands, Ctrl-Home, Ctrl-End, line-number field, Apply line
   button, and Ctrl-G.
 - Theme: Theme button, View -> Theme, and Ctrl-T cycle the fixed preset themes shared with the TUI:
@@ -266,7 +284,8 @@ kfnotepad-gui FILE1 FILE2
   Create file writes an empty file through the existing safe save path, refreshes the tree, and opens the new file
   through the existing safe open path. Create folder uses a single-directory create and refreshes the tree. Names
   must be relative UTF-8 child paths without parent traversal. Delete selected requires a second click on the same
-  selection; directory deletion warns that all subdirectories and files will be removed, refuses symlinks, and
+  selection; confirmed deletion moves the selected path to the operating system Trash/Recycle Bin, directory deletion
+  warns that all subdirectories and files move with it, refuses symlinks, and
   refuses files/directories that are open in editor tiles.
 - Minimize/restore: tile title control, Tile -> Minimize, and Ctrl-M minimize the active tile into the tray. Tray
   restore buttons restore minimized tiles. The last visible tile cannot be minimized.
@@ -327,7 +346,8 @@ Verify:
 - The file browser Refresh control picks up a disposable file created outside the GUI.
 - The file browser Create file/Create folder controls create under the selected directory when one is selected.
 - A regular file single-click selects only; double-click opens a new tile.
-- Delete selected requires confirmation and recursively removes selected directories only after warning.
+- Delete selected requires confirmation and moves selected files/directories to the operating system Trash/Recycle Bin;
+  selected directories move recursively only after warning.
 - File -> Open can open a disposable relative path into a new tile.
 - The active tile can be edited, saved, and closed.
 - File -> Save as can save the active tile to a disposable relative path without changing the original file on
@@ -355,7 +375,7 @@ Bounded launch smoke for automated/local checks:
 tmpdir=$(mktemp -d)
 printf 'first\n' > "$tmpdir/first.txt"
 printf 'second\n' > "$tmpdir/second.txt"
-XDG_CONFIG_HOME="$tmpdir/config" timeout 5s cargo run --locked --bin kfnotepad-gui -- "$tmpdir/first.txt" "$tmpdir/second.txt"
+XDG_CONFIG_HOME="$tmpdir/config" timeout 5s cargo run --locked --no-default-features --features gui --bin kfnotepad-gui -- "$tmpdir/first.txt" "$tmpdir/second.txt"
 status=$?
 rm -rf "$tmpdir"
 test "$status" -eq 124

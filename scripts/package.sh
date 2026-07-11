@@ -25,8 +25,9 @@ fi
 host_arch=$(uname -m)
 platform=${KFNOTEPAD_PACKAGE_PLATFORM:-cachyos-linux-${host_arch}}
 package_name="${package_id}-${version}-${platform}"
-dist_dir="dist"
-package_root="target/package"
+dist_dir=${KFNOTEPAD_DIST_DIR:-dist}
+target_dir=${CARGO_TARGET_DIR:-target}
+package_root="${target_dir}/package"
 staging_dir="${package_root}/${package_name}"
 deb_arch=${KFNOTEPAD_DEB_ARCH:-}
 appimage_arch=${KFNOTEPAD_APPIMAGE_ARCH:-}
@@ -103,8 +104,8 @@ build_tarball() {
   rm -rf "$staging_dir"
   mkdir -p "$staging_dir/bin" "$staging_dir/docs" "$dist_dir"
 
-  install -m 0755 target/release/kfnotepad "$staging_dir/bin/kfnotepad"
-  install -m 0755 target/release/kfnotepad-gui "$staging_dir/bin/kfnotepad-gui"
+  install -m 0755 "${target_dir}/release/kfnotepad" "$staging_dir/bin/kfnotepad"
+  install -m 0755 "${target_dir}/release/kfnotepad-gui" "$staging_dir/bin/kfnotepad-gui"
   install_common_docs "$staging_dir/docs"
   mkdir -p "$staging_dir/assets"
   install -m 0644 LICENSE "$staging_dir/LICENSE"
@@ -128,8 +129,8 @@ build_deb() {
     "$deb_root/usr/bin" \
     "$deb_root/usr/share/doc/${package_id}"
 
-  install -m 0755 target/release/kfnotepad "$deb_root/usr/bin/kfnotepad"
-  install -m 0755 target/release/kfnotepad-gui "$deb_root/usr/bin/kfnotepad-gui"
+  install -m 0755 "${target_dir}/release/kfnotepad" "$deb_root/usr/bin/kfnotepad"
+  install -m 0755 "${target_dir}/release/kfnotepad-gui" "$deb_root/usr/bin/kfnotepad-gui"
   install_common_docs "$deb_root/usr/share/doc/${package_id}"
   install_desktop_assets "$deb_root"
   install -m 0644 LICENSE "$deb_root/usr/share/doc/${package_id}/copyright"
@@ -166,8 +167,8 @@ build_appimage() {
   rm -rf "$appdir"
   mkdir -p "$appdir/usr/bin" "$appdir/usr/share/doc/${package_id}"
 
-  install -m 0755 target/release/kfnotepad "$appdir/usr/bin/kfnotepad"
-  install -m 0755 target/release/kfnotepad-gui "$appdir/usr/bin/kfnotepad-gui"
+  install -m 0755 "${target_dir}/release/kfnotepad" "$appdir/usr/bin/kfnotepad"
+  install -m 0755 "${target_dir}/release/kfnotepad-gui" "$appdir/usr/bin/kfnotepad-gui"
   install_common_docs "$appdir/usr/share/doc/${package_id}"
   install_desktop_assets "$appdir"
   cp "$appdir/usr/share/applications/${package_id}.desktop" "$appdir/${package_id}.desktop"
@@ -202,7 +203,8 @@ EOF_APPRUN
   printf 'Created %s\n' "${appimage_file}.sha256"
 }
 
-cargo build --locked --release
+cargo build --locked --release --no-default-features --features tui --bin kfnotepad
+cargo build --locked --release --no-default-features --features gui --bin kfnotepad-gui
 
 build_tarball
 build_deb

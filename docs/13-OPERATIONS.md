@@ -1,5 +1,16 @@
 # Operations and maintenance
 
+## Support tiers
+
+- Current target and support:
+  - Tier 1: Linux desktop (validated in local workflows and package tooling).
+  - Tier 2: macOS and Windows (feature-gated builds in CI; runtime behavior is available but not packaged yet).
+- CLI/GUI build paths:
+  - TUI path: `--no-default-features --features tui` can build terminal-only.
+  - GUI path: `--no-default-features --features gui` builds GUI dependencies.
+  - GUI external-change checks use conservative polling plus save-time conflict detection. Filesystem watcher support is not exposed until it can be long-lived and nonblocking.
+- CI runs checks for all supported platforms and the feature matrix described in `scripts/feature-check.sh`.
+
 ## Development runbook
 
 ```bash
@@ -7,7 +18,7 @@
 ./scripts/check.sh
 ./scripts/run.sh --help
 ./scripts/run.sh README.md
-cargo run --locked --release --bin kfnotepad-gui -- --describe
+cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- --describe
 ```
 
 `./scripts/run.sh` forwards arguments to `cargo run --locked --release --` by default. In an interactive terminal,
@@ -20,8 +31,9 @@ Current editor controls:
 - Arrow keys move.
 - Printable characters insert.
 - Enter splits a line.
-- Backspace deletes before the cursor.
-- Delete removes the character at the cursor or joins the next line at line end.
+- Backspace deletes the previous user-perceived character/grapheme cluster before the cursor.
+- Delete removes the user-perceived character/grapheme cluster at the cursor or joins the next line at line end.
+- File-browser Delete moves confirmed files/directories to the operating system Trash/Recycle Bin where supported.
 - Ctrl-Z undoes edits since the last save.
 - Ctrl-F searches text; Enter accepts the query and Esc cancels.
 - Ctrl-L toggles line numbers for the current editor session.
@@ -32,9 +44,9 @@ Current editor controls:
 Known code file extensions are syntax-highlighted in the interactive editor through the bundled `syntect` syntax
 set. Unknown files and plain text fall back to normal body rendering.
 
-Theme, line-number, and wrap choices persist in `$XDG_CONFIG_HOME/kfnotepad/config.toml`, or
-`$HOME/.config/kfnotepad/config.toml` when `XDG_CONFIG_HOME` is unset. The separate GUI binary shares the same
-preference file.
+Theme, line-number, and wrap choices persist under the platform config directory at `.../kfnotepad/config.toml`. On Unix
+that maps to `$XDG_CONFIG_HOME/kfnotepad/config.toml` or `$HOME/.config/kfnotepad/config.toml` as a fallback. The separate GUI
+binary shares the same preference file.
 
 The public CLI/keybinding contract and manual terminal checklist live in `docs/16-CLI-CONTRACT.md`. The separate Iced
 GUI contract, controls, manual smoke, and current feature gaps live in `docs/17-GUI-CONTRACT.md`.
@@ -44,9 +56,9 @@ GUI contract, controls, manual smoke, and current feature gaps live in `docs/17-
 The GUI is a separate local review binary, not a replacement for the terminal editor:
 
 ```bash
-cargo run --locked --release --bin kfnotepad-gui -- --help
-cargo run --locked --release --bin kfnotepad-gui -- --describe
-cargo run --locked --release --bin kfnotepad-gui -- README.md
+cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- --help
+cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- --describe
+cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- README.md
 ```
 
 Use a disposable config directory for manual verification when possible:
@@ -55,12 +67,13 @@ Use a disposable config directory for manual verification when possible:
 tmpdir=$(mktemp -d)
 printf 'first\n' > "$tmpdir/first.txt"
 printf 'second\n' > "$tmpdir/second.txt"
-XDG_CONFIG_HOME="$tmpdir/config" cargo run --locked --release --bin kfnotepad-gui -- "$tmpdir/first.txt" "$tmpdir/second.txt"
+XDG_CONFIG_HOME="$tmpdir/config" cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- "$tmpdir/first.txt" "$tmpdir/second.txt"
 rm -rf "$tmpdir"
 ```
 
 The GUI opens each valid file as a tile. It shares the TUI open/save validation and atomic save behavior, has no
-database or network behavior, and stores only display preferences plus geometry-only GUI layout under XDG config.
+database or network behavior, and stores only display preferences plus geometry-only GUI layout under the platform config
+directory.
 
 For local X11 visual smoke, run:
 
@@ -94,6 +107,8 @@ dist/SHA256SUMS
 
 The `.deb` requires `dpkg-deb`. The AppImage requires `appimagetool`. For fully offline AppImage builds, set
 `KFNOTEPAD_APPIMAGE_RUNTIME=/path/to/runtime-x86_64`; otherwise `appimagetool` may try to download the runtime.
+The script honors `CARGO_TARGET_DIR` for builds and staging. Set `KFNOTEPAD_DIST_DIR` to write artifacts outside the
+default `dist/` directory, which is useful for isolated release checks.
 Debian 11+ support is a build-environment commitment: build the release on Debian 11 or an equivalent older-glibc
 container/runner before claiming Debian 11 compatibility. A package generated on CachyOS can be structurally valid
 and work on newer Debian-derived systems, but may require newer runtime libraries than Debian 11 provides.
@@ -186,9 +201,10 @@ Database mode: **none**
 
 Notes remain normal files on disk. There is no schema, migration, backup, restore, or local database file.
 
-Managed notes remain normal files under `$XDG_DATA_HOME/kfnotepad/notes` or
-`$HOME/.local/share/kfnotepad/notes`. Use disposable `XDG_DATA_HOME` values for manual verification; do not manually
-create or delete production notes as part of release verification.
+Managed notes remain normal files under the platform data directory at `.../kfnotepad/notes`. On Unix this is
+`$XDG_DATA_HOME/kfnotepad/notes` or `$HOME/.local/share/kfnotepad/notes` when `XDG_DATA_HOME` is unset. Use disposable
+`XDG_DATA_HOME` values for manual verification; do not manually create or delete production notes as part of release
+verification.
 
 The write-safety and recovery policy is: same-directory temp file, flush, atomic rename, symlink path rejection,
 non-regular file rejection, existing permission preservation, `0o600` for new Unix files, 8 MiB file limit, no
@@ -218,10 +234,11 @@ combining major upgrades with feature work. Record compatibility changes and rol
 
 ## GUI layout recovery
 
-GUI layout persistence uses `$XDG_CONFIG_HOME/kfnotepad/gui-layout.v1`, or
-`$HOME/.config/kfnotepad/gui-layout.v1` when `XDG_CONFIG_HOME` is unset. The format is geometry-only and must not
-contain document text, absolute file paths, cursor positions, search queries, recent-file history, or unsaved
-buffers. It may contain browser visibility, browser width, pane split ratios, pane ordinals, and minimized ordinals.
+GUI layout persistence is under `.../kfnotepad/gui-layout.v1` in the platform config directory. On Unix this maps to
+`$XDG_CONFIG_HOME/kfnotepad/gui-layout.v1` with `$HOME/.config/kfnotepad/gui-layout.v1` as a fallback. The format is
+geometry-only and must not contain document text, absolute file paths, cursor positions, search queries, recent-file
+history, or unsaved buffers. It may contain browser visibility, browser width, pane split ratios, pane ordinals, and
+minimized ordinals.
 If the GUI opens with an unwanted tile arrangement or sidebar width, close kfnotepad and delete `gui-layout.v1`; the
 GUI falls back to its launch-time layout defaults.
 

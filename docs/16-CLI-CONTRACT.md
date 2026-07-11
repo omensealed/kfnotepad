@@ -36,8 +36,8 @@ kfnotepad --notes
 ## File behavior
 
 - Notes are normal files on disk; there is no database.
-- Managed notes are stored as normal `.md` files under `$XDG_DATA_HOME/kfnotepad/notes` when `XDG_DATA_HOME` is set,
-  otherwise `$HOME/.local/share/kfnotepad/notes`.
+- Managed notes are stored as normal `.md` files under the platform data directory at `.../kfnotepad/notes`. On Unix this is
+  `$XDG_DATA_HOME/kfnotepad/notes`, otherwise `$HOME/.local/share/kfnotepad/notes`.
 - Managed note titles are local names, not paths. Empty names, hidden names, `.`/`..`, traversal, path separators,
   control characters, and names that normalize to no usable slug are rejected.
 - Managed-note listing includes only direct regular visible `.md` files. It ignores directories, hidden files,
@@ -55,8 +55,9 @@ kfnotepad --notes
 
 ## Editor keys
 
-- Arrow keys: move cursor.
-- Ctrl-Left/Ctrl-Right: move cursor by word, crossing line boundaries when needed.
+- Arrow keys: move cursor. Horizontal movement steps over whole user-perceived characters/grapheme clusters.
+- Ctrl-Left/Ctrl-Right: move cursor by word, crossing line boundaries when needed. Word movement uses grapheme
+  cluster boundaries for multi-codepoint characters.
 - PageUp/PageDown: move by one visible editor page.
 - F2: open the command palette. While the palette is open, type part of a command label, shortcut, or menu group to
   filter commands; Up/Down/PageUp/PageDown/Home/End move the selection, Enter runs the selected command through the
@@ -82,10 +83,11 @@ kfnotepad --notes
 - Tab: insert one indentation level as four spaces at the cursor.
 - Shift-Tab: remove up to one four-space indentation level immediately before the cursor.
 - Enter: split the current line.
-- Backspace: delete before cursor; joins with previous line at line start.
-- Delete: delete at cursor; joins with next line at line end.
+- Backspace: delete the previous user-perceived character/grapheme cluster before the cursor; joins with previous line at line start.
+- Delete: delete the user-perceived character/grapheme cluster at the cursor; joins with next line at line end.
 - Ctrl-Backspace: delete from the previous word boundary to the cursor, crossing line boundaries when needed.
 - Ctrl-Delete: delete from the cursor through the current or next word, crossing line boundaries when needed.
+  Word deletion uses grapheme cluster boundaries for multi-codepoint characters.
 - Ctrl-K: delete from the cursor to the end of the current line. At line end it is a no-op.
 - Insert: toggle overwrite mode. While overwrite mode is on, printable characters replace the character under the
   cursor; at line end they insert normally without joining the next line. Press Insert again to return to normal
@@ -94,6 +96,8 @@ kfnotepad --notes
 - Ctrl-Y: redo the last undone edit. A new edit after undo clears the redo stack.
 - Ctrl-F: search text; the active search prompt appears in the status line, Enter accepts the query, and Esc cancels.
   Accepted search matches are highlighted in the visible document body. Search defaults to case-insensitive matching.
+  If a query matches inside a multi-codepoint grapheme cluster, the cursor/highlight expands to the whole grapheme so
+  search never leaves the editor positioned inside one visual character.
 - Ctrl-Shift-F: toggle exact-case search. The setting is persisted with the rest of the editor preferences.
 - Up/Down while the search prompt is active: recall the last ten unique non-empty accepted search queries for the
   current session.
@@ -111,9 +115,9 @@ kfnotepad --notes
   sidebar returns to the last visited sidebar directory for the current editor session.
 - While the file sidebar is open, Ctrl-N prompts for a local child filename, Ctrl-D prompts for a local child
   directory name, and Delete prompts for deletion confirmation. Create prompts reject empty names, `.`/`..`, hidden
-  names, path separators, and control characters. Directory deletion requires typing `yes` after a warning that all
-  contents will be removed. Symlink deletion is refused. Deleting a file that is open and modified in any editor tab
-  is refused.
+  names, path separators, and control characters. Confirmed file/directory deletion moves the selected path to the
+  operating system Trash/Recycle Bin. Directory deletion requires typing `yes` after a warning that all contents move
+  with it. Symlink deletion is refused. Deleting a file that is open and modified in any editor tab is refused.
 - Ctrl-L: toggle line numbers for the current editor session.
 - Ctrl-T: cycle built-in themes for the current editor session: `nocturne`, `aurora`, `pastel`, `terminal`,
   `abyss`, and `terror`.
@@ -125,8 +129,9 @@ kfnotepad --notes
   bounds and does not snap back to the edit cursor; if the edit cursor scrolls offscreen, the terminal cursor is
   hidden until the cursor row becomes visible again.
 - Ctrl-W: toggle word wrapping for the current editor session.
-- Mouse left-click: move the cursor in the visible editor body, including wrapped visual rows, select visible tab
-  labels, open top-menu groups, and choose visible dropdown menu items. The highlighted terminal cursor cell and
+- Mouse left-click: move the cursor in the visible editor body, including wrapped visual rows, snapping to the
+  nearest grapheme boundary for multi-codepoint characters; select visible tab labels, open top-menu groups, and
+  choose visible dropdown menu items. The highlighted terminal cursor cell and
   subsequent typed input target the same document row/column.
 - Mouse wheel over the editor body: move the cursor three rows up/down and scroll the viewport as needed. Wheel
   scrolling is ignored while menus or prompts are active.
@@ -143,8 +148,8 @@ kfnotepad --notes
 
 ## Editor preferences
 
-- Editor display preferences persist in `$XDG_CONFIG_HOME/kfnotepad/config.toml`, or
-  `$HOME/.config/kfnotepad/config.toml` when `XDG_CONFIG_HOME` is unset.
+- Editor display preferences persist in `.../kfnotepad/config.toml` under the platform config directory. On Unix this is
+  `$XDG_CONFIG_HOME/kfnotepad/config.toml`, otherwise `$HOME/.config/kfnotepad/config.toml`.
 - Persisted keys are `theme`, `syntax_theme`, `line_numbers`, `wrap`, `search_case_sensitive`,
   `gui_restore_last_workspace`, `gui_reader_mode_enabled`, and `gui_reader_lines_per_minute`.
 - `gui_restore_last_workspace` is a shared opt-in restore preference used by the GUI and TUI. The name remains for
@@ -167,7 +172,8 @@ kfnotepad --notes
   status line reserves critical metadata using compact labels: `num:on/off`, `wrap:on/off`, `x:N`, theme, and
   saved/modified state. The editor keeps the terminal cursor visible at the current editor position and paints the
   active text cell with reverse video as a second cursor-location affordance. Body rendering uses terminal display
-  width for clipping, wrapping, horizontal scrolling, and cursor placement; tabs render as spaces using four-column
+  width for clipping, wrapping, horizontal scrolling, and cursor placement. Wrapping preserves grapheme clusters so
+  combining marks, emoji ZWJ sequences, and regional-indicator flag pairs do not split across visual rows; tabs render as spaces using four-column
   tab stops. Word wrap prefers whitespace boundaries and falls back to character wrapping only for a single word that
   exceeds the visible width. F2 opens a centered keyboard command palette backed by the same command dispatcher as
   the menu. F10 opens a keyboard-driven top menu/drop-down for File, Edit, View, Go, Tabs,
@@ -198,8 +204,8 @@ kfnotepad --notes
 ## TUI workspace-project behavior
 
 - TUI workspace projects use the same path-only `*.v1` project format as the GUI, but live under a separate TUI
-  namespace: `$XDG_CONFIG_HOME/kfnotepad/workspaces/tui`, or `$HOME/.config/kfnotepad/workspaces/tui` when
-  `XDG_CONFIG_HOME` is unset. This prevents TUI restore state from colliding with GUI tiled-layout restore state.
+  namespace under the platform config directory as `.../kfnotepad/workspaces/tui`. On Unix this is
+  `$XDG_CONFIG_HOME/kfnotepad/workspaces/tui`, or `$HOME/.config/kfnotepad/workspaces/tui` when `XDG_CONFIG_HOME` is unset.
 - TUI saves write path-only projects with no GUI layout geometry. GUI-created projects with layout data are accepted;
   the TUI opens their file paths and active ordinal while ignoring tile geometry, browser width, and minimized state.
 - Workspace -> Save current writes or replaces the deterministic `current-workspace.v1` snapshot.
@@ -213,8 +219,8 @@ kfnotepad --notes
   missing or unavailable files in the status bar, and replaces the current tab set with the files that can be
   opened. If no project files can be loaded, it opens a clean `untitled.txt` tab instead. Up/Down in the prompt
   cycles saved project names.
-- Workspace -> Delete project prompts for a saved project name, supports Up/Down cycling, and removes only the saved
-  workspace project snapshot after typed `yes` confirmation.
+- Workspace -> Delete project prompts for a saved project name, supports Up/Down cycling, and moves only the saved
+  workspace project snapshot to the operating system Trash/Recycle Bin after typed `yes` confirmation.
 - Opening a workspace while any current tab is modified requires typing `yes` in a confirmation prompt. Canceling or
   failing to read the project snapshot leaves the current tabs unchanged.
 - Workspace -> Restore last toggles the shared `gui_restore_last_workspace` preference. When enabled, TUI launch and
@@ -274,6 +280,8 @@ Verify:
 - Ctrl-Left and Ctrl-Right move by word.
 - Ctrl-Home and Ctrl-End move to the start/end of the document.
 - Typing inserts text at the cursor.
+- Horizontal cursor movement, Backspace, Delete, and overwrite-mode replacement treat combining marks, emoji ZWJ
+  sequences, and regional-indicator flag pairs as single grapheme clusters.
 - Enter splits a line.
 - Backspace and Delete remove text and join lines at boundaries.
 - Ctrl-Backspace and Ctrl-Delete delete by word.
@@ -310,7 +318,8 @@ Verify:
 - While the sidebar is open, Ctrl-N creates a new file in the selected directory, or in the current sidebar directory
   when a file or `..` is selected. Ctrl-D creates a new directory using the same target rule. Creating inside a
   selected directory moves the sidebar view into that directory so the new child is visible. Delete starts a typed
-  confirmation; directories are removed recursively only after confirming with `yes`.
+  confirmation; confirmed file/directory deletion moves the selected path to the operating system Trash/Recycle Bin,
+  with directories moving recursively only after confirming with `yes`.
 - Mouse wheel over the sidebar moves the selected entry up/down without wrapping at the first or last entry.
 - Selecting a file while the current buffer is dirty opens the selected file as another tab; the dirty tab remains
   open and marked dirty.

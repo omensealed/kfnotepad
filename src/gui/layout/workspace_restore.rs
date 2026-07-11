@@ -1,0 +1,88 @@
+#[derive(Debug)]
+pub(super) struct RestoredGuiWorkspaceProject {
+    pub(super) project: GuiWorkspaceProject,
+    pub(super) documents: Vec<TextDocument>,
+    pub(super) active_loaded_ordinal: Option<usize>,
+    pub(super) skipped_files: Vec<String>,
+    pub(super) created_blank: bool,
+}
+
+impl RestoredGuiWorkspaceProject {
+    pub(super) fn skipped_status_message(&self) -> Option<String> {
+        if self.skipped_files.is_empty() {
+            return None;
+        }
+        let first = self
+            .skipped_files
+            .first()
+            .map(String::as_str)
+            .unwrap_or("unknown path");
+        let loaded = if self.created_blank {
+            "opened blank tile".to_string()
+        } else {
+            format!("loaded {} file(s)", self.documents.len())
+        };
+        Some(format!(
+            "skipped {} missing/unavailable workspace file(s), {loaded}; first: {first}",
+            self.skipped_files.len()
+        ))
+    }
+}
+
+pub(super) fn load_workspace_project_launch_documents(
+    path: &Path,
+    current_dir: PathBuf,
+) -> Result<RestoredGuiWorkspaceProject, String> {
+    let project = load_workspace_project_launch(path)?;
+    Ok(restore_gui_workspace_project_documents(
+        project,
+        current_dir,
+    ))
+}
+
+pub(super) fn restore_gui_workspace_project_documents(
+    project: GuiWorkspaceProject,
+    current_dir: PathBuf,
+) -> RestoredGuiWorkspaceProject {
+    let mut documents = Vec::new();
+    let mut active_loaded_ordinal = None;
+    let mut skipped_files = Vec::new();
+    for (ordinal, file_path) in project.files.iter().enumerate() {
+        let document = match open_text_file(file_path) {
+            Ok(document) => document,
+            Err(error) => {
+                skipped_files.push(format!("{}: {error}", file_path.display()));
+                continue;
+            }
+        };
+        if ordinal == project.active_ordinal {
+            active_loaded_ordinal = Some(documents.len());
+        }
+        documents.push(document);
+    }
+    let created_blank = documents.is_empty();
+    if created_blank {
+        documents.push(empty_document(current_dir));
+        active_loaded_ordinal = Some(0);
+    }
+    if active_loaded_ordinal.is_none() && !documents.is_empty() {
+        active_loaded_ordinal = Some(documents.len() - 1);
+    }
+    RestoredGuiWorkspaceProject {
+        project,
+        documents,
+        active_loaded_ordinal,
+        skipped_files,
+        created_blank,
+    }
+}
+
+pub(super) fn workspace_project_launch_command(executable: &Path, project_path: &Path) -> Command {
+    let mut command = Command::new(executable);
+    command.env(WORKSPACE_PROJECT_ENV, project_path);
+    command
+}
+
+pub(super) fn current_managed_notes_dir() -> Result<PathBuf, kfnotepad::ManagedNotesError> {
+    kfnotepad::current_managed_notes_dir()
+}
