@@ -1,5 +1,15 @@
-include!("prompts_and_mutation/start.rs");
-include!("prompts_and_mutation/status.rs");
-include!("prompts_and_mutation/apply.rs");
-include!("prompts_and_mutation/create.rs");
-include!("prompts_and_mutation/delete.rs");
+//! Sidebar create/delete prompts and filesystem mutations.
+
+use super::*;
+
+mod apply;
+mod create;
+mod delete;
+mod start;
+mod status;
+
+pub(crate) use apply::*;
+pub(crate) use create::*;
+pub(crate) use delete::*;
+pub(crate) use start::*;
+pub(crate) use status::*;

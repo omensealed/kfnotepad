@@ -1,3 +1,7 @@
+//! Prompt submission dispatch.
+
+use super::*;
+
 pub(crate) fn apply_sidebar_prompt(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

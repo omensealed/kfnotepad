@@ -1,3 +1,7 @@
+//! Prompt validation and status updates.
+
+use super::*;
+
 pub(crate) fn refresh_sidebar_prompt_status(runtime: &mut EditorRuntime) {
     runtime.status = match runtime.sidebar_prompt.as_ref() {
         Some(SidebarPrompt::CreateFile) => format!("New file name: {}", runtime.sidebar_query),

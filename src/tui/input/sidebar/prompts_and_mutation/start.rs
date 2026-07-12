@@ -1,3 +1,7 @@
+//! Create/delete prompt activation.
+
+use super::*;
+
 pub(crate) fn start_sidebar_create_file(runtime: &mut EditorRuntime) {
     runtime.sidebar_prompt = Some(SidebarPrompt::CreateFile);
     runtime.sidebar_query.clear();

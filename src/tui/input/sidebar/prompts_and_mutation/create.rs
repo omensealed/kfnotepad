@@ -1,3 +1,7 @@
+//! Safe sidebar file and directory creation.
+
+use super::*;
+
 pub(crate) fn create_sidebar_file(runtime: &mut EditorRuntime) {
     let name = match validated_sidebar_child_name(&runtime.sidebar_query) {
         Ok(name) => name.to_string(),

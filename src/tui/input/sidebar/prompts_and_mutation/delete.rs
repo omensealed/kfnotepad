@@ -1,3 +1,7 @@
+//! Confirmed sidebar file and directory deletion.
+
+use super::*;
+
 pub(crate) fn delete_sidebar_entry(
     workspace: &EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
