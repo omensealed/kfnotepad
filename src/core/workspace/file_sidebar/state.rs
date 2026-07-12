@@ -1,3 +1,7 @@
+//! Sidebar loading, selection, scrolling, and mouse-row mapping.
+
+use super::*;
+
 impl FileSidebarState {
     pub fn load(current_dir: PathBuf) -> Result<Self, FileSidebarError> {
         let current_dir = current_dir.canonicalize().unwrap_or(current_dir);

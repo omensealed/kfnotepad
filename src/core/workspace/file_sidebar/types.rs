@@ -1,3 +1,7 @@
+//! Shared sidebar state, entry, entry-kind, and error value types.
+
+use super::*;
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct FileSidebarState {
     pub current_dir: PathBuf,

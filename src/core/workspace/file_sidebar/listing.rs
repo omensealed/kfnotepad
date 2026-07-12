@@ -1,3 +1,7 @@
+//! Symlink-skipping, directory-first sidebar listing and sorting.
+
+use super::*;
+
 pub fn list_file_sidebar_entries(
     current_dir: &Path,
 ) -> Result<Vec<FileSidebarEntry>, FileSidebarError> {
