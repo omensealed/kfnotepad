@@ -1,3 +1,7 @@
+//! Message routing and focused state-transition handlers.
+
+use super::*;
+
 include!("dispatch/browser.rs");
 include!("dispatch/editor.rs");
 include!("dispatch/files.rs");

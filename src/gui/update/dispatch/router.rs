@@ -6,7 +6,7 @@ include!("router/search_editor.rs");
 include!("router/replacement.rs");
 include!("router/misc.rs");
 
-pub(super) fn update(state: &mut KfnotepadGui, message: Message) -> Task<Message> {
+pub(in crate::gui::app::state) fn update(state: &mut KfnotepadGui, message: Message) -> Task<Message> {
     let message = match dispatch_browser_and_files(state, message) {
         GuiDispatchResult::Handled(task) => return task,
         GuiDispatchResult::Unhandled(message) => message,

@@ -5,5 +5,10 @@
 
 use super::*;
 
-include!("update/dispatch.rs");
-include!("update/subscription.rs");
+#[path = "update/dispatch.rs"]
+mod dispatch;
+#[path = "update/subscription.rs"]
+mod subscription;
+
+pub(super) use dispatch::update;
+pub(super) use subscription::subscription;
