@@ -1,35 +1,47 @@
-struct PreparedFrameLayout {
-    visible_rows: usize,
-    terminal_width: usize,
-    editor_width: usize,
-    no_color: bool,
+//! Terminal dimensions and viewport preparation for one render pass.
+
+use kfnotepad::{EditorTab, TabStripItem};
+
+use super::super::LoopLayout;
+use crate::tui::app::SIDEBAR_WIDTH;
+use crate::tui::input::EditorRuntime;
+use crate::tui::render::{
+    clamp_horizontal_viewport, clamp_passive_viewport, clamp_viewport, line_number_width,
+    no_color_enabled, tab_strip_height_for_width, terminal_width, visible_editor_rows,
+};
+
+pub(super) struct PreparedFrameLayout {
+    pub(super) visible_rows: usize,
+    pub(super) terminal_width: usize,
+    pub(super) editor_width: usize,
+    pub(super) no_color: bool,
 }
 
-fn prepare_frame_layout(
+pub(super) fn prepare_frame_layout(
     active_tab: &mut EditorTab<'_>,
     runtime: &mut EditorRuntime,
     tab_items: &[TabStripItem],
     layout: &mut LoopLayout,
 ) -> PreparedFrameLayout {
-    layout.terminal_width = super::terminal_width();
-    let sidebar_width = runtime.sidebar.as_ref().map_or(0, |_| super::SIDEBAR_WIDTH);
+    layout.terminal_width = terminal_width();
+    let sidebar_width = runtime.sidebar.as_ref().map_or(0, |_| SIDEBAR_WIDTH);
     let editor_width = layout.terminal_width.saturating_sub(sidebar_width).max(1);
-    let no_color = super::no_color_enabled();
-    let tab_extra_rows = super::tab_strip_height_for_width(tab_items, editor_width)
+    let no_color = no_color_enabled();
+    let tab_extra_rows = tab_strip_height_for_width(tab_items, editor_width)
         .saturating_sub(1)
         .into();
-    layout.visible_rows = super::visible_editor_rows(tab_extra_rows);
+    layout.visible_rows = visible_editor_rows(tab_extra_rows);
     runtime.page_rows = layout.visible_rows;
-    layout.gutter_width = super::line_number_width(active_tab.document.as_ref());
+    layout.gutter_width = line_number_width(active_tab.document.as_ref());
     active_tab.state.viewport_start = if runtime.settings.gui_reader_mode_enabled {
-        super::clamp_passive_viewport(
+        clamp_passive_viewport(
             active_tab.document.as_ref(),
             active_tab.state.viewport_start,
             layout.visible_rows,
             runtime.settings,
         )
     } else {
-        super::clamp_viewport(
+        clamp_viewport(
             active_tab.document.as_ref(),
             active_tab.state.cursor,
             active_tab.state.viewport_start,
@@ -42,7 +54,7 @@ fn prepare_frame_layout(
     active_tab.state.horizontal_offset = if runtime.settings.wrap_lines {
         0
     } else {
-        super::clamp_horizontal_viewport(
+        clamp_horizontal_viewport(
             active_tab.document.as_ref(),
             active_tab.state.cursor,
             runtime.settings,

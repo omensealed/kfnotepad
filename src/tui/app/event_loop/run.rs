@@ -1,3 +1,5 @@
+use self::frame::render_frame;
+
 pub(crate) fn run_editor_workspace(
     mut workspace: EditorWorkspace<'_>,
     loaded_settings: Option<EditorSettings>,

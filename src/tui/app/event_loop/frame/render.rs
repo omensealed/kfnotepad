@@ -1,4 +1,17 @@
-fn render_frame<W: Write>(
+//! Editor frame orchestration and overlay ordering.
+
+use std::io::{self, Write};
+
+use kfnotepad::{EditorWorkspace, SyntaxHighlighter};
+
+use super::super::LoopLayout;
+use super::layout::prepare_frame_layout;
+use super::overlays::write_runtime_overlays;
+use crate::tui::app::SIDEBAR_WIDTH;
+use crate::tui::input::EditorRuntime;
+use crate::tui::render;
+
+pub(in crate::tui::app::event_loop) fn render_frame<W: Write>(
     stdout: &mut W,
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
@@ -20,7 +33,7 @@ fn render_frame<W: Write>(
             status: &runtime.status,
             settings: runtime.settings,
             menu: runtime.menu,
-            sidebar_width: runtime.sidebar.as_ref().map_or(0, |_| super::SIDEBAR_WIDTH),
+            sidebar_width: runtime.sidebar.as_ref().map_or(0, |_| SIDEBAR_WIDTH),
             tab_strip: &tab_items,
             search_highlight: runtime.search_highlight(),
         },
