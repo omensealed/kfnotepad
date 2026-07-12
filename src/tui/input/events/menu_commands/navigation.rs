@@ -1,3 +1,7 @@
+//! Menu-group navigation.
+
+use super::*;
+
 pub(crate) fn select_previous_menu_group(runtime: &mut EditorRuntime) {
     if let Some(menu) = &mut runtime.menu {
         menu.group = menu.group.previous();

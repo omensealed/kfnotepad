@@ -1,3 +1,7 @@
+//! Menu command dispatch for the active document and runtime.
+
+use super::*;
+
 pub(crate) fn run_menu_command(
     command: MenuCommand,
     document: &mut TextDocument,

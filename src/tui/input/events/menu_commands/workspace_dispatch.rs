@@ -1,3 +1,7 @@
+//! Menu command dispatch for workspace and tab operations.
+
+use super::*;
+
 pub(crate) fn run_workspace_menu_command(
     command: MenuCommand,
     workspace: &mut EditorWorkspace<'_>,

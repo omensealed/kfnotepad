@@ -1,3 +1,7 @@
+//! Built-in help-document tab activation.
+
+use super::*;
+
 pub(crate) fn open_tui_help_document(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

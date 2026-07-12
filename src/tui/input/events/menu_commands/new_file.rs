@@ -1,3 +1,7 @@
+//! New untitled workspace-tab creation.
+
+use super::*;
+
 pub(crate) fn create_new_file_tab(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
