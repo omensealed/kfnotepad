@@ -1,4 +1,4 @@
-fn write_header(
+pub(crate) fn write_header(
     writer: &mut impl Write,
     document: &TextDocument,
     menu: Option<MenuState>,

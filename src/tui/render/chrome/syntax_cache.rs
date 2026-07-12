@@ -4,7 +4,7 @@ pub(crate) struct TuiSyntaxHighlightCache {
     revision: u64,
     start_line: usize,
     visible_rows: usize,
-    lines: SyntaxHighlightedLines,
+    pub(crate) lines: SyntaxHighlightedLines,
     state_before_start: Option<SyntaxHighlightCacheState>,
     state_after_end: Option<SyntaxHighlightCacheState>,
     next_start_line: usize,
@@ -28,7 +28,7 @@ impl TuiSyntaxHighlightCache {
         self.valid = true;
     }
 
-    fn highlight(
+    pub(crate) fn highlight(
         &mut self,
         document: &TextDocument,
         start_line: usize,

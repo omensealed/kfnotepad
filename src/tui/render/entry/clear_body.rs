@@ -1,4 +1,4 @@
-fn clear_editor_body_row(
+pub(crate) fn clear_editor_body_row(
     writer: &mut impl Write,
     screen_row: u16,
     frame: RenderFrame,

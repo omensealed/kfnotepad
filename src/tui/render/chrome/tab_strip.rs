@@ -20,7 +20,7 @@ fn tab_strip_rows_for_width(tab_strip: &[TabStripItem], terminal_width: usize) -
     rows
 }
 
-fn write_tab_strip(
+pub(crate) fn write_tab_strip(
     writer: &mut impl Write,
     tab_strip: &[TabStripItem],
     frame: RenderFrame,

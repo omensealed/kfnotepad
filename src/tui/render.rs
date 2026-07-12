@@ -24,13 +24,15 @@ use kfnotepad::{
 const TAB_WIDTH: usize = 4;
 const EDITOR_BODY_PADDING: usize = 1;
 
-include!("render/entry.rs");
-include!("render/chrome.rs");
+mod chrome;
+mod entry;
 include!("render/editor_lines.rs");
 include!("render/status_text.rs");
 mod syntax_colors;
 mod viewport_wrapping;
 
+pub(crate) use chrome::*;
+pub(crate) use entry::*;
 pub(crate) use syntax_colors::*;
 pub(crate) use viewport_wrapping::*;
 include!("render/tests.rs");

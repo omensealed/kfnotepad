@@ -1,3 +1,7 @@
+//! Editor rendering entrypoints, orchestration, color setup, and cursor placement.
+
+use super::*;
+
 include!("entry/api.rs");
 include!("entry/color.rs");
 include!("entry/orchestrate.rs");

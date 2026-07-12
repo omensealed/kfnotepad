@@ -14,7 +14,7 @@ pub(crate) struct RenderFrame {
 }
 
 impl RenderFrame {
-    fn move_to(self, column: u16, row: u16) -> MoveTo {
+    pub(crate) fn move_to(self, column: u16, row: u16) -> MoveTo {
         MoveTo(self.origin_column.saturating_add(column), row)
     }
 }
@@ -61,12 +61,12 @@ pub(crate) struct SearchHighlightView<'a> {
     pub(crate) mode: SearchMode,
 }
 
-struct EditorLineView<'a> {
-    screen_row: u16,
-    document_row: usize,
-    line: &'a str,
-    settings: EditorSettings,
-    horizontal_offset: usize,
-    highlighted_line: Option<Vec<(SyntectStyle, String)>>,
-    search_highlight: Option<SearchHighlightView<'a>>,
+pub(crate) struct EditorLineView<'a> {
+    pub(crate) screen_row: u16,
+    pub(crate) document_row: usize,
+    pub(crate) line: &'a str,
+    pub(crate) settings: EditorSettings,
+    pub(crate) horizontal_offset: usize,
+    pub(crate) highlighted_line: Option<Vec<(SyntectStyle, String)>>,
+    pub(crate) search_highlight: Option<SearchHighlightView<'a>>,
 }

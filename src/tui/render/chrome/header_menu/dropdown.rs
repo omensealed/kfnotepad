@@ -1,4 +1,4 @@
-fn write_menu_dropdown(
+pub(crate) fn write_menu_dropdown(
     writer: &mut impl Write,
     menu: MenuState,
     frame: RenderFrame,
