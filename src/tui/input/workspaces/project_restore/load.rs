@@ -1,3 +1,7 @@
+//! Project file loading and document-to-workspace conversion.
+
+use super::*;
+
 pub(crate) fn load_tui_workspace_project(path: &Path) -> Result<GuiWorkspaceProject, String> {
     let text = fs::read_to_string(path)
         .map_err(|error| format!("cannot read {}: {error}", path.display()))?;

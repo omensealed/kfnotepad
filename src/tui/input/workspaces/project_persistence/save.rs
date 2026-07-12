@@ -1,3 +1,7 @@
+//! Named and automatic workspace project saves.
+
+use super::*;
+
 pub(crate) fn save_workspace_project_named(
     workspace: &EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

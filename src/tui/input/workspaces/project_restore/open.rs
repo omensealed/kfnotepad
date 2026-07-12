@@ -1,3 +1,7 @@
+//! Named project opening and dirty-workspace checks.
+
+use super::*;
+
 pub(crate) fn open_workspace_project_named(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

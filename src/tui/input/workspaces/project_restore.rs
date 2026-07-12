@@ -1,4 +1,13 @@
-include!("project_restore/open.rs");
-include!("project_restore/replace.rs");
-include!("project_restore/restored.rs");
-include!("project_restore/load.rs");
+//! Workspace project loading, validation, replacement, and restored state.
+
+use super::*;
+
+mod load;
+mod open;
+mod replace;
+mod restored;
+
+pub(crate) use load::*;
+pub(crate) use open::*;
+pub(crate) use replace::*;
+pub(crate) use restored::*;

@@ -3,5 +3,8 @@
 use super::*;
 
 include!("workspaces/prompts_and_manager.rs");
-include!("workspaces/project_persistence.rs");
-include!("workspaces/project_restore.rs");
+mod project_persistence;
+mod project_restore;
+
+pub(crate) use project_persistence::*;
+pub(crate) use project_restore::*;

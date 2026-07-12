@@ -1,3 +1,7 @@
+//! Workspace project delete preparation and confirmation.
+
+use super::*;
+
 pub(crate) fn prepare_delete_workspace_project(runtime: &mut EditorRuntime, name: &str) {
     let Some(projects_dir) = runtime.workspace_projects_dir.clone() else {
         runtime.status = String::from("Workspace delete failed: cannot resolve config directory");

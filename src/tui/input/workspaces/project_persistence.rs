@@ -1,5 +1,15 @@
-include!("project_persistence/save.rs");
-include!("project_persistence/delete.rs");
-include!("project_persistence/snapshot.rs");
-include!("project_persistence/manager.rs");
-include!("project_persistence/settings.rs");
+//! Workspace project saving, deletion, snapshots, manager loading, and restore settings.
+
+use super::*;
+
+mod delete;
+mod manager;
+mod save;
+mod settings;
+mod snapshot;
+
+pub(crate) use delete::*;
+pub(crate) use manager::*;
+pub(crate) use save::*;
+pub(crate) use settings::*;
+pub(crate) use snapshot::*;

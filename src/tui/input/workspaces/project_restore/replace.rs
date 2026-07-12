@@ -1,3 +1,7 @@
+//! Active workspace replacement from a validated project.
+
+use super::*;
+
 pub(crate) fn replace_workspace_from_project(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

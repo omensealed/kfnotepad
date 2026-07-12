@@ -1,3 +1,7 @@
+//! Current workspace project snapshot construction.
+
+use super::*;
+
 pub(crate) fn current_tui_workspace_project(
     workspace: &EditorWorkspace<'_>,
     project_name: &str,

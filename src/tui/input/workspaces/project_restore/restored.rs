@@ -1,3 +1,7 @@
+//! Validated restored workspace state.
+
+use super::*;
+
 pub(crate) struct RestoredTuiWorkspace {
     pub(crate) project_name: String,
     pub(crate) workspace: EditorWorkspace<'static>,

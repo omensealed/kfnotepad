@@ -1,3 +1,7 @@
+//! Workspace manager loading and selection initialization.
+
+use super::*;
+
 pub(crate) fn open_workspace_manager(runtime: &mut EditorRuntime) {
     let Some(projects_dir) = runtime.workspace_projects_dir.as_deref() else {
         runtime.status = String::from("Workspaces unavailable: cannot resolve config directory");
