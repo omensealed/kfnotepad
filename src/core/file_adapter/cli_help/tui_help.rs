@@ -1,3 +1,5 @@
+//! Full built-in terminal help document.
+
 pub fn tui_help_document_text() -> &'static str {
     r#"# kfnotepad help
 

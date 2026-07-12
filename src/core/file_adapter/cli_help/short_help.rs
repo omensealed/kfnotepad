@@ -1,3 +1,5 @@
+//! Concise command-line usage and terminal shortcut help.
+
 pub fn help_text() -> &'static str {
     r#"kfnotepad 0.1.1
 

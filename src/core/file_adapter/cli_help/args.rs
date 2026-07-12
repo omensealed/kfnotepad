@@ -1,3 +1,7 @@
+//! Command-line argument parsing into the shared command model.
+
+use super::*;
+
 pub fn parse_args(args: &[String]) -> Result<Command, String> {
     match args {
         [] => Ok(Command::LaunchEmpty),

@@ -2,6 +2,13 @@
 
 use super::*;
 
-include!("cli_help/args.rs");
-include!("cli_help/short_help.rs");
-include!("cli_help/tui_help.rs");
+#[path = "cli_help/args.rs"]
+mod args;
+#[path = "cli_help/short_help.rs"]
+mod short_help;
+#[path = "cli_help/tui_help.rs"]
+mod tui_help;
+
+pub use args::parse_args;
+pub use short_help::help_text;
+pub use tui_help::tui_help_document_text;
