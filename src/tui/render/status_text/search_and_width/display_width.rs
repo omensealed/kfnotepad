@@ -75,7 +75,7 @@ pub(crate) fn character_display_width(character: char, display_column: usize) ->
     }
 }
 
-fn cursor_cell_character(character: char) -> char {
+pub(super) fn cursor_cell_character(character: char) -> char {
     if character == '\t' || character_display_width(character, 0) == 0 {
         ' '
     } else {

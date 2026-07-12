@@ -1,3 +1,7 @@
+//! Cursor and line-number geometry for terminal rendering.
+
+use super::*;
+
 pub(crate) fn line_number_width(document: &TextDocument) -> usize {
     document.buffer.line_count().to_string().len().max(2)
 }
@@ -53,7 +57,7 @@ pub(crate) fn cursor_screen_row(
         .min(max_row)
 }
 
-fn cursor_visual_row_offset(
+pub(super) fn cursor_visual_row_offset(
     document: &TextDocument,
     view: EditorView<'_>,
     frame: RenderFrame,

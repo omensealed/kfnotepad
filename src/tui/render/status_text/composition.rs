@@ -1,3 +1,7 @@
+//! Text printing, truncation, status-line composition, and prompt composition.
+
+use super::*;
+
 include!("composition/printing.rs");
 include!("composition/truncate_end.rs");
 include!("composition/line.rs");
