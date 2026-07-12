@@ -1,3 +1,7 @@
+//! Cursor-cell highlighting and viewport visibility checks.
+
+use super::*;
+
 pub(crate) fn write_cursor_cell_highlight(
     writer: &mut impl Write,
     document: &TextDocument,

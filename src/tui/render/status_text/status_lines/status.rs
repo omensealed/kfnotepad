@@ -1,3 +1,7 @@
+//! Status-row model, composition selection, and rendering.
+
+use super::*;
+
 pub(crate) struct StatusLineView<'a> {
     pub(crate) document: &'a TextDocument,
     pub(crate) cursor: Cursor,

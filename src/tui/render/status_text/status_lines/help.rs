@@ -1,3 +1,7 @@
+//! Compact help-row composition and rendering.
+
+use super::*;
+
 pub(crate) fn write_help_line(
     writer: &mut impl Write,
     screen_row: u16,
