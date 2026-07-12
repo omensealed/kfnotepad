@@ -1,3 +1,7 @@
+//! Path-only GUI workspace project parsing and serialization.
+
+use super::*;
+
 pub fn parse_gui_workspace_project(text: &str) -> Option<GuiWorkspaceProject> {
     let mut version = None;
     let mut name = None;

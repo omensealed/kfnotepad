@@ -1,4 +1,6 @@
-fn gui_workspace_project_slug(name: &str) -> Option<String> {
+//! Conservative workspace project filename slug validation.
+
+pub(super) fn gui_workspace_project_slug(name: &str) -> Option<String> {
     let mut slug = String::new();
     let mut previous_dash = false;
     for character in name.chars() {

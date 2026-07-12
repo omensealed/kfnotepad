@@ -1,3 +1,7 @@
+//! Validated private atomic workspace project persistence and path construction.
+
+use super::*;
+
 pub fn save_gui_workspace_project(
     path: &Path,
     project: &GuiWorkspaceProject,

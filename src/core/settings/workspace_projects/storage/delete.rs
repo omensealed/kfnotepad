@@ -1,3 +1,7 @@
+//! Containment-checked workspace project deletion through OS trash.
+
+use super::*;
+
 pub fn delete_gui_workspace_project(
     projects_dir: &Path,
     project_path: &Path,

@@ -1,3 +1,7 @@
+//! Valid-project filtering and deterministic workspace project listing.
+
+use super::*;
+
 pub fn list_gui_workspace_projects(
     projects_dir: &Path,
 ) -> Result<Vec<GuiWorkspaceProjectEntry>, EditorConfigError> {

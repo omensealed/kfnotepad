@@ -1,4 +1,8 @@
-fn bytes_to_hex(bytes: &[u8]) -> String {
+//! Lossless project-name and platform-path hexadecimal encoding.
+
+use super::*;
+
+pub(super) fn bytes_to_hex(bytes: &[u8]) -> String {
     let mut hex = String::with_capacity(bytes.len() * 2);
     for byte in bytes {
         hex.push(hex_digit(byte >> 4));
@@ -7,7 +11,7 @@ fn bytes_to_hex(bytes: &[u8]) -> String {
     hex
 }
 
-fn hex_to_bytes(hex: &str) -> Option<Vec<u8>> {
+pub(super) fn hex_to_bytes(hex: &str) -> Option<Vec<u8>> {
     let hex = hex.trim();
     if !hex.len().is_multiple_of(2) {
         return None;
