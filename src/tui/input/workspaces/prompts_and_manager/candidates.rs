@@ -1,3 +1,7 @@
+//! Workspace prompt candidate loading, status, and selection.
+
+use super::*;
+
 pub(crate) fn refresh_workspace_prompt_status(runtime: &mut EditorRuntime) {
     runtime.status = match runtime.workspace_prompt.as_ref() {
         Some(WorkspacePrompt::SaveNamed) => {

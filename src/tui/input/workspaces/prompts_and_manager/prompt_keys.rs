@@ -1,3 +1,7 @@
+//! Workspace prompt keyboard handling.
+
+use super::*;
+
 pub(crate) fn handle_workspace_prompt_key_event(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

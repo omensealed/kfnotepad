@@ -1,3 +1,7 @@
+//! Workspace manager keyboard handling and selection movement.
+
+use super::*;
+
 pub(crate) fn handle_workspace_manager_key_event(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

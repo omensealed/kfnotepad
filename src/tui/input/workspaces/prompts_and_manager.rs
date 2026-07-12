@@ -1,5 +1,15 @@
-include!("prompts_and_manager/start.rs");
-include!("prompts_and_manager/prompt_keys.rs");
-include!("prompts_and_manager/manager_keys.rs");
-include!("prompts_and_manager/candidates.rs");
-include!("prompts_and_manager/apply.rs");
+//! Workspace prompt and manager activation, input, candidates, and actions.
+
+use super::*;
+
+mod apply;
+mod candidates;
+mod manager_keys;
+mod prompt_keys;
+mod start;
+
+pub(crate) use apply::*;
+pub(crate) use candidates::*;
+pub(crate) use manager_keys::*;
+pub(crate) use prompt_keys::*;
+pub(crate) use start::*;

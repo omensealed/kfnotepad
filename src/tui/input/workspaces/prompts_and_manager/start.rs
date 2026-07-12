@@ -1,3 +1,7 @@
+//! Workspace save/open/delete prompt activation.
+
+use super::*;
+
 pub(crate) fn start_workspace_save_prompt(runtime: &mut EditorRuntime) {
     runtime.workspace_manager = None;
     runtime.workspace_prompt = Some(WorkspacePrompt::SaveNamed);

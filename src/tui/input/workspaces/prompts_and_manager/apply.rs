@@ -1,3 +1,7 @@
+//! Workspace prompt submission actions.
+
+use super::*;
+
 pub(crate) fn apply_workspace_prompt(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
