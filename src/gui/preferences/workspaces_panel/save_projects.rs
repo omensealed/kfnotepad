@@ -1,9 +1,9 @@
 impl KfnotepadGui {
-    pub(super) fn save_current_workspace_project(&mut self) {
+    pub(in crate::gui) fn save_current_workspace_project(&mut self) {
         self.save_workspace_project_named("current workspace", "current workspace");
     }
 
-    pub(super) fn save_named_workspace_project(&mut self) {
+    pub(in crate::gui) fn save_named_workspace_project(&mut self) {
         let name = self.workspace_project_name.trim().to_string();
         if name.is_empty() {
             self.status_message = "workspace save failed: project name required".to_string();
@@ -12,7 +12,7 @@ impl KfnotepadGui {
         self.save_workspace_project_named(&name, &name);
     }
 
-    pub(super) fn save_workspace_project_named(&mut self, project_name: &str, status_name: &str) {
+    pub(in crate::gui) fn save_workspace_project_named(&mut self, project_name: &str, status_name: &str) {
         let Some(projects_dir) = self.workspace_projects_dir.clone() else {
             self.status_message =
                 "workspace save failed: cannot resolve config directory".to_string();
@@ -38,7 +38,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn current_workspace_project(
+    pub(in crate::gui) fn current_workspace_project(
         &self,
         project_name: &str,
     ) -> Option<GuiWorkspaceProject> {
@@ -67,7 +67,7 @@ impl KfnotepadGui {
         })
     }
 
-    pub(super) fn persist_last_workspace_if_enabled(&mut self) {
+    pub(in crate::gui) fn persist_last_workspace_if_enabled(&mut self) {
         if !self.settings.gui_restore_last_workspace {
             return;
         }

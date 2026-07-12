@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn set_restore_last_workspace(&mut self, enabled: bool) {
+    pub(in crate::gui) fn set_restore_last_workspace(&mut self, enabled: bool) {
         let message = if enabled {
             "restore last workspace: on".to_string()
         } else {
@@ -11,7 +11,7 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn set_show_line_numbers(&mut self, enabled: bool) {
+    pub(in crate::gui) fn set_show_line_numbers(&mut self, enabled: bool) {
         let message = if enabled {
             "line numbers: on".to_string()
         } else {
@@ -23,7 +23,7 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn set_wrap_lines(&mut self, enabled: bool) {
+    pub(in crate::gui) fn set_wrap_lines(&mut self, enabled: bool) {
         let message = if enabled {
             "wrap text: on".to_string()
         } else {
@@ -32,7 +32,7 @@ impl KfnotepadGui {
         self.update_settings_with_rollback(|settings| settings.wrap_lines = enabled, message);
     }
 
-    pub(super) fn set_search_case_sensitive(&mut self, enabled: bool) {
+    pub(in crate::gui) fn set_search_case_sensitive(&mut self, enabled: bool) {
         let message = if enabled {
             "search case sensitive: on".to_string()
         } else {

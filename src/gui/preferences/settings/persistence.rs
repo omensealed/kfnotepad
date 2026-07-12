@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn update_settings_with_rollback(
+    pub(in crate::gui) fn update_settings_with_rollback(
         &mut self,
         update: impl FnOnce(&mut EditorSettings),
         success_message: impl Into<String>,

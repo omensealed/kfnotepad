@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn cycle_gui_font_family(&mut self) {
+    pub(in crate::gui) fn cycle_gui_font_family(&mut self) {
         let next = self.settings.gui_font_family.next();
         self.update_settings_with_rollback(
             |settings| settings.gui_font_family = next,
@@ -7,7 +7,7 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn set_gui_font_size(&mut self, size: u16) {
+    pub(in crate::gui) fn set_gui_font_size(&mut self, size: u16) {
         if !(MIN_GUI_FONT_SIZE..=MAX_GUI_FONT_SIZE).contains(&size) {
             self.status_message =
                 format!("editor font size must be {MIN_GUI_FONT_SIZE}-{MAX_GUI_FONT_SIZE}");
@@ -19,7 +19,7 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn set_gui_ui_font_size(&mut self, size: u16) {
+    pub(in crate::gui) fn set_gui_ui_font_size(&mut self, size: u16) {
         if !(MIN_GUI_FONT_SIZE..=MAX_GUI_FONT_SIZE).contains(&size) {
             self.status_message =
                 format!("ui font size must be {MIN_GUI_FONT_SIZE}-{MAX_GUI_FONT_SIZE}");

@@ -1,5 +1,9 @@
+//! Menu command routing plus settings and layout persistence.
+
+use super::*;
+
 impl KfnotepadGui {
-    pub(super) fn run_menu_command(&mut self, command: GuiMenuCommand) -> Task<Message> {
+    pub(in crate::gui) fn run_menu_command(&mut self, command: GuiMenuCommand) -> Task<Message> {
         match command {
             GuiMenuCommand::NewTile => self.create_new_tile(),
             GuiMenuCommand::Open => return self.request_open_dialog(),
@@ -55,7 +59,7 @@ impl KfnotepadGui {
         Task::none()
     }
 
-    pub(super) fn persist_settings(&mut self) {
+    pub(in crate::gui) fn persist_settings(&mut self) {
         let Some(config_path) = self.config_path.as_deref() else {
             return;
         };
@@ -64,7 +68,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn persist_layout(&mut self) {
+    pub(in crate::gui) fn persist_layout(&mut self) {
         let Some(layout_path) = self.layout_path.as_deref() else {
             return;
         };

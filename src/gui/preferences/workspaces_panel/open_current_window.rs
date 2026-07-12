@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn open_workspace_project_in_current_window(&mut self, index: usize) {
+    pub(in crate::gui) fn open_workspace_project_in_current_window(&mut self, index: usize) {
         let Some(entry) = self.workspace_projects.get(index).cloned() else {
             return;
         };

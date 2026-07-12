@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn refresh_workspace_projects(&mut self) {
+    pub(in crate::gui) fn refresh_workspace_projects(&mut self) {
         self.pending_project_delete = None;
         let Some(projects_dir) = self.workspace_projects_dir.as_deref() else {
             self.workspace_projects.clear();
@@ -20,7 +20,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn delete_workspace_project(&mut self, index: usize) {
+    pub(in crate::gui) fn delete_workspace_project(&mut self, index: usize) {
         let Some(entry) = self.workspace_projects.get(index).cloned() else {
             return;
         };
@@ -67,14 +67,14 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn is_current_workspace_project(&self, entry: &GuiWorkspaceProjectEntry) -> bool {
+    pub(in crate::gui) fn is_current_workspace_project(&self, entry: &GuiWorkspaceProjectEntry) -> bool {
         self.workspace_projects_dir
             .as_deref()
             .and_then(|projects_dir| gui_workspace_project_path(projects_dir, "current workspace"))
             .is_some_and(|current_path| current_path == entry.path)
     }
 
-    pub(super) fn open_workspace_project_in_new_window(&mut self, index: usize) {
+    pub(in crate::gui) fn open_workspace_project_in_new_window(&mut self, index: usize) {
         let Some(entry) = self.workspace_projects.get(index).cloned() else {
             return;
         };
@@ -92,14 +92,14 @@ impl KfnotepadGui {
     }
 
     #[cfg(test)]
-    pub(super) fn spawn_workspace_project_window(&mut self, path: &Path) -> io::Result<()> {
+    pub(in crate::gui) fn spawn_workspace_project_window(&mut self, path: &Path) -> io::Result<()> {
         self.spawned_workspace_project_paths
             .push(path.to_path_buf());
         Ok(())
     }
 
     #[cfg(not(test))]
-    pub(super) fn spawn_workspace_project_window(&mut self, path: &Path) -> io::Result<()> {
+    pub(in crate::gui) fn spawn_workspace_project_window(&mut self, path: &Path) -> io::Result<()> {
         let executable = env::current_exe()?;
         workspace_project_launch_command(&executable, path)
             .spawn()

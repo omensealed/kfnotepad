@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn toggle_left_panel(&mut self) {
+    pub(in crate::gui) fn toggle_left_panel(&mut self) {
         self.left_panel.toggle_visibility();
         self.browser_visible = self.left_panel.visible;
         self.status_message = if self.left_panel.visible {
@@ -15,7 +15,7 @@ impl KfnotepadGui {
         };
         self.persist_layout();
     }
-    pub(super) fn select_left_panel_mode(&mut self, mode: GuiLeftPanelMode) {
+    pub(in crate::gui) fn select_left_panel_mode(&mut self, mode: GuiLeftPanelMode) {
         match mode {
             GuiLeftPanelMode::Files => self.left_panel.show_files(),
             GuiLeftPanelMode::Workspaces => self.left_panel.show_workspaces(),

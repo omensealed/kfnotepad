@@ -1,5 +1,7 @@
+//! GUI settings, workspace-project controls, and menu command persistence.
+
 use super::*;
 
-include!("preferences/workspaces_panel.rs");
-include!("preferences/settings.rs");
-include!("preferences/menu_persistence.rs");
+mod menu_persistence;
+mod settings;
+mod workspaces_panel;

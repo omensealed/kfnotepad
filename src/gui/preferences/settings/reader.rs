@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn set_reader_mode_enabled(&mut self, enabled: bool) {
+    pub(in crate::gui) fn set_reader_mode_enabled(&mut self, enabled: bool) {
         let message = if enabled {
             "reader mode: on".to_string()
         } else {
@@ -12,11 +12,11 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn toggle_reader_mode(&mut self) {
+    pub(in crate::gui) fn toggle_reader_mode(&mut self) {
         self.set_reader_mode_enabled(!self.settings.gui_reader_mode_enabled);
     }
 
-    pub(super) fn set_reader_speed(&mut self, lines_per_minute: u16) {
+    pub(in crate::gui) fn set_reader_speed(&mut self, lines_per_minute: u16) {
         if !(MIN_GUI_READER_LINES_PER_MINUTE..=MAX_GUI_READER_LINES_PER_MINUTE)
             .contains(&lines_per_minute)
         {
