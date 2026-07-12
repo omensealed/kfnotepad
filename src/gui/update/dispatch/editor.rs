@@ -1,4 +1,8 @@
-fn handle_editor_edit(
+//! Native and replacement-editor state transitions.
+
+use super::*;
+
+pub(super) fn handle_editor_edit(
     state: &mut KfnotepadGui,
     pane: pane_grid::Pane,
     action: text_editor::Action,
@@ -57,7 +61,7 @@ fn handle_editor_edit(
     Task::none()
 }
 
-fn handle_replacement_editor_inputs(
+pub(super) fn handle_replacement_editor_inputs(
     state: &mut KfnotepadGui,
     inputs: Vec<GuiEditorReplacementInput>,
 ) -> Task<Message> {
@@ -82,7 +86,7 @@ fn handle_replacement_editor_inputs(
     Task::none()
 }
 
-fn handle_replacement_editor_ime(state: &mut KfnotepadGui, event: input_method::Event) {
+pub(super) fn handle_replacement_editor_ime(state: &mut KfnotepadGui, event: input_method::Event) {
     if GUI_USE_READ_ONLY_EDITOR_RENDERER {
         state.apply_replacement_editor_ime_event(event);
     } else {
@@ -90,7 +94,7 @@ fn handle_replacement_editor_ime(state: &mut KfnotepadGui, event: input_method::
     }
 }
 
-fn handle_toggle_replacement_overwrite_mode(state: &mut KfnotepadGui) {
+pub(super) fn handle_toggle_replacement_overwrite_mode(state: &mut KfnotepadGui) {
     state.replacement_overwrite_mode = !state.replacement_overwrite_mode;
     state.status_message = if state.replacement_overwrite_mode {
         "overwrite mode".to_string()

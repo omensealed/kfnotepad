@@ -1,5 +1,9 @@
+//! Open, save, and external-file-check completion handling.
+
+use super::*;
+
 #[cfg(test)]
-fn handle_open_dialog_selected(
+pub(super) fn handle_open_dialog_selected(
     state: &mut KfnotepadGui,
     path: Option<PathBuf>,
 ) -> Task<Message> {
@@ -8,7 +12,7 @@ fn handle_open_dialog_selected(
     task
 }
 
-fn handle_open_dialog_completed(
+pub(super) fn handle_open_dialog_completed(
     state: &mut KfnotepadGui,
     path: PathBuf,
     result: Result<TextDocument, String>,
@@ -17,7 +21,7 @@ fn handle_open_dialog_completed(
     state.persist_last_workspace_if_enabled();
 }
 
-fn handle_save_active_tile_completed(
+pub(super) fn handle_save_active_tile_completed(
     state: &mut KfnotepadGui,
     tile_id: GuiTileId,
     result: Result<GuiSaveResult, String>,
@@ -26,7 +30,7 @@ fn handle_save_active_tile_completed(
     finish_save_and_run_queued(state, tile_id)
 }
 
-fn handle_save_active_tile_as_completed(
+pub(super) fn handle_save_active_tile_as_completed(
     state: &mut KfnotepadGui,
     tile_id: GuiTileId,
     requested_path: PathBuf,
@@ -47,7 +51,7 @@ fn finish_save_and_run_queued(state: &mut KfnotepadGui, tile_id: GuiTileId) -> T
     }
 }
 
-fn handle_external_file_check_completed(
+pub(super) fn handle_external_file_check_completed(
     state: &mut KfnotepadGui,
     results: Vec<GuiExternalFileCheckResult>,
 ) {
