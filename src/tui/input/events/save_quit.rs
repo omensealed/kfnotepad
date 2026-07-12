@@ -1,3 +1,7 @@
+//! Document save and dirty-buffer quit confirmation.
+
+use super::*;
+
 pub(crate) fn request_quit(document: &TextDocument, runtime: &mut EditorRuntime) -> bool {
     if document.buffer.is_dirty() {
         if runtime.quit_confirmation_pending {

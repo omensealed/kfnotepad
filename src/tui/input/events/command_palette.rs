@@ -1,3 +1,7 @@
+//! Command-palette activation, filtering, selection, and status.
+
+use super::*;
+
 pub(crate) fn open_menu(runtime: &mut EditorRuntime) {
     runtime.command_palette = None;
     runtime.menu = Some(MenuState::default());
