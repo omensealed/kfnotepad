@@ -1,4 +1,8 @@
-fn gui_subscription_event_message(
+//! Global GUI event routing across shortcut and replacement-editor domains.
+
+use super::*;
+
+pub(super) fn gui_subscription_event_message(
     event: Event,
     status: iced::event::Status,
     window_id: window::Id,

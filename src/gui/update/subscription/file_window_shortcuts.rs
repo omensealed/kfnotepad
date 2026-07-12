@@ -1,4 +1,11 @@
-fn file_window_shortcut_message(event: &Event, window_id: window::Id) -> Option<Message> {
+//! File, browser, pane-close, and window-quit shortcuts.
+
+use super::*;
+
+pub(super) fn file_window_shortcut_message(
+    event: &Event,
+    window_id: window::Id,
+) -> Option<Message> {
     match event {
         Event::Keyboard(keyboard::Event::KeyPressed {
             key,

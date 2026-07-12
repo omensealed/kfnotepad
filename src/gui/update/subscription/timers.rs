@@ -1,4 +1,8 @@
-fn gui_subscriptions(state: &KfnotepadGui) -> Vec<Subscription<Message>> {
+//! Subscription batch assembly and conditional reader/drag timers.
+
+use super::*;
+
+pub(super) fn gui_subscriptions(state: &KfnotepadGui) -> Vec<Subscription<Message>> {
     let replacement_drag_active =
         state.replacement_drag.is_some() || state.replacement_scrollbar_drag.is_some();
     let mut subscriptions = vec![

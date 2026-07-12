@@ -1,4 +1,8 @@
-fn search_navigation_shortcut_message(event: &Event) -> Option<Message> {
+//! Search, help, clipboard, and document navigation shortcuts.
+
+use super::*;
+
+pub(super) fn search_navigation_shortcut_message(event: &Event) -> Option<Message> {
     match event {
         Event::Keyboard(keyboard::Event::KeyPressed {
             key,

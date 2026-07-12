@@ -1,4 +1,8 @@
-fn replacement_editor_event_message(
+//! Unhandled keyboard and input-method events for the replacement editor.
+
+use super::*;
+
+pub(super) fn replacement_editor_event_message(
     event: Event,
     status: iced::event::Status,
 ) -> Option<Message> {
