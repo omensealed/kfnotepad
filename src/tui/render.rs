@@ -28,6 +28,9 @@ include!("render/entry.rs");
 include!("render/chrome.rs");
 include!("render/editor_lines.rs");
 include!("render/status_text.rs");
-include!("render/syntax_colors.rs");
-include!("render/viewport_wrapping.rs");
+mod syntax_colors;
+mod viewport_wrapping;
+
+pub(crate) use syntax_colors::*;
+pub(crate) use viewport_wrapping::*;
 include!("render/tests.rs");

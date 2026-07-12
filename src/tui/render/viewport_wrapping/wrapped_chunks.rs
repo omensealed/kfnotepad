@@ -42,7 +42,7 @@ pub(crate) fn wrapped_line_chunks(line: &str, width: usize) -> Vec<WrappedLineCh
     chunks
 }
 
-fn wrapped_line_chunk_count(line: &str, width: usize) -> usize {
+pub(crate) fn wrapped_line_chunk_count(line: &str, width: usize) -> usize {
     let width = width.max(1);
     if line.is_empty() {
         return 1;
@@ -101,7 +101,7 @@ fn take_wrapped_line_chunk(line: &str, width: usize) -> (&str, &str) {
     (line, "")
 }
 
-fn grapheme_display_width(grapheme: &str, start_column: usize) -> usize {
+pub(crate) fn grapheme_display_width(grapheme: &str, start_column: usize) -> usize {
     let mut display_column = start_column;
     for character in grapheme.chars() {
         display_column += character_display_width(character, display_column);

@@ -1,3 +1,7 @@
+//! Syntax-role color mapping and terminal palette adaptation.
+
+use super::*;
+
 include!("syntax_colors/roles.rs");
 include!("syntax_colors/hue.rs");
 include!("syntax_colors/palettes.rs");
