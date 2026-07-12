@@ -1,3 +1,7 @@
+//! GUI document tile state, open errors, close results, and save status.
+
+use super::*;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum GuiCloseTileResult {
     Missing,

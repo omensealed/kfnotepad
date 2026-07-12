@@ -1,3 +1,7 @@
+//! Persisted GUI workspace project value types.
+
+use super::*;
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct GuiWorkspaceProject {
     pub name: String,

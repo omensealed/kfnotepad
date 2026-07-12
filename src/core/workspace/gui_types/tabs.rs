@@ -1,3 +1,7 @@
+//! Shared tab-strip presentation and close-result value types.
+
+use super::*;
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TabStripItem {
     pub label: String,

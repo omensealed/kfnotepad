@@ -1,3 +1,5 @@
+//! GUI left-panel mode and visibility state.
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum GuiLeftPanelMode {
     Files,

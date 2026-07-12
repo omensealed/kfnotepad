@@ -1,3 +1,5 @@
+//! GUI tile identifiers, save states, layout actions, and geometry models.
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct GuiTileId(pub usize);
 
