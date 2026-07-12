@@ -1,3 +1,7 @@
+//! Cyclic menu-group labels and keyboard navigation.
+
+use super::MenuGroup;
+
 impl MenuGroup {
     pub(crate) fn label(self) -> &'static str {
         match self {

@@ -1,4 +1,8 @@
-const HELP_MENU_ITEMS: &[MenuItem] = &[
+//! Help document, palette, and shortcut reference menu items.
+
+use crate::tui::menu::{MenuCommand, MenuItem};
+
+pub(super) const HELP_MENU_ITEMS: &[MenuItem] = &[
     MenuItem {
         label: "Open help document",
         shortcut: Some("F10"),

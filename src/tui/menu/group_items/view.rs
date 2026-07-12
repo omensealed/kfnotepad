@@ -1,4 +1,8 @@
-const VIEW_MENU_ITEMS: &[MenuItem] = &[
+//! Presentation, theme, wrapping, and reader-mode menu items.
+
+use crate::tui::menu::{MenuCommand, MenuItem};
+
+pub(super) const VIEW_MENU_ITEMS: &[MenuItem] = &[
     MenuItem {
         label: "Line numbers",
         shortcut: Some("Ctrl-L"),

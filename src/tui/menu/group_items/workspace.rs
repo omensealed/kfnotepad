@@ -1,4 +1,8 @@
-const WORKSPACE_MENU_ITEMS: &[MenuItem] = &[
+//! Workspace persistence and restore menu items.
+
+use crate::tui::menu::{MenuCommand, MenuItem};
+
+pub(super) const WORKSPACE_MENU_ITEMS: &[MenuItem] = &[
     MenuItem {
         label: "Save current",
         shortcut: None,

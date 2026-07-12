@@ -1,3 +1,5 @@
+//! Workspace manager list and selection state.
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub(crate) struct WorkspaceManagerState {
     pub(crate) entries: Vec<WorkspaceManagerEntry>,

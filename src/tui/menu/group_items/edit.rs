@@ -1,4 +1,8 @@
-const EDIT_MENU_ITEMS: &[MenuItem] = &[
+//! Edit and search menu items.
+
+use crate::tui::menu::{MenuCommand, MenuItem};
+
+pub(super) const EDIT_MENU_ITEMS: &[MenuItem] = &[
     MenuItem {
         label: "Find",
         shortcut: Some("Ctrl-F"),

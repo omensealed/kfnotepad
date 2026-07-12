@@ -1,4 +1,8 @@
-const TABS_MENU_ITEMS: &[MenuItem] = &[
+//! Tab navigation and lifecycle menu items.
+
+use crate::tui::menu::{MenuCommand, MenuItem};
+
+pub(super) const TABS_MENU_ITEMS: &[MenuItem] = &[
     MenuItem {
         label: "Previous tab",
         shortcut: Some("Ctrl-PageUp"),

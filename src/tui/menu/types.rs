@@ -1,3 +1,5 @@
+//! Menu group identity and active selection state.
+
 pub(crate) const MENU_GROUPS: [MenuGroup; 7] = [
     MenuGroup::File,
     MenuGroup::Edit,

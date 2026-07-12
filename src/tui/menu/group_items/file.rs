@@ -1,4 +1,8 @@
-const FILE_MENU_ITEMS: &[MenuItem] = &[
+//! File lifecycle and sidebar menu items.
+
+use crate::tui::menu::{MenuCommand, MenuItem};
+
+pub(super) const FILE_MENU_ITEMS: &[MenuItem] = &[
     MenuItem {
         label: "New file",
         shortcut: Some("Ctrl-N"),

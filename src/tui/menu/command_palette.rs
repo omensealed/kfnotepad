@@ -1,3 +1,7 @@
+//! Command-palette query, selection, and flattened entry state.
+
+use super::{MenuCommand, MenuGroup};
+
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub(crate) struct CommandPaletteState {
     pub(crate) query: String,

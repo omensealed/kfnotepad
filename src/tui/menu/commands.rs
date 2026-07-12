@@ -1,3 +1,5 @@
+//! Menu item metadata and executable command identifiers.
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) struct MenuItem {
     pub(crate) label: &'static str,

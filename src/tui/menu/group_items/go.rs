@@ -1,4 +1,8 @@
-const GO_MENU_ITEMS: &[MenuItem] = &[
+//! Document navigation menu items.
+
+use crate::tui::menu::{MenuCommand, MenuItem};
+
+pub(super) const GO_MENU_ITEMS: &[MenuItem] = &[
     MenuItem {
         label: "Page up",
         shortcut: Some("PageUp"),
