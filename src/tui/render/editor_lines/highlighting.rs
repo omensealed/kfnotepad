@@ -15,7 +15,7 @@ fn highlighter_lines_for_wrapped_view(
     )
 }
 
-fn highlight_lines_for_render(
+pub(crate) fn highlight_lines_for_render(
     document: &TextDocument,
     start_line: usize,
     visible_rows: usize,
@@ -89,7 +89,7 @@ fn write_highlighted_line_window(
     queue!(writer, ResetColor)
 }
 
-fn grapheme_safe_highlight_segments(
+pub(crate) fn grapheme_safe_highlight_segments(
     segments: Vec<(SyntectStyle, String)>,
 ) -> Vec<(SyntectStyle, String)> {
     use unicode_segmentation::UnicodeSegmentation;

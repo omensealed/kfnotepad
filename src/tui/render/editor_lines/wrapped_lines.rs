@@ -1,4 +1,4 @@
-fn write_wrapped_editor_lines(
+pub(crate) fn write_wrapped_editor_lines(
     writer: &mut impl Write,
     document: &TextDocument,
     view: EditorView<'_>,

@@ -1,13 +1,13 @@
-struct StatusLineView<'a> {
-    document: &'a TextDocument,
-    cursor: Cursor,
-    status: &'a str,
-    settings: EditorSettings,
-    screen_row: u16,
-    horizontal_offset: usize,
+pub(crate) struct StatusLineView<'a> {
+    pub(crate) document: &'a TextDocument,
+    pub(crate) cursor: Cursor,
+    pub(crate) status: &'a str,
+    pub(crate) settings: EditorSettings,
+    pub(crate) screen_row: u16,
+    pub(crate) horizontal_offset: usize,
 }
 
-fn write_status_line(
+pub(crate) fn write_status_line(
     writer: &mut impl Write,
     view: StatusLineView<'_>,
     frame: RenderFrame,

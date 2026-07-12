@@ -1,4 +1,4 @@
-fn write_editor_line(
+pub(crate) fn write_editor_line(
     writer: &mut impl Write,
     view: EditorLineView<'_>,
     frame: RenderFrame,

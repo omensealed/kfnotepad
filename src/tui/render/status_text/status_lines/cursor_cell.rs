@@ -1,4 +1,4 @@
-fn write_cursor_cell_highlight(
+pub(crate) fn write_cursor_cell_highlight(
     writer: &mut impl Write,
     document: &TextDocument,
     view: EditorView<'_>,

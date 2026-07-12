@@ -25,14 +25,16 @@ const TAB_WIDTH: usize = 4;
 const EDITOR_BODY_PADDING: usize = 1;
 
 mod chrome;
+mod editor_lines;
 mod entry;
-include!("render/editor_lines.rs");
-include!("render/status_text.rs");
+mod status_text;
 mod syntax_colors;
 mod viewport_wrapping;
 
 pub(crate) use chrome::*;
+pub(crate) use editor_lines::*;
 pub(crate) use entry::*;
+pub(crate) use status_text::*;
 pub(crate) use syntax_colors::*;
 pub(crate) use viewport_wrapping::*;
 include!("render/tests.rs");

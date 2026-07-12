@@ -6,7 +6,7 @@ pub(crate) fn text_display_width(text: &str) -> usize {
     display_column
 }
 
-fn line_segment_display_width(text: &str, start_column: usize) -> usize {
+pub(crate) fn line_segment_display_width(text: &str, start_column: usize) -> usize {
     let mut display_column = start_column;
     for character in text.chars() {
         display_column += character_display_width(character, display_column);
@@ -14,7 +14,7 @@ fn line_segment_display_width(text: &str, start_column: usize) -> usize {
     display_column - start_column
 }
 
-fn line_display_width_until(line: &str, character_column: usize) -> usize {
+pub(crate) fn line_display_width_until(line: &str, character_column: usize) -> usize {
     let mut display_column = 0;
     for (start_column, end_column, grapheme) in grapheme_column_units(line) {
         if start_column >= character_column {
@@ -62,7 +62,7 @@ fn grapheme_display_width_for_display_column(grapheme: &str, display_column: usi
     current - display_column
 }
 
-fn character_display_width(character: char, display_column: usize) -> usize {
+pub(crate) fn character_display_width(character: char, display_column: usize) -> usize {
     if character == '\t' {
         let remainder = display_column % TAB_WIDTH;
         if remainder == 0 {

@@ -1,4 +1,8 @@
-fn write_help_line(writer: &mut impl Write, screen_row: u16, frame: RenderFrame) -> io::Result<()> {
+pub(crate) fn write_help_line(
+    writer: &mut impl Write,
+    screen_row: u16,
+    frame: RenderFrame,
+) -> io::Result<()> {
     let mut remaining = frame.terminal_width;
     let help = compose_help_line(frame.terminal_width);
     queue!(
