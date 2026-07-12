@@ -1,3 +1,5 @@
+//! Stable built-in editor theme identifiers and labels.
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum EditorThemeId {
     #[default]

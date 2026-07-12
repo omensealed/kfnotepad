@@ -1,3 +1,7 @@
+//! Configuration read, validation, directory, and atomic-write errors.
+
+use super::*;
+
 #[derive(Debug)]
 pub enum EditorConfigError {
     Read {

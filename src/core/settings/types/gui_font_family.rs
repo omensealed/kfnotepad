@@ -1,3 +1,5 @@
+//! Configurable GUI font-family identifiers and display labels.
+
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum GuiFontFamily {
     #[default]

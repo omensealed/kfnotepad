@@ -1,3 +1,7 @@
+//! Persisted editor, search, reader, and GUI preference values and limits.
+
+use super::*;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct EditorSettings {
     pub show_line_numbers: bool,
