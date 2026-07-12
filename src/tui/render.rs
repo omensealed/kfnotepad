@@ -37,4 +37,6 @@ pub(crate) use entry::*;
 pub(crate) use status_text::*;
 pub(crate) use syntax_colors::*;
 pub(crate) use viewport_wrapping::*;
-include!("render/tests.rs");
+
+#[cfg(test)]
+mod tests;
