@@ -1,3 +1,7 @@
+//! Application header rendering and responsive menu visibility.
+
+use super::*;
+
 pub(crate) fn write_header(
     writer: &mut impl Write,
     document: &TextDocument,

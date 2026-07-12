@@ -1,4 +1,8 @@
-fn write_menu_bar(
+//! Header menu-bar rendering.
+
+use super::*;
+
+pub(super) fn write_menu_bar(
     writer: &mut impl Write,
     menu: Option<MenuState>,
     frame: RenderFrame,

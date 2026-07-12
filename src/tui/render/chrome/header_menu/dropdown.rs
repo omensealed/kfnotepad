@@ -1,3 +1,7 @@
+//! Active menu dropdown rendering.
+
+use super::*;
+
 pub(crate) fn write_menu_dropdown(
     writer: &mut impl Write,
     menu: MenuState,

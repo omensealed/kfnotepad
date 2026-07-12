@@ -1,8 +1,12 @@
+//! Menu labels, widths, and dropdown positioning.
+
+use super::*;
+
 pub(crate) fn menu_item_display_width(item: &MenuItem) -> usize {
     text_display_width(&format_menu_item(item, 0))
 }
 
-fn format_menu_item(item: &MenuItem, inner_width: usize) -> String {
+pub(super) fn format_menu_item(item: &MenuItem, inner_width: usize) -> String {
     match item.shortcut {
         Some(shortcut) => {
             let label_width = text_display_width(item.label);
@@ -28,6 +32,6 @@ pub(crate) fn menu_dropdown_column(group: MenuGroup, frame: RenderFrame) -> u16 
     column.min(frame.terminal_width.saturating_sub(1)) as u16
 }
 
-fn menu_bar_text() -> &'static str {
+pub(super) fn menu_bar_text() -> &'static str {
     " File  Edit  View  Go  Tabs  Workspace  Help |"
 }
