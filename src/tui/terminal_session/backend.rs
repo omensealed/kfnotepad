@@ -1,3 +1,5 @@
+//! Crossterm setup and best-effort terminal restoration backend.
+
 use std::io::{self, Error, ErrorKind, Write};
 
 use crossterm::cursor::Show;
@@ -10,6 +12,8 @@ use crossterm::terminal::{
     disable_raw_mode, enable_raw_mode, supports_keyboard_enhancement, EnterAlternateScreen,
     LeaveAlternateScreen,
 };
+
+use super::{editor_keyboard_enhancement_flags, supports_tui_terminal};
 
 pub(crate) trait TerminalBackend {
     type Writer: Write;
@@ -102,5 +106,4 @@ impl TerminalBackend for CrosstermBackend {
     fn uses_alternate_screen(&self) -> bool {
         self.alternate_screen_active
     }
-
 }

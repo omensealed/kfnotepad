@@ -1,8 +1,13 @@
+//! Terminal capability and restoration lifecycle tests.
+
 use std::cell::RefCell;
+use std::env;
 use std::io;
 use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::rc::Rc;
 use std::sync::{Mutex, OnceLock};
+
+use crossterm::event::KeyboardEnhancementFlags;
 
 use super::*;
 

@@ -1,6 +1,10 @@
+//! RAII terminal session that restores its backend on drop and panic unwind.
+
+use super::{CrosstermBackend, TerminalBackend};
+
 pub(crate) struct TerminalSession<B: TerminalBackend = CrosstermBackend> {
     pub(crate) stdout: B::Writer,
-    backend: B,
+    pub(super) backend: B,
 }
 
 impl TerminalSession<CrosstermBackend> {

@@ -1,3 +1,5 @@
+//! Terminal capability detection and keyboard enhancement policy.
+
 use std::env;
 
 use crossterm::event::KeyboardEnhancementFlags;
