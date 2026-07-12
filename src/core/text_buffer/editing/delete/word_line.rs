@@ -1,3 +1,7 @@
+//! Word and line-tail deletion commands.
+
+use super::*;
+
 impl TextBuffer {
     pub fn delete_previous_word(&mut self, cursor: Cursor) -> Result<Cursor, BufferError> {
         self.validate_cursor(cursor)?;

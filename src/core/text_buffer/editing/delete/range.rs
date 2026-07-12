@@ -1,3 +1,7 @@
+//! Grapheme-normalized same-line and multiline range deletion.
+
+use super::*;
+
 impl TextBuffer {
     pub fn delete_range(&mut self, start: Cursor, end: Cursor) -> Result<(), BufferError> {
         self.delete_range_with_trailing_newline_policy(start, end, false)
@@ -79,10 +83,13 @@ impl TextBuffer {
     }
 
     fn range_start_boundary_cursor(&self, cursor: Cursor) -> Result<Cursor, BufferError> {
-        let line = self.lines.get(cursor.row).ok_or(BufferError::RowOutOfBounds {
-            row: cursor.row,
-            rows: self.lines.len(),
-        })?;
+        let line = self
+            .lines
+            .get(cursor.row)
+            .ok_or(BufferError::RowOutOfBounds {
+                row: cursor.row,
+                rows: self.lines.len(),
+            })?;
         Ok(Cursor {
             row: cursor.row,
             column: grapheme_range_start_boundary_column(line, cursor.column),
@@ -90,10 +97,13 @@ impl TextBuffer {
     }
 
     fn range_end_boundary_cursor(&self, cursor: Cursor) -> Result<Cursor, BufferError> {
-        let line = self.lines.get(cursor.row).ok_or(BufferError::RowOutOfBounds {
-            row: cursor.row,
-            rows: self.lines.len(),
-        })?;
+        let line = self
+            .lines
+            .get(cursor.row)
+            .ok_or(BufferError::RowOutOfBounds {
+                row: cursor.row,
+                rows: self.lines.len(),
+            })?;
         Ok(Cursor {
             row: cursor.row,
             column: grapheme_range_end_boundary_column(line, cursor.column),

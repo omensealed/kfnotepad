@@ -1,3 +1,7 @@
+//! Forward character deletion and cursor-relative backspace behavior.
+
+use super::*;
+
 impl TextBuffer {
     pub fn delete_char(&mut self, row: usize, column: usize) -> Result<(), BufferError> {
         let rows = self.lines.len();

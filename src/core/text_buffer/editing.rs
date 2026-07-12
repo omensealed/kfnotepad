@@ -2,5 +2,7 @@
 
 use super::*;
 
-include!("editing/insert_replace.rs");
-include!("editing/delete.rs");
+#[path = "editing/delete.rs"]
+mod delete;
+#[path = "editing/insert_replace.rs"]
+mod insert_replace;

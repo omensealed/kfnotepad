@@ -1,3 +1,7 @@
+//! Text insertion, character replacement, and newline splitting.
+
+use super::*;
+
 impl TextBuffer {
     pub fn insert_text(&mut self, cursor: Cursor, text: &str) -> Result<Cursor, BufferError> {
         self.validate_cursor(cursor)?;
@@ -28,7 +32,11 @@ impl TextBuffer {
 
             let last_index = segments.len() - 1;
             let mut inserted_lines = Vec::with_capacity(last_index);
-            inserted_lines.extend(segments[1..last_index].iter().map(|line| (*line).to_string()));
+            inserted_lines.extend(
+                segments[1..last_index]
+                    .iter()
+                    .map(|line| (*line).to_string()),
+            );
             inserted_lines.push(format!("{}{remainder}", segments[last_index]));
             self.lines
                 .splice((cursor.row + 1)..(cursor.row + 1), inserted_lines);
