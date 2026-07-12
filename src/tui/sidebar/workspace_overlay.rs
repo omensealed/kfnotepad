@@ -1,3 +1,16 @@
+//! Saved-workspace manager overlay rendering.
+
+use std::io::{self, Write};
+
+use crossterm::cursor::MoveTo;
+use crossterm::queue;
+use crossterm::style::{Attribute, ResetColor, SetAttribute};
+
+use super::colors::{queue_set_background_color, queue_set_foreground_color};
+use crate::tui::app::print_truncated;
+use crate::tui::menu::WorkspaceManagerState;
+use crate::tui::theme::EditorTheme;
+
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn write_workspace_manager_overlay(
     writer: &mut impl Write,

@@ -1,3 +1,16 @@
+//! File sidebar rows, selection, and current-directory header rendering.
+
+use std::io::{self, Write};
+
+use crossterm::cursor::MoveTo;
+use crossterm::queue;
+use crossterm::style::{Attribute, ResetColor, SetAttribute};
+use kfnotepad::FileSidebarState;
+
+use super::colors::{queue_set_background_color, queue_set_foreground_color};
+use crate::tui::app::{fit_text_end, print_truncated, SIDEBAR_WIDTH};
+use crate::tui::theme::EditorTheme;
+
 pub(crate) fn render_file_sidebar(
     writer: &mut impl Write,
     sidebar: &FileSidebarState,

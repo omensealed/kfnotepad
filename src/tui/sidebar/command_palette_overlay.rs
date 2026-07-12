@@ -1,3 +1,17 @@
+//! Filtered command-palette overlay and input cursor rendering.
+
+use std::io::{self, Write};
+
+use crossterm::cursor::{MoveTo, Show};
+use crossterm::queue;
+use crossterm::style::{Attribute, ResetColor, SetAttribute};
+
+use super::colors::{queue_set_background_color, queue_set_foreground_color};
+use crate::tui::app::{fit_text_end, print_truncated, text_display_width};
+use crate::tui::input::command_palette_candidates;
+use crate::tui::menu::CommandPaletteState;
+use crate::tui::theme::EditorTheme;
+
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn write_command_palette_overlay(
     writer: &mut impl Write,

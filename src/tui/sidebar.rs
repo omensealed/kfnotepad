@@ -1,23 +1,14 @@
-//! Sidebar and overlay rendering helpers for terminal UI.
+//! Sidebar and overlay rendering helpers for the terminal UI.
 
-// Sidebar helpers are compiled through the library target but driven by the
-// TUI binary/runtime tests, which leaves false dead-code positives per target.
-use std::io::{self, Write};
+#[path = "sidebar/colors.rs"]
+mod colors;
+#[path = "sidebar/command_palette_overlay.rs"]
+mod command_palette_overlay;
+#[path = "sidebar/file_sidebar.rs"]
+mod file_sidebar;
+#[path = "sidebar/workspace_overlay.rs"]
+mod workspace_overlay;
 
-use crossterm::cursor::MoveTo;
-use crossterm::cursor::Show;
-use crossterm::queue;
-use crossterm::style::{
-    Attribute, Color, ResetColor, SetAttribute, SetBackgroundColor, SetForegroundColor,
-};
-use kfnotepad::FileSidebarState;
-
-use super::input::command_palette_candidates;
-use super::menu::{CommandPaletteState, WorkspaceManagerState};
-use super::theme::EditorTheme;
-use crate::tui::app::{fit_text_end, print_truncated, text_display_width, SIDEBAR_WIDTH};
-
-include!("sidebar/file_sidebar.rs");
-include!("sidebar/workspace_overlay.rs");
-include!("sidebar/command_palette_overlay.rs");
-include!("sidebar/colors.rs");
+pub(crate) use command_palette_overlay::write_command_palette_overlay;
+pub(crate) use file_sidebar::render_file_sidebar;
+pub(crate) use workspace_overlay::write_workspace_manager_overlay;
