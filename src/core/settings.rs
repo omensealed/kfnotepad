@@ -12,10 +12,25 @@ use super::{
     GuiLayoutNode, GuiWorkspaceProject, GuiWorkspaceProjectDeleteResult, GuiWorkspaceProjectEntry,
 };
 
-include!("settings/types.rs");
-include!("settings/paths.rs");
-include!("settings/parse_helpers.rs");
-include!("settings/editor_config.rs");
-include!("settings/gui_layout.rs");
-include!("settings/workspace_projects.rs");
-include!("settings/io_helpers.rs");
+#[path = "settings/editor_config.rs"]
+mod editor_config;
+#[path = "settings/gui_layout.rs"]
+mod gui_layout;
+#[path = "settings/io_helpers.rs"]
+mod io_helpers;
+#[path = "settings/parse_helpers.rs"]
+mod parse_helpers;
+#[path = "settings/paths.rs"]
+mod paths;
+#[path = "settings/types.rs"]
+mod types;
+#[path = "settings/workspace_projects.rs"]
+mod workspace_projects;
+
+pub use editor_config::*;
+pub use gui_layout::*;
+use io_helpers::{set_private_config_dir_permissions, write_config_temp_then_rename};
+use parse_helpers::{parse_config_bool, parse_config_string};
+pub use paths::*;
+pub use types::*;
+pub use workspace_projects::*;

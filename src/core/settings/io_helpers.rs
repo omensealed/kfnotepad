@@ -1,4 +1,8 @@
-fn write_config_temp_then_rename(
+//! Private-permission and durable atomic configuration write helpers.
+
+use super::*;
+
+pub(super) fn write_config_temp_then_rename(
     target_path: &Path,
     temp_path: &Path,
     bytes: &[u8],
@@ -49,13 +53,13 @@ fn sync_parent_directory_best_effort(path: &Path) {
 }
 
 #[cfg(unix)]
-fn set_private_config_dir_permissions(path: &Path) -> io::Result<()> {
+pub(super) fn set_private_config_dir_permissions(path: &Path) -> io::Result<()> {
     use std::os::unix::fs::PermissionsExt;
 
     fs::set_permissions(path, fs::Permissions::from_mode(0o700))
 }
 
 #[cfg(not(unix))]
-fn set_private_config_dir_permissions(_path: &Path) -> io::Result<()> {
+pub(super) fn set_private_config_dir_permissions(_path: &Path) -> io::Result<()> {
     Ok(())
 }

@@ -1,3 +1,7 @@
+//! Cross-platform editor, GUI layout, and workspace-project paths.
+
+use super::*;
+
 pub fn editor_config_path(xdg_config_home: Option<&Path>, home: Option<&Path>) -> Option<PathBuf> {
     resolve_editor_config_path(xdg_config_home, home)
 }
