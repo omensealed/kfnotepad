@@ -1,3 +1,7 @@
+//! Paste normalization, bulk insertion, and prompt-aware paste behavior.
+
+use super::*;
+
 pub(crate) fn insert_paste(
     document: &mut TextDocument,
     cursor: &mut Cursor,

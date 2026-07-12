@@ -1,3 +1,7 @@
+//! Typed-character insertion and overwrite behavior.
+
+use super::*;
+
 pub(crate) fn insert_typed_character(
     document: &mut TextDocument,
     cursor: &mut Cursor,
@@ -19,7 +23,9 @@ fn insert_typed_character_internal(
             .buffer
             .replace_char(cursor.row, cursor.column, value)
     } else {
-        document.buffer.insert_char(cursor.row, cursor.column, value)
+        document
+            .buffer
+            .insert_char(cursor.row, cursor.column, value)
     };
     match result {
         Ok(()) => {

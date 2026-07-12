@@ -1,5 +1,15 @@
-include!("editing/undo_redo.rs");
-include!("editing/word_deletion.rs");
-include!("editing/overwrite.rs");
-include!("editing/typed_insert.rs");
-include!("editing/paste.rs");
+//! Undo/redo, deletion, overwrite, typed insertion, and paste commands.
+
+use super::*;
+
+mod overwrite;
+mod paste;
+mod typed_insert;
+mod undo_redo;
+mod word_deletion;
+
+pub(crate) use overwrite::*;
+pub(crate) use paste::*;
+pub(crate) use typed_insert::*;
+pub(crate) use undo_redo::*;
+pub(crate) use word_deletion::*;

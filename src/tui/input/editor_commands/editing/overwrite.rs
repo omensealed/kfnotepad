@@ -1,3 +1,7 @@
+//! Overwrite-mode state transitions.
+
+use super::*;
+
 pub(crate) fn toggle_overwrite_mode(runtime: &mut EditorRuntime) {
     runtime.quit_confirmation_pending = false;
     runtime.overwrite_mode = !runtime.overwrite_mode;

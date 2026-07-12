@@ -1,3 +1,7 @@
+//! Previous-word, next-word, and line-tail deletion commands.
+
+use super::*;
+
 pub(crate) fn delete_previous_word(
     document: &mut TextDocument,
     cursor: &mut Cursor,

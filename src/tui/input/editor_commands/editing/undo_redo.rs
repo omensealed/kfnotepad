@@ -1,3 +1,7 @@
+//! Undo and redo commands with cursor/runtime synchronization.
+
+use super::*;
+
 pub(crate) fn undo_document(
     document: &mut TextDocument,
     cursor: &mut Cursor,
