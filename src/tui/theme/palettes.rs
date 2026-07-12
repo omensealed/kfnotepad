@@ -1,3 +1,10 @@
+//! Concrete terminal palettes for each shared editor theme.
+
+use crossterm::style::Color;
+use kfnotepad::EditorThemeId;
+
+use super::EditorTheme;
+
 impl EditorTheme {
     pub(crate) fn for_id(theme_id: EditorThemeId) -> Self {
         match theme_id {

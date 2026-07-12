@@ -1,3 +1,8 @@
+//! Terminal chrome color roles.
+
+use crossterm::style::Color;
+use kfnotepad::EditorThemeId;
+
 #[derive(Clone, Copy)]
 pub(crate) struct EditorTheme {
     pub(crate) header_fg: Color,

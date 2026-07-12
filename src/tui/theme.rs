@@ -1,5 +1,8 @@
-use crossterm::style::Color;
-use kfnotepad::EditorThemeId;
+//! Terminal chrome palettes derived from shared editor theme identifiers.
 
-include!("theme/types.rs");
-include!("theme/palettes.rs");
+#[path = "theme/palettes.rs"]
+mod palettes;
+#[path = "theme/types.rs"]
+mod types;
+
+pub(crate) use types::EditorTheme;
