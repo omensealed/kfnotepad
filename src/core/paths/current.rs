@@ -1,3 +1,14 @@
+//! Current-platform application paths used by runtime entry points.
+
+use std::path::PathBuf;
+
+use super::platform::{current_config_base_dir, current_data_base_dir, platform_home_dir};
+use super::resolve::{
+    resolve_editor_config_path, resolve_gui_layout_path, resolve_gui_workspace_projects_dir,
+    resolve_managed_notes_dir,
+};
+use crate::core::ManagedNotesError;
+
 pub fn current_editor_config_path() -> Option<PathBuf> {
     resolve_editor_config_path(
         current_config_base_dir().as_deref(),

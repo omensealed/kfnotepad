@@ -1,3 +1,10 @@
+//! Deterministic application path resolution from explicit base directories.
+
+use std::path::{Path, PathBuf};
+
+use super::helpers::non_empty;
+use crate::core::ManagedNotesError;
+
 pub fn resolve_editor_config_path(
     xdg_config_home: Option<&Path>,
     home: Option<&Path>,
