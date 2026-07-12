@@ -2,7 +2,7 @@
 
 use super::*;
 
-include!("workspaces_panel/left_panel.rs");
-include!("workspaces_panel/project_list.rs");
-include!("workspaces_panel/save_projects.rs");
-include!("workspaces_panel/open_current_window.rs");
+mod left_panel;
+mod open_current_window;
+mod project_list;
+mod save_projects;

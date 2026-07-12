@@ -1,3 +1,7 @@
+//! Workspace-project capture, saving, and last-workspace persistence.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn save_current_workspace_project(&mut self) {
         self.save_workspace_project_named("current workspace", "current workspace");
@@ -12,7 +16,11 @@ impl KfnotepadGui {
         self.save_workspace_project_named(&name, &name);
     }
 
-    pub(in crate::gui) fn save_workspace_project_named(&mut self, project_name: &str, status_name: &str) {
+    pub(in crate::gui) fn save_workspace_project_named(
+        &mut self,
+        project_name: &str,
+        status_name: &str,
+    ) {
         let Some(projects_dir) = self.workspace_projects_dir.clone() else {
             self.status_message =
                 "workspace save failed: cannot resolve config directory".to_string();

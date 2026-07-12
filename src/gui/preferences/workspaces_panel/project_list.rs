@@ -1,3 +1,7 @@
+//! Workspace-project listing, deletion, and new-window opening.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn refresh_workspace_projects(&mut self) {
         self.pending_project_delete = None;
@@ -67,7 +71,10 @@ impl KfnotepadGui {
         }
     }
 
-    pub(in crate::gui) fn is_current_workspace_project(&self, entry: &GuiWorkspaceProjectEntry) -> bool {
+    pub(in crate::gui) fn is_current_workspace_project(
+        &self,
+        entry: &GuiWorkspaceProjectEntry,
+    ) -> bool {
         self.workspace_projects_dir
             .as_deref()
             .and_then(|projects_dir| gui_workspace_project_path(projects_dir, "current workspace"))

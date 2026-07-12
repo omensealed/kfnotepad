@@ -1,3 +1,7 @@
+//! Left-panel visibility and mode selection.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn toggle_left_panel(&mut self) {
         self.left_panel.toggle_visibility();
