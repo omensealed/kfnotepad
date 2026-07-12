@@ -1,3 +1,9 @@
+//! Errors produced while validating and opening a text file.
+
+use std::fmt;
+use std::io;
+use std::path::PathBuf;
+
 #[derive(Debug)]
 pub enum OpenError {
     Access {

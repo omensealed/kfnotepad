@@ -1,3 +1,11 @@
+//! Errors produced by managed-note path, storage, and lifecycle operations.
+
+use std::fmt;
+use std::io;
+use std::path::PathBuf;
+
+use super::{OpenError, SaveError};
+
 #[derive(Debug)]
 pub enum ManagedNotesError {
     MissingDataHome,

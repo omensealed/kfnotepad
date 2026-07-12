@@ -1,3 +1,9 @@
+//! Errors produced by conservative atomic text-file saves.
+
+use std::fmt;
+use std::io;
+use std::path::PathBuf;
+
 #[derive(Debug)]
 pub enum SaveError {
     Metadata {

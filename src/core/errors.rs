@@ -1,9 +1,12 @@
-//! Error types shared across file and document operations.
+//! Error types shared across file, save, and managed-note operations.
 
-use std::fmt;
-use std::io;
-use std::path::PathBuf;
+#[path = "errors/managed_notes.rs"]
+mod managed_notes;
+#[path = "errors/open.rs"]
+mod open;
+#[path = "errors/save.rs"]
+mod save;
 
-include!("errors/open.rs");
-include!("errors/save.rs");
-include!("errors/managed_notes.rs");
+pub use managed_notes::ManagedNotesError;
+pub use open::OpenError;
+pub use save::SaveError;
