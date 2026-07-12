@@ -1,3 +1,7 @@
+//! Public text summary, open, and buffer/document save adapters.
+
+use super::*;
+
 pub fn summarize_text(text: &str) -> FileSummary {
     FileSummary {
         bytes: text.len() as u64,

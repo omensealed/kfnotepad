@@ -1,8 +1,14 @@
-fn read_text_file(path: &Path) -> Result<String, OpenError> {
+//! Conservative file reads, save-target validation, and external-change snapshots.
+
+use super::*;
+
+pub(super) fn read_text_file(path: &Path) -> Result<String, OpenError> {
     read_text_file_with_snapshot(path).map(|(text, _snapshot)| text)
 }
 
-fn read_text_file_with_snapshot(path: &Path) -> Result<(String, FileSnapshot), OpenError> {
+pub(super) fn read_text_file_with_snapshot(
+    path: &Path,
+) -> Result<(String, FileSnapshot), OpenError> {
     let metadata = fs::symlink_metadata(path).map_err(|source| OpenError::Access {
         path: path.to_path_buf(),
         source,
@@ -58,7 +64,7 @@ fn read_text_file_with_snapshot(path: &Path) -> Result<(String, FileSnapshot), O
         })
 }
 
-fn validate_save_target(path: &Path) -> Result<Option<fs::Permissions>, SaveError> {
+pub(super) fn validate_save_target(path: &Path) -> Result<Option<fs::Permissions>, SaveError> {
     match fs::symlink_metadata(path) {
         Ok(metadata) if metadata.file_type().is_symlink() => Err(SaveError::Symlink {
             path: path.to_path_buf(),
@@ -78,7 +84,7 @@ fn validate_save_target(path: &Path) -> Result<Option<fs::Permissions>, SaveErro
     }
 }
 
-fn file_snapshot(path: &Path) -> io::Result<FileSnapshot> {
+pub(super) fn file_snapshot(path: &Path) -> io::Result<FileSnapshot> {
     let metadata = fs::symlink_metadata(path)?;
     let bytes = fs::read(path)?;
     Ok(FileSnapshot {

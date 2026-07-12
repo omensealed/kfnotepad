@@ -1,11 +1,18 @@
-fn save_text_buffer_for_document(path: &Path, buffer: &mut TextBuffer) -> Result<(), SaveError> {
+//! Snapshot-aware, size-limited atomic text saving.
+
+use super::*;
+
+pub(super) fn save_text_buffer_for_document(
+    path: &Path,
+    buffer: &mut TextBuffer,
+) -> Result<(), SaveError> {
     let expected_snapshot = buffer.file_snapshot().cloned();
     let snapshot = save_text_buffer_inner(path, buffer, expected_snapshot.as_ref())?;
     buffer.set_file_snapshot(Some(snapshot));
     Ok(())
 }
 
-fn save_text_buffer_inner(
+pub(super) fn save_text_buffer_inner(
     path: &Path,
     buffer: &TextBuffer,
     expected_snapshot: Option<&FileSnapshot>,

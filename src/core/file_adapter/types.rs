@@ -1,3 +1,7 @@
+//! Public managed-note and metadata snapshot value types.
+
+use super::*;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ManagedNoteEntry {
     pub file_name: String,

@@ -1,3 +1,7 @@
+//! OS trash integration and atomic-save filesystem helpers.
+
+use super::*;
+
 pub fn move_path_to_trash(path: &Path) -> io::Result<()> {
     let metadata = fs::symlink_metadata(path)?;
     if metadata.file_type().is_symlink() {
@@ -16,7 +20,7 @@ pub fn move_path_to_trash(path: &Path) -> io::Result<()> {
     trash::delete(path).map_err(|error| io::Error::other(format!("trash unavailable: {error}")))
 }
 
-fn fingerprint_bytes(bytes: &[u8]) -> u64 {
+pub(super) fn fingerprint_bytes(bytes: &[u8]) -> u64 {
     let mut hash = 0xcbf29ce484222325u64;
     for byte in bytes {
         hash ^= u64::from(*byte);
@@ -25,7 +29,7 @@ fn fingerprint_bytes(bytes: &[u8]) -> u64 {
     hash
 }
 
-fn write_temp_then_rename(
+pub(super) fn write_temp_then_rename(
     target_path: &Path,
     temp_path: &Path,
     bytes: &[u8],
@@ -75,7 +79,7 @@ fn write_temp_then_rename(
     Ok(())
 }
 
-fn temporary_sibling_path(path: &Path) -> PathBuf {
+pub(super) fn temporary_sibling_path(path: &Path) -> PathBuf {
     let file_name = path
         .file_name()
         .and_then(|name| name.to_str())
@@ -96,7 +100,7 @@ fn sync_parent_directory_best_effort(path: &Path) {
     }
 }
 
-fn is_managed_note_file_name(path: &Path) -> bool {
+pub(super) fn is_managed_note_file_name(path: &Path) -> bool {
     let Some(file_name) = path.file_name().and_then(|name| name.to_str()) else {
         return false;
     };
