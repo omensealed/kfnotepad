@@ -1,3 +1,7 @@
+//! Sidebar visibility, selection, and scrolling controls.
+
+use super::*;
+
 pub(crate) fn toggle_file_sidebar(runtime: &mut EditorRuntime) {
     if runtime.sidebar.is_some() {
         close_file_sidebar(runtime);

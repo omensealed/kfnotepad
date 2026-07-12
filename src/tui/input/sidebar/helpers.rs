@@ -1,3 +1,7 @@
+//! Sidebar path validation, target selection, refresh, and dirty-tab checks.
+
+use super::*;
+
 pub(crate) fn validated_sidebar_child_name(name: &str) -> Result<&str, String> {
     let name = name.trim();
     if name.is_empty() {

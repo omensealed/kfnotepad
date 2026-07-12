@@ -2,7 +2,11 @@
 
 use super::*;
 
-include!("sidebar/navigation.rs");
+mod helpers;
+mod navigation;
+
 include!("sidebar/prompts_and_mutation.rs");
-include!("sidebar/helpers.rs");
 include!("sidebar/activation.rs");
+
+pub(crate) use helpers::*;
+pub(crate) use navigation::*;
