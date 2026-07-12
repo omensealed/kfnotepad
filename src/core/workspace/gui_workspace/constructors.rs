@@ -1,3 +1,7 @@
+//! GUI workspace construction and tile lookup accessors.
+
+use super::*;
+
 impl GuiWorkspace {
     pub fn from_document(document: TextDocument) -> Self {
         let first_id = GuiTileId(0);

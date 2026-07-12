@@ -1,3 +1,7 @@
+//! Per-tile save-error state transitions.
+
+use super::*;
+
 impl GuiWorkspace {
     pub fn mark_tile_save_failed(
         &mut self,

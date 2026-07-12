@@ -1,3 +1,7 @@
+//! Tile opening, validation, focus, and minimization behavior.
+
+use super::*;
+
 impl GuiWorkspace {
     pub fn open_tile(&mut self, document: TextDocument) -> GuiTileId {
         let tile_id = GuiTileId(self.next_tile_id);

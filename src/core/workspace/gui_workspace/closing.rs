@@ -1,3 +1,7 @@
+//! Dirty-aware tile closing and focus fallback behavior.
+
+use super::*;
+
 impl GuiWorkspace {
     pub fn close_tile(&mut self, tile_id: GuiTileId, confirm_dirty: bool) -> GuiCloseTileResult {
         let Some(index) = self.tiles.iter().position(|tile| tile.id == tile_id) else {

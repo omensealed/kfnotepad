@@ -1,3 +1,7 @@
+//! Split, move, and resize layout-intent tracking.
+
+use super::*;
+
 impl GuiWorkspace {
     pub fn request_split(&mut self, tile_id: GuiTileId, direction: GuiSplitDirection) -> bool {
         if self.tile(tile_id).is_none() {
