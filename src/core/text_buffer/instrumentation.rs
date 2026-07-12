@@ -1,10 +1,12 @@
+//! Test-only counters for detecting whole-buffer GUI reconstruction.
+
 #[cfg(all(test, feature = "gui"))]
 use std::cell::Cell;
 
 #[cfg(all(test, feature = "gui"))]
 thread_local! {
-    static TO_TEXT_CALL_COUNT: Cell<usize> = const { Cell::new(0) };
-    static FROM_TEXT_CALL_COUNT: Cell<usize> = const { Cell::new(0) };
+    pub(super) static TO_TEXT_CALL_COUNT: Cell<usize> = const { Cell::new(0) };
+    pub(super) static FROM_TEXT_CALL_COUNT: Cell<usize> = const { Cell::new(0) };
 }
 
 #[cfg(all(test, feature = "gui"))]

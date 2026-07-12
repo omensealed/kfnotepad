@@ -1,9 +1,13 @@
+//! Text-buffer state, snapshots, and public error types.
+
+use super::*;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TextBuffer {
     pub(crate) lines: Vec<String>,
     pub(crate) trailing_newline: bool,
     pub(crate) dirty: bool,
-    edit_revision: u64,
+    pub(super) edit_revision: u64,
     pub(crate) undo_history: VecDeque<BufferSnapshot>,
     pub(crate) redo_history: VecDeque<BufferSnapshot>,
     pub(crate) undo_bytes: usize,
@@ -22,9 +26,9 @@ pub struct FileSnapshot {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct InsertUndoGroup {
-    row: usize,
-    next_column: usize,
-    last_edit: Instant,
+    pub(super) row: usize,
+    pub(super) next_column: usize,
+    pub(super) last_edit: Instant,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

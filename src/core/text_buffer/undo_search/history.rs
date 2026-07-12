@@ -1,5 +1,5 @@
 impl TextBuffer {
-    fn record_undo_for_typed_insert(&mut self, row: usize, column: usize) {
+    pub(super) fn record_undo_for_typed_insert(&mut self, row: usize, column: usize) {
         let now = Instant::now();
         let can_merge = self.insert_undo_group.is_some_and(|group| {
             group.row == row
@@ -74,12 +74,12 @@ impl TextBuffer {
         }
     }
 
-    fn mark_changed(&mut self) {
+    pub(super) fn mark_changed(&mut self) {
         self.dirty = true;
         self.edit_revision = self.edit_revision.wrapping_add(1);
     }
 
-    fn record_undo(&mut self) {
+    pub(super) fn record_undo(&mut self) {
         self.insert_undo_group = None;
         let snapshot = match std::mem::replace(
             &mut self.compound_edit,

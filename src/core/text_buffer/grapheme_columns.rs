@@ -1,13 +1,16 @@
+//! Grapheme-aware conversion and boundary helpers for character columns.
+
+use super::*;
 use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Clone, Copy)]
-struct GraphemeColumn {
-    start: usize,
-    end: usize,
-    is_word: bool,
+pub(super) struct GraphemeColumn {
+    pub(super) start: usize,
+    pub(super) end: usize,
+    pub(super) is_word: bool,
 }
 
-fn previous_grapheme_column(line: &str, column: usize) -> Result<usize, BufferError> {
+pub(super) fn previous_grapheme_column(line: &str, column: usize) -> Result<usize, BufferError> {
     let columns = line.chars().count();
     if column > columns {
         return Err(BufferError::ColumnOutOfBounds { column, columns });
@@ -23,7 +26,7 @@ fn previous_grapheme_column(line: &str, column: usize) -> Result<usize, BufferEr
     Ok(previous)
 }
 
-fn next_grapheme_column(line: &str, column: usize) -> Result<usize, BufferError> {
+pub(super) fn next_grapheme_column(line: &str, column: usize) -> Result<usize, BufferError> {
     let columns = line.chars().count();
     if column > columns {
         return Err(BufferError::ColumnOutOfBounds { column, columns });
@@ -40,7 +43,10 @@ fn next_grapheme_column(line: &str, column: usize) -> Result<usize, BufferError>
     Ok(columns)
 }
 
-fn nearest_grapheme_boundary_column(line: &str, column: usize) -> Result<usize, BufferError> {
+pub(super) fn nearest_grapheme_boundary_column(
+    line: &str,
+    column: usize,
+) -> Result<usize, BufferError> {
     let columns = line.chars().count();
     if column > columns {
         return Err(BufferError::ColumnOutOfBounds { column, columns });
@@ -56,7 +62,7 @@ fn nearest_grapheme_boundary_column(line: &str, column: usize) -> Result<usize, 
     Ok(columns)
 }
 
-fn grapheme_char_range_at_column(
+pub(super) fn grapheme_char_range_at_column(
     line: &str,
     column: usize,
 ) -> Result<Option<(usize, usize)>, BufferError> {
@@ -73,7 +79,7 @@ fn grapheme_char_range_at_column(
     Ok(None)
 }
 
-fn grapheme_range_boundary_columns_for_line(
+pub(super) fn grapheme_range_boundary_columns_for_line(
     line: &str,
     start_column: usize,
     end_column: usize,
@@ -97,7 +103,7 @@ fn grapheme_range_boundary_columns_for_line(
     Ok((start.min(end), end.max(start)))
 }
 
-fn grapheme_range_start_boundary_column(line: &str, column: usize) -> usize {
+pub(super) fn grapheme_range_start_boundary_column(line: &str, column: usize) -> usize {
     for (start, end) in grapheme_column_ranges(line) {
         if start < column && column < end {
             return start;
@@ -106,7 +112,7 @@ fn grapheme_range_start_boundary_column(line: &str, column: usize) -> usize {
     column
 }
 
-fn grapheme_range_end_boundary_column(line: &str, column: usize) -> usize {
+pub(super) fn grapheme_range_end_boundary_column(line: &str, column: usize) -> usize {
     for (start, end) in grapheme_column_ranges(line) {
         if start < column && column < end {
             return end;
@@ -137,7 +143,7 @@ fn grapheme_word_columns(line: &str) -> Vec<GraphemeColumn> {
         .collect()
 }
 
-fn grapheme_word_index_for_column(
+pub(super) fn grapheme_word_index_for_column(
     line: &str,
     column: usize,
 ) -> Result<(Vec<GraphemeColumn>, usize), BufferError> {

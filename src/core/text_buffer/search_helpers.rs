@@ -1,4 +1,8 @@
-fn byte_index_for_char_column(line: &str, column: usize) -> Result<usize, BufferError> {
+//! Line-local search and character-column conversion helpers.
+
+use super::*;
+
+pub(super) fn byte_index_for_char_column(line: &str, column: usize) -> Result<usize, BufferError> {
     let columns = line.chars().count();
     if column > columns {
         return Err(BufferError::ColumnOutOfBounds { column, columns });
@@ -10,7 +14,7 @@ fn byte_index_for_char_column(line: &str, column: usize) -> Result<usize, Buffer
         .map_or(line.len(), |(index, _)| index))
 }
 
-fn find_in_line_with_mode(
+pub(super) fn find_in_line_with_mode(
     line: &str,
     query: &str,
     start_column: usize,
@@ -31,7 +35,7 @@ fn find_in_line_with_mode(
     })
 }
 
-fn find_last_in_line_before_with_mode(
+pub(super) fn find_last_in_line_before_with_mode(
     line: &str,
     query: &str,
     end_column: usize,
@@ -78,6 +82,6 @@ fn find_last_in_line_case_insensitive(
     })
 }
 
-fn is_word_character(character: char) -> bool {
+pub(super) fn is_word_character(character: char) -> bool {
     character == '_' || character.is_alphanumeric()
 }

@@ -1,5 +1,9 @@
+//! Snapshot sizing and byte-budgeted history queue operations.
+
+use super::*;
+
 impl BufferSnapshot {
-    fn from_buffer(buffer: &TextBuffer) -> Self {
+    pub(super) fn from_buffer(buffer: &TextBuffer) -> Self {
         Self {
             lines: buffer.lines.clone(),
             trailing_newline: buffer.trailing_newline,
@@ -8,7 +12,7 @@ impl BufferSnapshot {
     }
 }
 
-fn buffer_bytes(lines: &[String], trailing_newline: bool) -> usize {
+pub(super) fn buffer_bytes(lines: &[String], trailing_newline: bool) -> usize {
     let line_bytes: usize = lines.iter().map(String::len).sum();
     let newline_bytes = lines.len().saturating_sub(1);
     let trailing_newline_byte = usize::from(trailing_newline);

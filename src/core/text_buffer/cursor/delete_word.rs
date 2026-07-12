@@ -1,5 +1,5 @@
 impl TextBuffer {
-    fn next_word_delete_end_cursor(&self, cursor: Cursor) -> Cursor {
+    pub(super) fn next_word_delete_end_cursor(&self, cursor: Cursor) -> Cursor {
         let mut row = cursor.row;
         let mut column = cursor.column;
 

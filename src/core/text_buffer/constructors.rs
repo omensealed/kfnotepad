@@ -1,3 +1,7 @@
+//! Construction, serialization, metadata, and clean-state behavior.
+
+use super::*;
+
 impl TextBuffer {
     pub fn from_text(text: &str) -> Self {
         #[cfg(all(test, feature = "gui"))]
