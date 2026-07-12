@@ -1,3 +1,7 @@
+//! Document, cursor, command, and edit result data types.
+
+use crate::core::TextBuffer;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Command {
     Help,

@@ -1,3 +1,8 @@
+//! Repeated forward and backward document search operations.
+
+use super::{Cursor, TextDocument};
+use crate::core::{next_search_start, SearchMode, SearchRepeatResult};
+
 pub fn repeat_search_next(
     document: &TextDocument,
     cursor: &mut Cursor,
@@ -23,7 +28,7 @@ pub fn repeat_search_next_with_mode(
         return SearchRepeatResult::NoPreviousSearch;
     }
 
-    let start = super::next_search_start(document, *cursor);
+    let start = next_search_start(document, *cursor);
     if let Some(found) = document
         .buffer
         .find_next_with_mode(query, start, mode)

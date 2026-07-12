@@ -1,3 +1,8 @@
+//! Cursor movement and document-level editing commands.
+
+use super::{Cursor, CursorMove, EditResult, TextDocument, UndoRedoResult};
+use crate::core::GoToLineResult;
+
 pub fn clamp_cursor_to_document(document: &TextDocument, cursor: &mut Cursor) {
     cursor.row = cursor
         .row

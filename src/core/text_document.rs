@@ -1,7 +1,12 @@
-//! Document-level types and cursor/navigation operations.
+//! Document-level types and cursor, editing, and search operations.
 
-use super::{GoToLineResult, SearchMode, SearchRepeatResult, TextBuffer};
+#[path = "text_document/cursor_edit.rs"]
+mod cursor_edit;
+#[path = "text_document/search.rs"]
+mod search;
+#[path = "text_document/types.rs"]
+mod types;
 
-include!("text_document/types.rs");
-include!("text_document/cursor_edit.rs");
-include!("text_document/search.rs");
+pub use cursor_edit::*;
+pub use search::*;
+pub use types::*;
