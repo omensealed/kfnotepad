@@ -1,6 +1,17 @@
-include!("keyboard/editor_dispatch.rs");
-include!("keyboard/workspace_shortcuts.rs");
-include!("keyboard/workspace_menu.rs");
-include!("keyboard/command_palette.rs");
-include!("keyboard/menu.rs");
-include!("keyboard/sidebar.rs");
+//! Keyboard dispatch for editor, workspace, palette, menus, and sidebar.
+
+use super::*;
+
+mod command_palette;
+mod editor_dispatch;
+mod menu;
+mod sidebar;
+mod workspace_menu;
+mod workspace_shortcuts;
+
+pub(crate) use command_palette::*;
+pub(crate) use editor_dispatch::*;
+pub(crate) use menu::*;
+pub(crate) use sidebar::*;
+pub(crate) use workspace_menu::*;
+pub(crate) use workspace_shortcuts::*;

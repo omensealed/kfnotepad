@@ -1,3 +1,7 @@
+//! Sidebar and sidebar-prompt keyboard handling.
+
+use super::*;
+
 pub(crate) fn handle_sidebar_key_event(
     document: &mut TextDocument,
     cursor: &mut Cursor,
