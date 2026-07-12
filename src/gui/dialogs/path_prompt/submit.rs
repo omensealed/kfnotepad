@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn submit_path_prompt(&mut self) -> Task<Message> {
+    pub(in crate::gui) fn submit_path_prompt(&mut self) -> Task<Message> {
         let Some(prompt) = self.path_prompt else {
             return Task::none();
         };

@@ -1,5 +1,9 @@
+//! Native save-as dialog workflow.
+
+use super::*;
+
 impl KfnotepadGui {
-    pub(super) fn request_save_as_dialog(&mut self) -> Task<Message> {
+    pub(in crate::gui) fn request_save_as_dialog(&mut self) -> Task<Message> {
         if let Some(reason) = Self::gui_file_dialog_unavailable_reason() {
             return self.request_file_dialog_fallback(GuiPathPrompt::SaveAs, reason);
         }
@@ -32,7 +36,7 @@ impl KfnotepadGui {
     }
 
     #[cfg(test)]
-    pub(super) fn handle_save_as_dialog_selected(
+    pub(in crate::gui) fn handle_save_as_dialog_selected(
         &mut self,
         path: Option<PathBuf>,
     ) -> Task<Message> {
@@ -48,7 +52,7 @@ impl KfnotepadGui {
     }
 
     #[cfg(not(test))]
-    pub(super) fn handle_save_as_dialog_selected(
+    pub(in crate::gui) fn handle_save_as_dialog_selected(
         &mut self,
         path: Option<PathBuf>,
     ) -> Task<Message> {

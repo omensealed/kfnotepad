@@ -1,3 +1,7 @@
+//! Native-dialog availability checks and path-prompt fallback selection.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(crate) fn gui_file_dialog_unavailable_reason() -> Option<&'static str> {
         if env::var_os("KFNOTEPAD_DISABLE_NATIVE_FILE_DIALOG").is_some_and(|value| {
@@ -27,7 +31,7 @@ impl KfnotepadGui {
         None
     }
 
-    fn request_file_dialog_fallback(
+    pub(super) fn request_file_dialog_fallback(
         &mut self,
         prompt: GuiPathPrompt,
         reason: &str,

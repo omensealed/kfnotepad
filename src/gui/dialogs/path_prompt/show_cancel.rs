@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn show_path_prompt(&mut self, prompt: GuiPathPrompt) {
+    pub(in crate::gui) fn show_path_prompt(&mut self, prompt: GuiPathPrompt) {
         self.path_prompt = Some(prompt);
         self.path_prompt_value = match prompt {
             GuiPathPrompt::Open => String::new(),
@@ -23,7 +23,7 @@ impl KfnotepadGui {
         };
     }
 
-    pub(super) fn cancel_path_prompt(&mut self) {
+    pub(in crate::gui) fn cancel_path_prompt(&mut self) {
         self.clear_path_prompt_context();
         self.status_message = "path prompt canceled".to_string();
     }

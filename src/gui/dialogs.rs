@@ -1,6 +1,8 @@
+//! Native file dialogs and path-prompt fallback workflows.
+
 use super::*;
 
-include!("dialogs/availability.rs");
-include!("dialogs/open.rs");
-include!("dialogs/save_as.rs");
-include!("dialogs/path_prompt.rs");
+mod availability;
+mod open;
+mod path_prompt;
+mod save_as;

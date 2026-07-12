@@ -1,5 +1,9 @@
+//! Native and asynchronous file-open dialog workflow.
+
+use super::*;
+
 impl KfnotepadGui {
-    pub(super) fn request_open_dialog(&mut self) -> Task<Message> {
+    pub(in crate::gui) fn request_open_dialog(&mut self) -> Task<Message> {
         if let Some(reason) = Self::gui_file_dialog_unavailable_reason() {
             return self.request_file_dialog_fallback(GuiPathPrompt::Open, reason);
         }
@@ -21,7 +25,7 @@ impl KfnotepadGui {
         )
     }
 
-    pub(super) fn open_path_in_new_pane_async(&mut self, path: PathBuf) -> Task<Message> {
+    pub(in crate::gui) fn open_path_in_new_pane_async(&mut self, path: PathBuf) -> Task<Message> {
         self.status_message = format!("opening {}", path.display());
         let requested_path = path.clone();
 
@@ -38,7 +42,7 @@ impl KfnotepadGui {
         )
     }
 
-    pub(super) fn handle_open_dialog_selected_async(
+    pub(in crate::gui) fn handle_open_dialog_selected_async(
         &mut self,
         path: Option<PathBuf>,
     ) -> Task<Message> {
@@ -51,7 +55,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn handle_open_dialog_completed(
+    pub(in crate::gui) fn handle_open_dialog_completed(
         &mut self,
         path: PathBuf,
         result: Result<TextDocument, String>,
@@ -74,7 +78,10 @@ impl KfnotepadGui {
     }
 
     #[cfg(test)]
-    pub(super) fn handle_open_dialog_selected(&mut self, path: Option<PathBuf>) -> Task<Message> {
+    pub(in crate::gui) fn handle_open_dialog_selected(
+        &mut self,
+        path: Option<PathBuf>,
+    ) -> Task<Message> {
         match path {
             Some(path) => {
                 let _opened = self.open_path_in_new_pane(path);

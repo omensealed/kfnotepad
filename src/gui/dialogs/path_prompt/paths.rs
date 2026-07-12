@@ -6,7 +6,7 @@ impl KfnotepadGui {
         self.pending_managed_note_delete = None;
     }
 
-    pub(super) fn resolve_prompt_path(&self, raw_path: &str) -> PathBuf {
+    pub(in crate::gui) fn resolve_prompt_path(&self, raw_path: &str) -> PathBuf {
         let path = PathBuf::from(raw_path);
         if path.is_absolute() {
             path
