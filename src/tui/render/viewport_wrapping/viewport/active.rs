@@ -1,3 +1,7 @@
+//! Cursor-following vertical viewport clamping.
+
+use super::*;
+
 pub(crate) fn clamp_viewport(
     document: &TextDocument,
     cursor: Cursor,

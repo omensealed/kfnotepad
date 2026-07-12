@@ -1,3 +1,7 @@
+//! Terminal dimensions and available editor-body geometry.
+
+use super::*;
+
 pub(crate) fn visible_editor_rows(extra_reserved_rows: usize) -> usize {
     size()
         .map(|(_, rows)| rows.saturating_sub(3 + extra_reserved_rows as u16).max(1) as usize)

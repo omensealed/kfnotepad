@@ -1,3 +1,6 @@
+//! Grapheme-safe, display-width-aware line wrapping.
+
+use super::*;
 use unicode_segmentation::UnicodeSegmentation;
 
 #[derive(Clone, Debug, PartialEq, Eq)]

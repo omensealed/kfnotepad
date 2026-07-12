@@ -1,3 +1,7 @@
+//! Passive vertical viewport clamping for reader-driven scrolling.
+
+use super::*;
+
 pub(crate) fn clamp_passive_viewport(
     document: &TextDocument,
     viewport_start: usize,
@@ -9,7 +13,7 @@ pub(crate) fn clamp_passive_viewport(
     viewport_start.min(max_start)
 }
 
-fn max_viewport_start(
+pub(super) fn max_viewport_start(
     document: &TextDocument,
     visible_rows: usize,
     settings: EditorSettings,
