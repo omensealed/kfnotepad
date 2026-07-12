@@ -1,5 +1,9 @@
+//! Open and save-as path-prompt submissions.
+
+use super::*;
+
 impl KfnotepadGui {
-    fn submit_open_path_prompt(&mut self, raw_path: &str) -> Task<Message> {
+    pub(super) fn submit_open_path_prompt(&mut self, raw_path: &str) -> Task<Message> {
         let path = self.resolve_prompt_path(raw_path);
         #[cfg(test)]
         {
@@ -16,7 +20,7 @@ impl KfnotepadGui {
         }
     }
 
-    fn submit_save_as_path_prompt(&mut self, raw_path: &str) -> Task<Message> {
+    pub(super) fn submit_save_as_path_prompt(&mut self, raw_path: &str) -> Task<Message> {
         let path = self.resolve_prompt_path(raw_path);
         #[cfg(test)]
         {

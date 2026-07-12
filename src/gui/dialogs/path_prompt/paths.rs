@@ -1,5 +1,9 @@
+//! Prompt context clearing and relative-path resolution.
+
+use super::*;
+
 impl KfnotepadGui {
-    fn clear_path_prompt_context(&mut self) {
+    pub(super) fn clear_path_prompt_context(&mut self) {
         self.path_prompt = None;
         self.path_prompt_value.clear();
         self.notes_panel = None;

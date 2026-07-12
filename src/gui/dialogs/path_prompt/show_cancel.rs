@@ -1,3 +1,7 @@
+//! Path-prompt presentation and cancellation.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn show_path_prompt(&mut self, prompt: GuiPathPrompt) {
         self.path_prompt = Some(prompt);

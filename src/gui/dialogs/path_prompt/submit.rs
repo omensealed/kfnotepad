@@ -1,3 +1,7 @@
+//! Path-prompt validation and submission routing.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn submit_path_prompt(&mut self) -> Task<Message> {
         let Some(prompt) = self.path_prompt else {
@@ -24,9 +28,7 @@ impl KfnotepadGui {
                 self.submit_managed_note_prompt(&raw_path);
                 Task::none()
             }
-            GuiPathPrompt::BrowserCreateFile => {
-                self.submit_browser_create_file_prompt(&raw_path)
-            }
+            GuiPathPrompt::BrowserCreateFile => self.submit_browser_create_file_prompt(&raw_path),
             GuiPathPrompt::BrowserCreateDirectory => {
                 self.submit_browser_create_directory_prompt(&raw_path)
             }
