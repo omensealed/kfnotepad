@@ -1,4 +1,8 @@
-fn parse_gui_layout_node(
+//! Recursive layout node parsing with cycle and duplicate-leaf rejection.
+
+use super::*;
+
+pub(super) fn parse_gui_layout_node(
     node_id: usize,
     pane_count: usize,
     node_specs: &HashMap<usize, String>,

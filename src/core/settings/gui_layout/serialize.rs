@@ -1,3 +1,7 @@
+//! Deterministic geometry-only GUI layout serialization.
+
+use super::*;
+
 pub fn serialize_gui_layout(layout: &GuiLayout) -> String {
     let mut lines = vec![
         "version = 1".to_string(),

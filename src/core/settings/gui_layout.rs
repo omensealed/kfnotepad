@@ -2,6 +2,13 @@
 
 use super::*;
 
-include!("gui_layout/parse.rs");
-include!("gui_layout/serialize.rs");
-include!("gui_layout/save.rs");
+#[path = "gui_layout/parse.rs"]
+mod parse;
+#[path = "gui_layout/save.rs"]
+mod save;
+#[path = "gui_layout/serialize.rs"]
+mod serialize;
+
+pub use parse::parse_gui_layout;
+pub use save::save_gui_layout;
+pub use serialize::serialize_gui_layout;

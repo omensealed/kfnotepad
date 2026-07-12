@@ -1,3 +1,7 @@
+//! Private-permission atomic GUI layout persistence.
+
+use super::*;
+
 pub fn save_gui_layout(path: &Path, layout: &GuiLayout) -> Result<(), EditorConfigError> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|source| EditorConfigError::CreateDir {

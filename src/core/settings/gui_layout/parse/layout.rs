@@ -1,3 +1,7 @@
+//! Top-level layout format parsing and pane-ordinal validation.
+
+use super::*;
+
 pub fn parse_gui_layout(text: &str, pane_count: usize) -> Option<GuiLayout> {
     if pane_count == 0 {
         return None;
