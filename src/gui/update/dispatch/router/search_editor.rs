@@ -1,6 +1,15 @@
-fn dispatch_search_and_editor(state: &mut KfnotepadGui, message: Message) -> GuiDispatchResult {
+//! Search, navigation, editor, reader, theme, and menu messages.
+
+use super::*;
+
+pub(super) fn dispatch_search_and_editor(
+    state: &mut KfnotepadGui,
+    message: Message,
+) -> GuiDispatchResult {
     match message {
-        Message::Edit(pane, action) => GuiDispatchResult::Handled(handle_editor_edit(state, pane, action)),
+        Message::Edit(pane, action) => {
+            GuiDispatchResult::Handled(handle_editor_edit(state, pane, action))
+        }
         Message::ReaderScrollTick => {
             state.reader_scroll_tick();
             handled_none()
@@ -49,7 +58,9 @@ fn dispatch_search_and_editor(state: &mut KfnotepadGui, message: Message) -> Gui
             state.scroll_active_editor_viewport(delta);
             handled_none()
         }
-        Message::MenuCommand(command) => GuiDispatchResult::Handled(state.run_menu_command(command)),
+        Message::MenuCommand(command) => {
+            GuiDispatchResult::Handled(state.run_menu_command(command))
+        }
         Message::ClipboardPasted(contents) => {
             state.paste_into_active_editor(contents);
             handled_none()

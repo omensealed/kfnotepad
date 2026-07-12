@@ -1,4 +1,8 @@
-fn dispatch_panes(state: &mut KfnotepadGui, message: Message) -> GuiDispatchResult {
+//! Pane lifecycle, focus, resize, and movement messages.
+
+use super::*;
+
+pub(super) fn dispatch_panes(state: &mut KfnotepadGui, message: Message) -> GuiDispatchResult {
     match message {
         Message::PaneClicked(pane) => {
             handle_pane_clicked(state, pane);

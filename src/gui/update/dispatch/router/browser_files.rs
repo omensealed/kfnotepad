@@ -1,4 +1,11 @@
-fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> GuiDispatchResult {
+//! Browser, file-dialog, save, managed-note, and external-file messages.
+
+use super::*;
+
+pub(super) fn dispatch_browser_and_files(
+    state: &mut KfnotepadGui,
+    message: Message,
+) -> GuiDispatchResult {
     match message {
         Message::BrowserLocalTreeToggle(path) => {
             GuiDispatchResult::Handled(state.toggle_local_browser_tree_path(path))
@@ -17,8 +24,12 @@ fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> Gui
             state.apply_browser_load(generation, result);
             handled_none()
         }
-        Message::BrowserParentRequested => GuiDispatchResult::Handled(state.navigate_browser_parent()),
-        Message::BrowserRefreshRequested => GuiDispatchResult::Handled(state.refresh_file_browser()),
+        Message::BrowserParentRequested => {
+            GuiDispatchResult::Handled(state.navigate_browser_parent())
+        }
+        Message::BrowserRefreshRequested => {
+            GuiDispatchResult::Handled(state.refresh_file_browser())
+        }
         Message::BrowserCreateFileRequested => {
             state.show_path_prompt(GuiPathPrompt::BrowserCreateFile);
             handled_none()
@@ -50,25 +61,22 @@ fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> Gui
             handle_open_dialog_completed(state, path, result.map(|document| *document));
             handled_none()
         }
-        Message::SaveActiveTileCompleted {
-            tile_id,
-            result,
-        } => {
+        Message::SaveActiveTileCompleted { tile_id, result } => {
             GuiDispatchResult::Handled(handle_save_active_tile_completed(state, tile_id, result))
         }
         Message::SaveActiveTileAsCompleted {
             tile_id,
             requested_path,
             result,
-        } => {
-            GuiDispatchResult::Handled(handle_save_active_tile_as_completed(
-                state,
-                tile_id,
-                requested_path,
-                result,
-            ))
+        } => GuiDispatchResult::Handled(handle_save_active_tile_as_completed(
+            state,
+            tile_id,
+            requested_path,
+            result,
+        )),
+        Message::SaveAsPromptRequested => {
+            GuiDispatchResult::Handled(state.request_save_as_dialog())
         }
-        Message::SaveAsPromptRequested => GuiDispatchResult::Handled(state.request_save_as_dialog()),
         Message::SaveAsDialogSelected(path) => {
             GuiDispatchResult::Handled(state.handle_save_as_dialog_selected(path))
         }
@@ -91,7 +99,9 @@ fn dispatch_browser_and_files(state: &mut KfnotepadGui, message: Message) -> Gui
             state.unlock_external_edit(tile_id);
             handled_none()
         }
-        Message::SaveRequested => GuiDispatchResult::Handled(state.request_save_active_tile_async()),
+        Message::SaveRequested => {
+            GuiDispatchResult::Handled(state.request_save_active_tile_async())
+        }
         other => GuiDispatchResult::Unhandled(other),
     }
 }

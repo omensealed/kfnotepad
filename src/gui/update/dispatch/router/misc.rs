@@ -1,6 +1,15 @@
-fn dispatch_miscellaneous(state: &mut KfnotepadGui, message: Message) -> GuiDispatchResult {
+//! Window-close and application-quit messages.
+
+use super::*;
+
+pub(super) fn dispatch_miscellaneous(
+    state: &mut KfnotepadGui,
+    message: Message,
+) -> GuiDispatchResult {
     match message {
-        Message::QuitRequested(window_id) => GuiDispatchResult::Handled(state.request_app_close(window_id)),
+        Message::QuitRequested(window_id) => {
+            GuiDispatchResult::Handled(state.request_app_close(window_id))
+        }
         Message::QuitLatestWindow(Some(window_id)) => {
             GuiDispatchResult::Handled(state.request_app_close(window_id))
         }

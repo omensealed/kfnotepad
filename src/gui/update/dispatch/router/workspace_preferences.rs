@@ -1,4 +1,8 @@
-fn dispatch_workspace_and_preferences(
+//! Workspace panel, preferences, and path-prompt messages.
+
+use super::*;
+
+pub(super) fn dispatch_workspace_and_preferences(
     state: &mut KfnotepadGui,
     message: Message,
 ) -> GuiDispatchResult {

@@ -1,4 +1,11 @@
-fn dispatch_replacement_editor(state: &mut KfnotepadGui, message: Message) -> GuiDispatchResult {
+//! Replacement-editor input, pointer, IME, and scrollbar messages.
+
+use super::*;
+
+pub(super) fn dispatch_replacement_editor(
+    state: &mut KfnotepadGui,
+    message: Message,
+) -> GuiDispatchResult {
     match message {
         Message::ReplacementEditorWheelScrolled(pane, delta) => {
             state.scroll_replacement_editor_pane_viewport(pane, delta);

@@ -2,13 +2,28 @@
 
 use super::*;
 
-include!("router/types.rs");
-include!("router/browser_files.rs");
-include!("router/workspace_preferences.rs");
-include!("router/panes.rs");
-include!("router/search_editor.rs");
-include!("router/replacement.rs");
-include!("router/misc.rs");
+#[path = "router/browser_files.rs"]
+mod browser_files;
+#[path = "router/misc.rs"]
+mod misc;
+#[path = "router/panes.rs"]
+mod panes;
+#[path = "router/replacement.rs"]
+mod replacement;
+#[path = "router/search_editor.rs"]
+mod search_editor;
+#[path = "router/types.rs"]
+mod types;
+#[path = "router/workspace_preferences.rs"]
+mod workspace_preferences;
+
+use browser_files::dispatch_browser_and_files;
+use misc::dispatch_miscellaneous;
+use panes::dispatch_panes;
+use replacement::dispatch_replacement_editor;
+use search_editor::dispatch_search_and_editor;
+use types::{handled_none, GuiDispatchResult};
+use workspace_preferences::dispatch_workspace_and_preferences;
 
 pub(super) fn update(state: &mut KfnotepadGui, message: Message) -> Task<Message> {
     let message = match dispatch_browser_and_files(state, message) {
