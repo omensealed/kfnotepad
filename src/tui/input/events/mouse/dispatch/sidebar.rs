@@ -1,4 +1,8 @@
-fn handle_sidebar_mouse_event(
+//! Sidebar mouse routing.
+
+use super::*;
+
+pub(super) fn handle_sidebar_mouse_event(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
     event: MouseEvent,

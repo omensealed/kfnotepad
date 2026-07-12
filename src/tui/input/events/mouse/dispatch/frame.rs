@@ -1,4 +1,8 @@
-fn mouse_render_frame(runtime: &EditorRuntime, context: MouseContext) -> RenderFrame {
+//! Render-frame construction for mouse hit testing.
+
+use super::*;
+
+pub(super) fn mouse_render_frame(runtime: &EditorRuntime, context: MouseContext) -> RenderFrame {
     RenderFrame {
         theme: EditorTheme::for_id(runtime.settings.theme_id),
         gutter_width: context.gutter_width,

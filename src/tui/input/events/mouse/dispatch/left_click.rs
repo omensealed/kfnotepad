@@ -1,4 +1,8 @@
-fn handle_workspace_left_click(
+//! Left-click routing for menus, tabs, and editor cursor placement.
+
+use super::*;
+
+pub(super) fn handle_workspace_left_click(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
     event: MouseEvent,

@@ -1,4 +1,8 @@
-fn handle_editor_scroll_mouse_event(
+//! Editor mouse-wheel routing.
+
+use super::*;
+
+pub(super) fn handle_editor_scroll_mouse_event(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
     event: MouseEvent,

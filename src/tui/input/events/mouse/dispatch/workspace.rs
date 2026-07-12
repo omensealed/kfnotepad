@@ -1,3 +1,7 @@
+//! Top-level workspace mouse event routing.
+
+use super::*;
+
 pub(crate) fn handle_workspace_mouse_event(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

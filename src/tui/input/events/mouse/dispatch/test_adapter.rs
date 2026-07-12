@@ -1,4 +1,7 @@
-#[cfg(test)]
+//! Single-document adapter for mouse workflow tests.
+
+use super::*;
+
 pub(crate) fn handle_mouse_event(
     document: &mut TextDocument,
     cursor: &mut Cursor,
