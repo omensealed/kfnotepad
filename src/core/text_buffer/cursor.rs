@@ -2,7 +2,11 @@
 
 use super::*;
 
-include!("cursor/movement.rs");
-include!("cursor/word_movement.rs");
-include!("cursor/delete_word.rs");
-include!("cursor/validation.rs");
+#[path = "cursor/delete_word.rs"]
+mod delete_word;
+#[path = "cursor/movement.rs"]
+mod movement;
+#[path = "cursor/validation.rs"]
+mod validation;
+#[path = "cursor/word_movement.rs"]
+mod word_movement;

@@ -1,3 +1,7 @@
+//! Character, line, and document cursor movement.
+
+use super::*;
+
 impl TextBuffer {
     pub fn move_cursor(
         &self,

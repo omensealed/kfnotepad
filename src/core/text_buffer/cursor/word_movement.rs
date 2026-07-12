@@ -1,5 +1,9 @@
+//! Previous and next word-boundary cursor movement.
+
+use super::*;
+
 impl TextBuffer {
-    pub(super) fn previous_word_cursor(&self, cursor: Cursor) -> Cursor {
+    pub(in crate::core::text_buffer) fn previous_word_cursor(&self, cursor: Cursor) -> Cursor {
         let mut row = cursor.row;
         let mut column = cursor.column;
 

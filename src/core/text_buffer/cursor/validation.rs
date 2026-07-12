@@ -1,5 +1,12 @@
+//! Cursor validation and grapheme-boundary normalization.
+
+use super::*;
+
 impl TextBuffer {
-    pub(super) fn validate_cursor(&self, cursor: Cursor) -> Result<(), BufferError> {
+    pub(in crate::core::text_buffer) fn validate_cursor(
+        &self,
+        cursor: Cursor,
+    ) -> Result<(), BufferError> {
         let columns = self.line_char_count(cursor.row)?;
         if cursor.column > columns {
             return Err(BufferError::ColumnOutOfBounds {
