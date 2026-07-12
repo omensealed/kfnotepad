@@ -1,3 +1,7 @@
+//! Search and go-to-line prompt input and history handling.
+
+use super::*;
+
 pub(crate) fn handle_search_key_event(
     document: &TextDocument,
     cursor: &mut Cursor,

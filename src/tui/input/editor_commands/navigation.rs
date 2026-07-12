@@ -1,3 +1,7 @@
+//! Indentation, paging, document-edge, and word navigation commands.
+
+use super::*;
+
 pub(crate) fn indent_at_cursor(
     document: &mut TextDocument,
     cursor: &mut Cursor,
