@@ -2,6 +2,9 @@
 
 use super::*;
 
-include!("undo_search/undo_redo.rs");
-include!("undo_search/search.rs");
-include!("undo_search/history.rs");
+#[path = "undo_search/history.rs"]
+mod history;
+#[path = "undo_search/search.rs"]
+mod search;
+#[path = "undo_search/undo_redo.rs"]
+mod undo_redo;

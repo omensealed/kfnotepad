@@ -1,5 +1,13 @@
+//! Undo grouping, compound-edit boundaries, and snapshot recording.
+
+use super::*;
+
 impl TextBuffer {
-    pub(super) fn record_undo_for_typed_insert(&mut self, row: usize, column: usize) {
+    pub(in crate::core::text_buffer) fn record_undo_for_typed_insert(
+        &mut self,
+        row: usize,
+        column: usize,
+    ) {
         let now = Instant::now();
         let can_merge = self.insert_undo_group.is_some_and(|group| {
             group.row == row
@@ -29,62 +37,56 @@ impl TextBuffer {
     }
 
     pub(crate) fn begin_compound_edit(&mut self) {
-        self.compound_edit = match std::mem::replace(
-            &mut self.compound_edit,
-            CompoundEditState::Inactive,
-        ) {
-            CompoundEditState::Inactive => {
-                self.break_undo_group();
-                CompoundEditState::Pending {
-                    depth: 1,
-                    snapshot: Box::new(BufferSnapshot::from_buffer(self)),
+        self.compound_edit =
+            match std::mem::replace(&mut self.compound_edit, CompoundEditState::Inactive) {
+                CompoundEditState::Inactive => {
+                    self.break_undo_group();
+                    CompoundEditState::Pending {
+                        depth: 1,
+                        snapshot: Box::new(BufferSnapshot::from_buffer(self)),
+                    }
                 }
-            }
-            CompoundEditState::Pending { depth, snapshot } => CompoundEditState::Pending {
-                depth: depth.saturating_add(1),
-                snapshot,
-            },
-            CompoundEditState::Recorded { depth } => CompoundEditState::Recorded {
-                depth: depth.saturating_add(1),
-            },
-        };
+                CompoundEditState::Pending { depth, snapshot } => CompoundEditState::Pending {
+                    depth: depth.saturating_add(1),
+                    snapshot,
+                },
+                CompoundEditState::Recorded { depth } => CompoundEditState::Recorded {
+                    depth: depth.saturating_add(1),
+                },
+            };
     }
 
     pub(crate) fn end_compound_edit(&mut self) {
-        self.compound_edit = match std::mem::replace(
-            &mut self.compound_edit,
-            CompoundEditState::Inactive,
-        ) {
-            CompoundEditState::Pending { depth, snapshot } if depth > 1 => {
-                CompoundEditState::Pending {
-                    depth: depth - 1,
-                    snapshot,
+        self.compound_edit =
+            match std::mem::replace(&mut self.compound_edit, CompoundEditState::Inactive) {
+                CompoundEditState::Pending { depth, snapshot } if depth > 1 => {
+                    CompoundEditState::Pending {
+                        depth: depth - 1,
+                        snapshot,
+                    }
                 }
-            }
-            CompoundEditState::Recorded { depth } if depth > 1 => {
-                CompoundEditState::Recorded { depth: depth - 1 }
-            }
-            _ => {
-                self.break_undo_group();
-                CompoundEditState::Inactive
-            }
-        };
+                CompoundEditState::Recorded { depth } if depth > 1 => {
+                    CompoundEditState::Recorded { depth: depth - 1 }
+                }
+                _ => {
+                    self.break_undo_group();
+                    CompoundEditState::Inactive
+                }
+            };
         if matches!(self.compound_edit, CompoundEditState::Inactive) {
             self.break_undo_group();
         }
     }
 
-    pub(super) fn mark_changed(&mut self) {
+    pub(in crate::core::text_buffer) fn mark_changed(&mut self) {
         self.dirty = true;
         self.edit_revision = self.edit_revision.wrapping_add(1);
     }
 
-    pub(super) fn record_undo(&mut self) {
+    pub(in crate::core::text_buffer) fn record_undo(&mut self) {
         self.insert_undo_group = None;
-        let snapshot = match std::mem::replace(
-            &mut self.compound_edit,
-            CompoundEditState::Inactive,
-        ) {
+        let snapshot = match std::mem::replace(&mut self.compound_edit, CompoundEditState::Inactive)
+        {
             CompoundEditState::Pending { depth, snapshot } => {
                 self.compound_edit = CompoundEditState::Recorded { depth };
                 *snapshot

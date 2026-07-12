@@ -1,3 +1,7 @@
+//! Byte-budgeted undo and redo snapshot application.
+
+use super::*;
+
 impl TextBuffer {
     pub fn undo_last_edit(&mut self) -> bool {
         let Some(snapshot) = pop_history_snapshot(&mut self.undo_history, &mut self.undo_bytes)

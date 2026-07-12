@@ -1,3 +1,7 @@
+//! Forward and backward document search with configurable case sensitivity.
+
+use super::*;
+
 impl TextBuffer {
     pub fn find_next(&self, query: &str, start: Cursor) -> Option<Cursor> {
         self.find_next_with_mode(
