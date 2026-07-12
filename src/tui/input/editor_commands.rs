@@ -3,9 +3,10 @@
 use super::*;
 
 include!("editor_commands/editing.rs");
-include!("editor_commands/modes_and_reader.rs");
+mod modes_and_reader;
 mod navigation;
 mod prompts;
 
+pub(crate) use modes_and_reader::*;
 pub(crate) use navigation::*;
 pub(crate) use prompts::*;

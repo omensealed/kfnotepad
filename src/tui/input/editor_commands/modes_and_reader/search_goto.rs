@@ -1,3 +1,7 @@
+//! Search repetition, go-to-line status, and mode activation.
+
+use super::*;
+
 pub(crate) fn start_search(runtime: &mut EditorRuntime) {
     runtime.quit_confirmation_pending = false;
     runtime.goto_line_active = false;

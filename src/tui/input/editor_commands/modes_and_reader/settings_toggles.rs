@@ -1,3 +1,7 @@
+//! Persisted editor display and search setting toggles.
+
+use super::*;
+
 pub(crate) fn toggle_line_numbers(runtime: &mut EditorRuntime) {
     runtime.quit_confirmation_pending = false;
     runtime.settings.show_line_numbers = !runtime.settings.show_line_numbers;

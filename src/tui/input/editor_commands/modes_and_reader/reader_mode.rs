@@ -1,3 +1,7 @@
+//! Reader-mode activation, speed adjustment, and timed scrolling.
+
+use super::*;
+
 pub(crate) fn toggle_reader_mode(runtime: &mut EditorRuntime) {
     runtime.quit_confirmation_pending = false;
     runtime.reader_scroll_milli_lines = 0;
