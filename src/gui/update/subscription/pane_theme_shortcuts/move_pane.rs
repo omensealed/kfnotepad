@@ -1,4 +1,8 @@
-fn move_pane_shortcut_message(event: &Event) -> Option<Message> {
+//! Directional pane-movement shortcuts.
+
+use super::*;
+
+pub(super) fn move_pane_shortcut_message(event: &Event) -> Option<Message> {
     let Event::Keyboard(keyboard::Event::KeyPressed { key, modifiers, .. }) = event else {
         return None;
     };

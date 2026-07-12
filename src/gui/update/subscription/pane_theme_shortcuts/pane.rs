@@ -1,4 +1,8 @@
-fn pane_size_shortcut_message(event: &Event) -> Option<Message> {
+//! Pane minimize and maximize shortcuts.
+
+use super::*;
+
+pub(super) fn pane_size_shortcut_message(event: &Event) -> Option<Message> {
     let Event::Keyboard(keyboard::Event::KeyPressed {
         key,
         physical_key,

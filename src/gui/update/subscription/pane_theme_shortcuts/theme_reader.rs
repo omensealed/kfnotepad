@@ -1,4 +1,8 @@
-fn theme_reader_shortcut_message(event: &Event) -> Option<Message> {
+//! Application theme, syntax theme, and reader-mode shortcuts.
+
+use super::*;
+
+pub(super) fn theme_reader_shortcut_message(event: &Event) -> Option<Message> {
     let Event::Keyboard(keyboard::Event::KeyPressed {
         key,
         physical_key,

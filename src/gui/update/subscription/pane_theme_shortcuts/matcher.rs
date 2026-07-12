@@ -1,10 +1,14 @@
+//! Combined pane/theme/reader shortcut matching and character normalization.
+
+use super::*;
+
 pub(super) fn pane_theme_reader_shortcut_message(event: &Event) -> Option<Message> {
     pane_size_shortcut_message(event)
         .or_else(|| theme_reader_shortcut_message(event))
         .or_else(|| move_pane_shortcut_message(event))
 }
 
-fn shortcut_character_matches(
+pub(super) fn shortcut_character_matches(
     key: &Key,
     physical_key: keyboard::key::Physical,
     expected: char,
