@@ -1,3 +1,7 @@
+//! Shared display-name and atomic configuration temporary-path helpers.
+
+use super::*;
+
 pub(crate) fn temporary_config_path(path: &Path) -> PathBuf {
     let file_name = path
         .file_name()

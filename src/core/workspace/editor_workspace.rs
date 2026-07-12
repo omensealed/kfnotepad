@@ -1,3 +1,7 @@
+//! Terminal editor tab lifecycle, selection, and strip presentation.
+
+use super::*;
+
 impl<'a> EditorWorkspace<'a> {
     pub fn from_document(document: &'a mut TextDocument) -> Self {
         Self {

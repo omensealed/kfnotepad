@@ -1,3 +1,7 @@
+//! Shared terminal editor tab and workspace value types.
+
+use super::*;
+
 pub enum EditorTabDocument<'a> {
     Borrowed(&'a mut TextDocument),
     Owned(Box<TextDocument>),

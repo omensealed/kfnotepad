@@ -1,3 +1,7 @@
+//! GUI-facing file-browser state built on the shared sidebar model.
+
+use super::*;
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct GuiFileBrowser {
     pub sidebar: FileSidebarState,

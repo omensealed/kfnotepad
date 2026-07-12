@@ -16,7 +16,7 @@ pub struct GuiDocumentTile {
     pub document: TextDocument,
     pub state: EditorTabState,
     pub minimized: bool,
-    last_save_error: Option<String>,
+    pub(in crate::core::workspace) last_save_error: Option<String>,
 }
 
 impl GuiDocumentTile {
