@@ -1,3 +1,7 @@
+//! Managed-note creation, safe opening, and deterministic directory listing.
+
+use super::*;
+
 pub fn open_or_create_managed_note(
     notes_dir: &Path,
     title: &str,

@@ -1,3 +1,7 @@
+//! Managed-note directory resolution, title validation, and path construction.
+
+use super::*;
+
 pub fn managed_notes_dir(
     xdg_data_home: Option<&Path>,
     home: Option<&Path>,

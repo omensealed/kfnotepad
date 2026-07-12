@@ -1,3 +1,7 @@
+//! Containment-checked, symlink-safe managed-note deletion through OS trash.
+
+use super::*;
+
 pub fn delete_managed_note(
     notes_dir: &Path,
     note_path: &Path,
