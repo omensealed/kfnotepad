@@ -1,4 +1,8 @@
-fn handle_editor_edit_key(
+//! Text mutation key handling.
+
+use super::*;
+
+pub(super) fn handle_editor_edit_key(
     document: &mut TextDocument,
     cursor: &mut Cursor,
     runtime: &mut EditorRuntime,
@@ -32,10 +36,7 @@ fn handle_editor_edit_key(
         }
         (_, KeyCode::Enter) => {
             runtime.quit_confirmation_pending = false;
-            match document
-                .buffer
-                .insert_newline(cursor.row, cursor.column)
-            {
+            match document.buffer.insert_newline(cursor.row, cursor.column) {
                 Ok(()) => {
                     cursor.row += 1;
                     cursor.column = 0;

@@ -1,3 +1,7 @@
+//! Top-level single-document editor key routing.
+
+use super::*;
+
 pub(crate) fn handle_key_event(
     document: &mut TextDocument,
     cursor: &mut Cursor,

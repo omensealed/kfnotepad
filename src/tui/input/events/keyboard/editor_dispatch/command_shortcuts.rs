@@ -1,4 +1,8 @@
-fn handle_editor_command_shortcut(
+//! Editor command keyboard shortcuts.
+
+use super::*;
+
+pub(super) fn handle_editor_command_shortcut(
     document: &mut TextDocument,
     cursor: &mut Cursor,
     runtime: &mut EditorRuntime,

@@ -1,4 +1,8 @@
-fn handle_active_editor_mode(
+//! Routing for active sidebar, menu, go-to-line, and search modes.
+
+use super::*;
+
+pub(super) fn handle_active_editor_mode(
     document: &mut TextDocument,
     cursor: &mut Cursor,
     runtime: &mut EditorRuntime,

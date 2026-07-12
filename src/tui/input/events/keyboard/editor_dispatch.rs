@@ -2,8 +2,14 @@
 
 use super::*;
 
-include!("editor_dispatch/entry.rs");
-include!("editor_dispatch/active_modes.rs");
-include!("editor_dispatch/command_shortcuts.rs");
-include!("editor_dispatch/movement_keys.rs");
-include!("editor_dispatch/edit_keys.rs");
+mod active_modes;
+mod command_shortcuts;
+mod edit_keys;
+mod entry;
+mod movement_keys;
+
+use active_modes::handle_active_editor_mode;
+use command_shortcuts::handle_editor_command_shortcut;
+use edit_keys::handle_editor_edit_key;
+pub(crate) use entry::*;
+use movement_keys::handle_editor_movement_key;

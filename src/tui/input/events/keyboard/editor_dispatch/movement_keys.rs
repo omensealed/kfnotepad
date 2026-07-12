@@ -1,4 +1,8 @@
-fn handle_editor_movement_key(
+//! Cursor and viewport movement key handling.
+
+use super::*;
+
+pub(super) fn handle_editor_movement_key(
     document: &TextDocument,
     cursor: &mut Cursor,
     runtime: &mut EditorRuntime,
