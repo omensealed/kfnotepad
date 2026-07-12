@@ -1,4 +1,15 @@
-fn run_managed_note_command(title: &str) -> ExitCode {
+//! Managed-note create/open with interactive editing or summary fallback.
+
+use std::io::{self, IsTerminal};
+use std::process::ExitCode;
+
+use kfnotepad::{open_or_create_managed_note, summarize_text};
+
+use crate::tui::app::{
+    current_managed_notes_dir, has_tui_terminal, maybe_print_tui_unavailable, run_editor,
+};
+
+pub(in crate::tui::app) fn run_managed_note_command(title: &str) -> ExitCode {
     let notes_dir = match current_managed_notes_dir() {
         Ok(notes_dir) => notes_dir,
         Err(error) => {

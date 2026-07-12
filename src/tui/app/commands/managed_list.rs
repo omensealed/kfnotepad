@@ -1,4 +1,12 @@
-fn run_list_managed_notes_command() -> ExitCode {
+//! Managed-note listing for scripts and terminal users.
+
+use std::process::ExitCode;
+
+use kfnotepad::list_managed_notes;
+
+use crate::tui::app::current_managed_notes_dir;
+
+pub(in crate::tui::app) fn run_list_managed_notes_command() -> ExitCode {
     let notes_dir = match current_managed_notes_dir() {
         Ok(notes_dir) => notes_dir,
         Err(error) => {

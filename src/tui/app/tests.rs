@@ -4,7 +4,7 @@ use crossterm::event::{KeyCode, KeyEvent, KeyModifiers, MouseButton, MouseEvent,
 use crossterm::style::Color;
 use kfnotepad::*;
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 struct TempArea {
     root: PathBuf,
