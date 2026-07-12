@@ -1,3 +1,7 @@
+//! Clearing of unused rows within the editor body.
+
+use super::*;
+
 pub(crate) fn clear_editor_body_row(
     writer: &mut impl Write,
     screen_row: u16,

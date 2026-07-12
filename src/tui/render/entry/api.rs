@@ -1,3 +1,7 @@
+//! Public and test-facing editor rendering entrypoints.
+
+use super::*;
+
 #[cfg(test)]
 pub(crate) fn render_editor(
     writer: &mut impl Write,

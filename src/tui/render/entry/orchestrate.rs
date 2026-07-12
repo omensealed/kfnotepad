@@ -1,3 +1,7 @@
+//! Editor-frame rendering orchestration.
+
+use super::*;
+
 #[cfg(test)]
 pub(crate) fn render_editor_with_width_and_color(
     writer: &mut impl Write,
@@ -18,7 +22,7 @@ pub(crate) fn render_editor_with_width_and_color(
     )
 }
 
-fn render_editor_with_width_color_and_cache(
+pub(super) fn render_editor_with_width_color_and_cache(
     writer: &mut impl Write,
     document: &TextDocument,
     view: EditorView<'_>,

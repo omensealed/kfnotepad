@@ -1,4 +1,8 @@
-fn place_terminal_cursor(
+//! Final terminal cursor placement after editor rendering.
+
+use super::*;
+
+pub(super) fn place_terminal_cursor(
     writer: &mut impl Write,
     document: &TextDocument,
     view: EditorView<'_>,
