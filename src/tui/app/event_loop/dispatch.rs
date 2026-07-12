@@ -1,4 +1,19 @@
-fn handle_terminal_event(
+//! Keyboard, paste, mouse, resize, and modal input dispatch.
+
+use crossterm::event::{Event, KeyEvent};
+use kfnotepad::EditorWorkspace;
+
+use super::LoopLayout;
+use crate::tui::app::SIDEBAR_WIDTH;
+use crate::tui::input::{
+    handle_command_palette_key_event, handle_key_event, handle_workspace_key_event,
+    handle_workspace_manager_key_event, handle_workspace_menu_key_event,
+    handle_workspace_mouse_event, handle_workspace_prompt_key_event,
+    handle_workspace_sidebar_key_event, insert_paste, EditorRuntime, InputResult, MouseContext,
+};
+use crate::tui::render::tab_strip_height_for_width;
+
+pub(super) fn handle_terminal_event(
     event: Event,
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
@@ -20,10 +35,9 @@ fn handle_terminal_event(
             }
         }
         Event::Mouse(event) => {
-            let sidebar_width = runtime.sidebar.as_ref().map_or(0, |_| super::SIDEBAR_WIDTH);
+            let sidebar_width = runtime.sidebar.as_ref().map_or(0, |_| SIDEBAR_WIDTH);
             let editor_width = layout.terminal_width.saturating_sub(sidebar_width).max(1);
-            let body_top =
-                super::tab_strip_height_for_width(&workspace.tab_strip_items(), editor_width);
+            let body_top = tab_strip_height_for_width(&workspace.tab_strip_items(), editor_width);
             let viewport_start = workspace.active_tab().state.viewport_start;
             let horizontal_offset = workspace.active_tab().state.horizontal_offset;
             handle_workspace_mouse_event(
@@ -49,7 +63,7 @@ fn handle_terminal_event(
 fn handle_terminal_key_event(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
-    event: crossterm::event::KeyEvent,
+    event: KeyEvent,
 ) -> InputResult {
     if handle_workspace_key_event(workspace, runtime, event) {
         return InputResult::Handled;

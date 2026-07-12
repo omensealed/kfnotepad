@@ -1,4 +1,14 @@
-fn read_event_or_apply_reader_tick(
+//! Blocking event reads with timed reader-mode advancement.
+
+use std::io;
+use std::time::Duration;
+
+use crossterm::event::{poll, read, Event};
+use kfnotepad::EditorWorkspace;
+
+use crate::tui::input::{apply_reader_tick, EditorRuntime, TUI_READER_TICK_MS};
+
+pub(super) fn read_event_or_apply_reader_tick(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,
     visible_rows: usize,
