@@ -1,3 +1,7 @@
+//! Sidebar activation for the single-document editor flow.
+
+use super::*;
+
 pub(crate) fn activate_sidebar_entry(
     document: &mut TextDocument,
     cursor: &mut Cursor,

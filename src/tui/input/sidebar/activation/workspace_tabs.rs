@@ -1,3 +1,7 @@
+//! Sidebar file activation and focus behavior for workspace tabs.
+
+use super::*;
+
 pub(crate) fn activate_sidebar_entry_for_workspace(
     workspace: &mut EditorWorkspace<'_>,
     runtime: &mut EditorRuntime,

@@ -1,3 +1,7 @@
+//! Editor scrolling initiated from sidebar-aware mouse input.
+
+use super::*;
+
 pub(crate) fn scroll_editor_by_mouse(
     document: &TextDocument,
     cursor: &mut Cursor,

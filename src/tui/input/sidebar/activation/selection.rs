@@ -1,3 +1,7 @@
+//! Selected-entry activation routing for documents and workspaces.
+
+use super::*;
+
 pub(crate) fn activate_selected_sidebar_entry(
     document: &mut TextDocument,
     cursor: &mut Cursor,

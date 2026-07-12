@@ -1,4 +1,13 @@
-include!("activation/mouse_scroll.rs");
-include!("activation/selection.rs");
-include!("activation/single_document.rs");
-include!("activation/workspace_tabs.rs");
+//! Sidebar scrolling, selection routing, and file activation.
+
+use super::*;
+
+mod mouse_scroll;
+mod selection;
+mod single_document;
+mod workspace_tabs;
+
+pub(crate) use mouse_scroll::*;
+pub(crate) use selection::*;
+pub(crate) use single_document::*;
+pub(crate) use workspace_tabs::*;
