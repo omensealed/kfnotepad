@@ -1,3 +1,7 @@
+//! Workspace restore, line-number, wrapping, and search toggles.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn set_restore_last_workspace(&mut self, enabled: bool) {
         let message = if enabled {

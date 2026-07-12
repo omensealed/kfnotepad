@@ -1,3 +1,7 @@
+//! Reader-mode enablement and speed preferences.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn set_reader_mode_enabled(&mut self, enabled: bool) {
         let message = if enabled {

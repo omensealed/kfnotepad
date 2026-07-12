@@ -2,8 +2,8 @@
 
 use super::*;
 
-include!("settings/theme.rs");
-include!("settings/persistence.rs");
-include!("settings/toggles.rs");
-include!("settings/reader.rs");
-include!("settings/fonts.rs");
+mod fonts;
+mod persistence;
+mod reader;
+mod theme;
+mod toggles;

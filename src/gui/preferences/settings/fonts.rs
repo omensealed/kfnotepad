@@ -1,3 +1,7 @@
+//! Editor/UI font family and size preferences.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn cycle_gui_font_family(&mut self) {
         let next = self.settings.gui_font_family.next();

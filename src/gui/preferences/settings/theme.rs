@@ -1,3 +1,7 @@
+//! Application and syntax theme cycling.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn cycle_theme(&mut self) {
         self.settings.theme_id = self.settings.theme_id.next();

@@ -1,3 +1,7 @@
+//! Settings mutation with atomic rollback on persistence failure.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui) fn update_settings_with_rollback(
         &mut self,
