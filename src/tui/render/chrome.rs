@@ -2,7 +2,12 @@
 
 use super::*;
 
-include!("chrome/tab_strip.rs");
-include!("chrome/syntax_cache.rs");
-include!("chrome/frame_and_view.rs");
-include!("chrome/header_menu.rs");
+mod frame_and_view;
+mod header_menu;
+mod syntax_cache;
+mod tab_strip;
+
+pub(crate) use frame_and_view::*;
+pub(crate) use header_menu::*;
+pub(crate) use syntax_cache::*;
+pub(crate) use tab_strip::*;

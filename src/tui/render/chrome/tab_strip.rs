@@ -1,3 +1,7 @@
+//! Tab-strip sizing, clearing, and rendering.
+
+use super::*;
+
 pub(crate) fn tab_strip_height_for_width(tab_strip: &[TabStripItem], terminal_width: usize) -> u16 {
     if tab_strip.len() <= 1 {
         return 1;

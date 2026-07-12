@@ -1,3 +1,7 @@
+//! Incremental syntax-highlight cache for the visible TUI viewport.
+
+use super::*;
+
 #[derive(Default)]
 pub(crate) struct TuiSyntaxHighlightCache {
     path: PathBuf,

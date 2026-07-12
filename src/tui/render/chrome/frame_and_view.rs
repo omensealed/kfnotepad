@@ -1,3 +1,7 @@
+//! Shared render frame and editor view models plus color queue helpers.
+
+use super::*;
+
 pub(crate) fn compose_tab_label(index: usize, item: &TabStripItem) -> String {
     let dirty = if item.dirty { "*" } else { "" };
     format!(" {}:{}{} ", index + 1, item.label, dirty)
