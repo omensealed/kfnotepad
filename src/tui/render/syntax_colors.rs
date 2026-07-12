@@ -2,9 +2,13 @@
 
 use super::*;
 
-include!("syntax_colors/roles.rs");
-include!("syntax_colors/hue.rs");
-include!("syntax_colors/palettes.rs");
+mod hue;
+mod palettes;
+mod roles;
+
+use hue::terminal_rgb_hue_degrees;
+use palettes::terminal_syntax_role_rgb;
+use roles::{terminal_syntax_color_role, TerminalSyntaxColorRole};
 
 pub(crate) fn syntect_color_to_terminal(
     color: syntect::highlighting::Color,

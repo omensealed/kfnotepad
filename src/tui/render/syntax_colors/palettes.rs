@@ -1,4 +1,8 @@
-fn terminal_syntax_role_rgb(
+//! Theme-specific terminal syntax palettes.
+
+use super::*;
+
+pub(super) fn terminal_syntax_role_rgb(
     theme_id: EditorThemeId,
     role: TerminalSyntaxColorRole,
 ) -> (u8, u8, u8) {

@@ -1,5 +1,9 @@
+//! Classification of source colors into stable terminal syntax roles.
+
+use super::*;
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum TerminalSyntaxColorRole {
+pub(super) enum TerminalSyntaxColorRole {
     Text,
     Comment,
     Rose,
@@ -11,7 +15,7 @@ enum TerminalSyntaxColorRole {
     Purple,
 }
 
-fn terminal_syntax_color_role(red: u8, green: u8, blue: u8) -> TerminalSyntaxColorRole {
+pub(super) fn terminal_syntax_color_role(red: u8, green: u8, blue: u8) -> TerminalSyntaxColorRole {
     let max = red.max(green).max(blue);
     let min = red.min(green).min(blue);
     let chroma = max.saturating_sub(min);

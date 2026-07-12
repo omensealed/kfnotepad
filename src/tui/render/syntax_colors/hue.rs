@@ -1,4 +1,6 @@
-fn terminal_rgb_hue_degrees(red: u8, green: u8, blue: u8) -> f32 {
+//! RGB hue calculation used by syntax-role classification.
+
+pub(super) fn terminal_rgb_hue_degrees(red: u8, green: u8, blue: u8) -> f32 {
     let red = f32::from(red) / 255.0;
     let green = f32::from(green) / 255.0;
     let blue = f32::from(blue) / 255.0;
