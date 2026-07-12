@@ -1,3 +1,5 @@
+//! Repeat-search starting cursor calculation.
+
 pub(crate) fn next_search_start(
     document: &super::TextDocument,
     cursor: super::Cursor,

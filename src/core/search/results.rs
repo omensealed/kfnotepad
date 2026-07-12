@@ -1,3 +1,5 @@
+//! Repeat-search and go-to-line result value types.
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SearchRepeatResult {
     NoPreviousSearch,

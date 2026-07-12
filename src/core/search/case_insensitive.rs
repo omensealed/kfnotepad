@@ -1,4 +1,8 @@
+//! Unicode-aware case-insensitive matching with original-column mapping.
+
 use std::ops::Range;
+
+use super::*;
 
 pub fn find_case_insensitive_range(
     text: &str,
@@ -9,14 +13,15 @@ pub fn find_case_insensitive_range(
     let (folded_tail, column_map) = folded_with_column_map(text.get(start_byte..)?);
     let folded_query = folded_text(query);
     let match_byte = folded_tail.find(&folded_query)?;
-    folded_match_to_original_range(&folded_tail, &column_map, match_byte, folded_query.len())
-        .map(|range| {
+    folded_match_to_original_range(&folded_tail, &column_map, match_byte, folded_query.len()).map(
+        |range| {
             let base_column = text[..start_byte].chars().count();
             expand_range_to_grapheme_boundaries(
                 text,
                 base_column + range.start..base_column + range.end,
             )
-        })
+        },
+    )
 }
 
 pub fn find_last_case_insensitive_range(

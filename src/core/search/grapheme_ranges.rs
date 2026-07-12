@@ -1,3 +1,5 @@
+//! Expansion of character-column ranges to full grapheme clusters.
+
 pub fn expand_range_to_grapheme_boundaries(
     text: &str,
     range: std::ops::Range<usize>,
