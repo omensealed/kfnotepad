@@ -1,3 +1,7 @@
+//! Grapheme-safe case-sensitive and case-insensitive search ranges.
+
+use super::*;
+
 pub(crate) fn search_match_ranges(
     text: &str,
     query: &str,

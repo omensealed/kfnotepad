@@ -1,3 +1,7 @@
+//! Grapheme-aware text, line, and character display-width calculations.
+
+use super::*;
+
 pub(crate) fn text_display_width(text: &str) -> usize {
     let mut display_column = 0;
     for character in text.chars() {
@@ -75,7 +79,7 @@ pub(crate) fn character_display_width(character: char, display_column: usize) ->
     }
 }
 
-pub(super) fn cursor_cell_character(character: char) -> char {
+pub(in crate::tui::render::status_text) fn cursor_cell_character(character: char) -> char {
     if character == '\t' || character_display_width(character, 0) == 0 {
         ' '
     } else {

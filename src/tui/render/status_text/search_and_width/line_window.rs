@@ -1,3 +1,7 @@
+//! Search-aware rendering of a bounded horizontal line window.
+
+use super::*;
+
 pub(crate) struct LineWindowSearchView<'a> {
     pub(crate) text: &'a str,
     pub(crate) start_column: usize,
@@ -36,9 +40,10 @@ pub(crate) fn print_line_window_with_search(
             break;
         }
 
-        let in_match = view.search_ranges.iter().any(|range| {
-            range.start < grapheme_source_end && current_source_column < range.end
-        });
+        let in_match = view
+            .search_ranges
+            .iter()
+            .any(|range| range.start < grapheme_source_end && current_source_column < range.end);
         if in_match {
             queue_set_foreground_color(writer, &view.frame, view.frame.theme.search_fg)?;
             queue_set_background_color(writer, &view.frame, view.frame.theme.search_bg)?;
