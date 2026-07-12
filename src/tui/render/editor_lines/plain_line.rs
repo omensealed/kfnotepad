@@ -1,3 +1,7 @@
+//! Unwrapped editor-line rendering.
+
+use super::*;
+
 pub(crate) fn write_editor_line(
     writer: &mut impl Write,
     view: EditorLineView<'_>,

@@ -1,4 +1,8 @@
-fn clear_remaining_editor_rows(
+//! Rendering state and helpers for individual wrapped line chunks.
+
+use super::*;
+
+pub(super) fn clear_remaining_editor_rows(
     writer: &mut impl Write,
     mut screen_row: u16,
     visible_rows: usize,
@@ -12,19 +16,19 @@ fn clear_remaining_editor_rows(
     Ok(())
 }
 
-struct WrappedEditorChunkView<'a> {
-    screen_row: u16,
-    document_row: usize,
-    chunk_index: usize,
-    line: &'a str,
-    chunk: &'a str,
-    chunk_start_column: usize,
-    highlighted_line: Option<Vec<(SyntectStyle, String)>>,
-    settings: EditorSettings,
-    search_highlight: Option<SearchHighlightView<'a>>,
+pub(super) struct WrappedEditorChunkView<'a> {
+    pub(super) screen_row: u16,
+    pub(super) document_row: usize,
+    pub(super) chunk_index: usize,
+    pub(super) line: &'a str,
+    pub(super) chunk: &'a str,
+    pub(super) chunk_start_column: usize,
+    pub(super) highlighted_line: Option<Vec<(SyntectStyle, String)>>,
+    pub(super) settings: EditorSettings,
+    pub(super) search_highlight: Option<SearchHighlightView<'a>>,
 }
 
-fn write_wrapped_editor_chunk(
+pub(super) fn write_wrapped_editor_chunk(
     writer: &mut impl Write,
     view: WrappedEditorChunkView<'_>,
     frame: RenderFrame,

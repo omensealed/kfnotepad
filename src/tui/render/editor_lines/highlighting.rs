@@ -1,4 +1,8 @@
-fn highlighter_lines_for_wrapped_view(
+//! Visible-line syntax highlighting and grapheme-safe segment rendering.
+
+use super::*;
+
+pub(super) fn highlighter_lines_for_wrapped_view(
     document: &TextDocument,
     view: EditorView<'_>,
     highlighter: &SyntaxHighlighter,
@@ -45,7 +49,7 @@ fn wrapped_visible_source_line_count(
     }
     source_rows.max(1)
 }
-fn write_highlighted_line_window(
+pub(super) fn write_highlighted_line_window(
     writer: &mut impl Write,
     segments: Vec<(SyntectStyle, String)>,
     start_column: usize,

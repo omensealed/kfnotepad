@@ -1,4 +1,11 @@
-fn write_editor_body_padding(writer: &mut impl Write, remaining: &mut usize) -> io::Result<()> {
+//! Shared editor-body spacing helpers.
+
+use super::*;
+
+pub(super) fn write_editor_body_padding(
+    writer: &mut impl Write,
+    remaining: &mut usize,
+) -> io::Result<()> {
     for _ in 0..EDITOR_BODY_PADDING {
         if *remaining == 0 {
             break;

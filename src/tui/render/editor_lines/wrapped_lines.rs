@@ -1,3 +1,7 @@
+//! Wrapped editor-line orchestration across visible terminal rows.
+
+use super::*;
+
 pub(crate) fn write_wrapped_editor_lines(
     writer: &mut impl Write,
     document: &TextDocument,
