@@ -1,3 +1,7 @@
+//! Private-permission atomic editor settings persistence.
+
+use super::*;
+
 pub fn save_editor_settings(
     path: &Path,
     settings: EditorSettings,

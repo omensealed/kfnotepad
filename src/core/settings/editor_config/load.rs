@@ -1,3 +1,7 @@
+//! Editor settings loading with missing-file defaults.
+
+use super::*;
+
 pub fn load_editor_settings(path: &Path) -> Result<EditorSettings, EditorConfigError> {
     let text = match fs::read_to_string(path) {
         Ok(text) => text,

@@ -1,3 +1,7 @@
+//! Tolerant editor configuration parsing with bounded numeric values.
+
+use super::*;
+
 pub fn parse_editor_settings_config(text: &str) -> EditorSettings {
     let mut settings = EditorSettings::default();
 
