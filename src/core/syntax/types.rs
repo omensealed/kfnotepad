@@ -1,6 +1,11 @@
+//! Public syntax highlighter and cache data types.
+
+use syntect::highlighting::{HighlightState, Style as SyntectStyle, Theme, ThemeSet};
+use syntect::parsing::{ParseState, SyntaxSet};
+
 pub struct SyntaxHighlighter {
-    syntax_set: SyntaxSet,
-    theme: Theme,
+    pub(super) syntax_set: SyntaxSet,
+    pub(super) theme: Theme,
 }
 
 pub type SyntaxHighlightedLine = Option<Vec<(SyntectStyle, String)>>;
@@ -8,8 +13,8 @@ pub type SyntaxHighlightedLines = Vec<SyntaxHighlightedLine>;
 
 #[derive(Clone)]
 pub struct SyntaxHighlightCacheState {
-    highlight_state: HighlightState,
-    parse_state: ParseState,
+    pub(super) highlight_state: HighlightState,
+    pub(super) parse_state: ParseState,
 }
 
 impl Default for SyntaxHighlighter {

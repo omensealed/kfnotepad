@@ -1,12 +1,14 @@
-use std::path::Path;
+//! Syntax selection and stateful highlighting backed by Syntect.
 
-use syntect::easy::HighlightLines;
-use syntect::highlighting::{HighlightState, Style as SyntectStyle, Theme, ThemeSet};
-use syntect::parsing::{ParseState, SyntaxReference, SyntaxSet};
+#[path = "syntax/highlight.rs"]
+mod highlight;
+#[path = "syntax/incremental.rs"]
+mod incremental;
+#[path = "syntax/selection.rs"]
+mod selection;
+#[path = "syntax/types.rs"]
+mod types;
 
-use crate::core::TextDocument;
-
-include!("syntax/types.rs");
-include!("syntax/selection.rs");
-include!("syntax/highlight.rs");
-include!("syntax/incremental.rs");
+pub use types::{
+    SyntaxHighlightCacheState, SyntaxHighlightedLine, SyntaxHighlightedLines, SyntaxHighlighter,
+};

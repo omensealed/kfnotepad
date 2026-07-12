@@ -1,3 +1,12 @@
+//! Incremental syntax highlighting with reusable parser and theme state.
+
+use std::path::Path;
+
+use syntect::easy::HighlightLines;
+
+use super::{SyntaxHighlightCacheState, SyntaxHighlightedLines, SyntaxHighlighter};
+use crate::core::TextDocument;
+
 impl SyntaxHighlighter {
     pub fn highlight_lines_incremental(
         &self,

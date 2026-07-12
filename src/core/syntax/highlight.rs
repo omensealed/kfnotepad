@@ -1,3 +1,10 @@
+//! Single-line and viewport syntax highlighting operations.
+
+use syntect::easy::HighlightLines;
+
+use super::{SyntaxHighlightedLine, SyntaxHighlightedLines, SyntaxHighlighter};
+use crate::core::TextDocument;
+
 impl SyntaxHighlighter {
     pub fn highlight_line(
         &self,

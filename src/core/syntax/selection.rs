@@ -1,5 +1,14 @@
+//! File-path based syntax selection and display metadata.
+
+use std::path::Path;
+
+use syntect::parsing::SyntaxReference;
+
+use super::SyntaxHighlighter;
+use crate::core::TextDocument;
+
 impl SyntaxHighlighter {
-    fn syntax_for_path(&self, path: &Path) -> &SyntaxReference {
+    pub(super) fn syntax_for_path(&self, path: &Path) -> &SyntaxReference {
         self.syntax_set
             .find_syntax_for_file(path)
             .ok()
@@ -7,7 +16,7 @@ impl SyntaxHighlighter {
             .unwrap_or_else(|| self.syntax_set.find_syntax_plain_text())
     }
 
-    fn syntax_for_document(&self, document: &TextDocument) -> &SyntaxReference {
+    pub(super) fn syntax_for_document(&self, document: &TextDocument) -> &SyntaxReference {
         self.syntax_for_path(&document.path)
     }
 
