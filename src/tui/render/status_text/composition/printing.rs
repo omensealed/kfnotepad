@@ -1,3 +1,7 @@
+//! Display-width-bounded terminal text printing.
+
+use super::*;
+
 pub(crate) fn print_truncated(
     writer: &mut impl Write,
     text: &str,

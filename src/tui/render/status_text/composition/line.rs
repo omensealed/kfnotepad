@@ -1,3 +1,7 @@
+//! Fixed-width status-line composition and render result model.
+
+use super::*;
+
 pub(crate) fn compose_status_line(left: &str, right: &str, width: usize) -> String {
     let width = width.max(1);
     let right_count = text_display_width(right);

@@ -1,4 +1,8 @@
-fn fit_text_start(text: &str, width: usize) -> String {
+//! Trailing-ellipsis fitting that preserves the start of text.
+
+use super::*;
+
+pub(super) fn fit_text_start(text: &str, width: usize) -> String {
     let width = width.max(1);
     if text_display_width(text) <= width {
         return text.to_string();

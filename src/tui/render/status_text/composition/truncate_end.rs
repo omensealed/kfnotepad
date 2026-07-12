@@ -1,3 +1,7 @@
+//! Leading-ellipsis fitting that preserves the end of text.
+
+use super::*;
+
 pub(crate) fn fit_text_end(text: &str, width: usize) -> String {
     let width = width.max(1);
     if text_display_width(text) <= width {

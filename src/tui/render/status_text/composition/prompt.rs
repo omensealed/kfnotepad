@@ -1,3 +1,7 @@
+//! Prompt-aware status-line composition and cursor placement.
+
+use super::*;
+
 pub(crate) fn compose_prompt_status_line(
     prompt: &str,
     query: &str,
