@@ -1,3 +1,7 @@
+//! Screen-position to grapheme-safe editor cursor mapping.
+
+use super::*;
+
 pub(crate) fn cursor_at_mouse(
     document: &TextDocument,
     column: u16,
@@ -43,10 +47,8 @@ pub(crate) fn cursor_at_mouse(
 
     let document_row = context.viewport_start + body_row;
     let line = document.buffer.lines().get(document_row)?;
-    let column = char_column_for_display_column(
-        line,
-        context.horizontal_offset.saturating_add(body_column),
-    );
+    let column =
+        char_column_for_display_column(line, context.horizontal_offset.saturating_add(body_column));
     Some(Cursor {
         row: document_row,
         column: document

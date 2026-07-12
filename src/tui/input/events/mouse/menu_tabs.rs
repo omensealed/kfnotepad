@@ -1,3 +1,7 @@
+//! Menu-group, menu-command, and tab-strip mouse hit testing.
+
+use super::*;
+
 pub(crate) fn menu_group_at_mouse(column: u16, frame: RenderFrame) -> Option<MenuGroup> {
     if !show_menu_bar(frame) {
         return None;

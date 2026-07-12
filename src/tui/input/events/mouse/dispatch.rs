@@ -1,3 +1,7 @@
+//! Mouse event routing for sidebar, editor, tabs, menus, and workspaces.
+
+use super::*;
+
 include!("dispatch/test_adapter.rs");
 include!("dispatch/sidebar.rs");
 include!("dispatch/editor_scroll.rs");
