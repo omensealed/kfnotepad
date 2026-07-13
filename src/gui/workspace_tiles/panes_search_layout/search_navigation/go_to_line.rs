@@ -1,3 +1,7 @@
+//! Validated Go To Line execution and editor synchronization.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn go_active_line(&mut self) {
         self.sync_active_editor_to_document();

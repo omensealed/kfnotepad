@@ -1,3 +1,7 @@
+//! Forward/backward active-document search and match selection.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn search_active(&mut self, backwards: bool) {
         self.sync_active_editor_to_document();

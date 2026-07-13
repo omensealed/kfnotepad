@@ -1,3 +1,7 @@
+//! Bounded search history updates and selection.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn remember_search_query(&mut self, query: &str) {
         if query.is_empty() {

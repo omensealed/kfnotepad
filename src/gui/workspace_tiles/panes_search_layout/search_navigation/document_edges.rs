@@ -1,3 +1,7 @@
+//! Active-document start and end navigation.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn go_active_document_start(&mut self) {
         self.sync_active_editor_to_document();
