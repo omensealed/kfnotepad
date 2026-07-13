@@ -1,5 +1,6 @@
 use super::*;
 use crate::tui::input::*;
+use crate::tui::render::clamp_horizontal_viewport;
 
 #[test]
 fn horizontal_viewport_follows_cursor_left_and_right() {

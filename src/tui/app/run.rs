@@ -1,3 +1,14 @@
+//! Public TUI command-line entrypoint and top-level command dispatch.
+
+use std::env;
+use std::process::ExitCode;
+
+use kfnotepad::{parse_args, Command, VERSION};
+
+use super::commands::{
+    run_empty_command, run_file_command, run_list_managed_notes_command, run_managed_note_command,
+};
+
 pub fn run() -> ExitCode {
     let args: Vec<String> = env::args().skip(1).collect();
 

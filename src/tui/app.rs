@@ -6,15 +6,22 @@
 #[path = "app/commands.rs"]
 mod commands;
 mod event_loop;
+#[path = "app/helpers.rs"]
+mod helpers;
+#[path = "app/run.rs"]
+mod run;
 
-use commands::{
-    run_empty_command, run_file_command, run_list_managed_notes_command, run_managed_note_command,
+use helpers::{
+    current_managed_notes_dir, has_tui_terminal, maybe_print_tui_unavailable, run_editor,
 };
 
-include!("app/imports.rs");
-include!("app/exports.rs");
-include!("app/run.rs");
-include!("app/helpers.rs");
+pub use run::run;
+
+#[cfg(test)]
+pub(crate) use crate::tui::theme::EditorTheme;
+pub(crate) use event_loop::run_editor_workspace;
+
+pub(crate) const SIDEBAR_WIDTH: usize = 22;
 
 #[cfg(test)]
 #[path = "app/tests.rs"]

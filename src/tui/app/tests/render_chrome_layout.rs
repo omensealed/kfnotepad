@@ -1,6 +1,7 @@
 use super::*;
 use crate::tui::menu::*;
 use crate::tui::render::*;
+use crate::tui::sidebar::write_workspace_manager_overlay;
 
 #[test]
 fn render_marks_dirty_buffer_and_controls() {

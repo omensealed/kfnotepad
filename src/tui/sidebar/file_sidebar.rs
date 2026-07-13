@@ -8,7 +8,8 @@ use crossterm::style::{Attribute, ResetColor, SetAttribute};
 use kfnotepad::FileSidebarState;
 
 use super::colors::{queue_set_background_color, queue_set_foreground_color};
-use crate::tui::app::{fit_text_end, print_truncated, SIDEBAR_WIDTH};
+use crate::tui::app::SIDEBAR_WIDTH;
+use crate::tui::render::{fit_text_end, print_truncated};
 use crate::tui::theme::EditorTheme;
 
 pub(crate) fn render_file_sidebar(
