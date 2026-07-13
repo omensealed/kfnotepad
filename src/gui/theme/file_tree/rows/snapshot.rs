@@ -1,6 +1,11 @@
+//! Test-only immutable file-tree row snapshots.
+
+#[cfg(test)]
+use super::*;
+
 #[cfg(test)]
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct GuiFileTreeRowModelSnapshot {
+pub(in crate::gui::app::state) struct GuiFileTreeRowModelSnapshot {
     path: PathBuf,
     label: String,
     kind: FileSidebarEntryKind,
@@ -10,29 +15,29 @@ pub(super) struct GuiFileTreeRowModelSnapshot {
 
 #[cfg(test)]
 impl GuiFileTreeRowModelSnapshot {
-    pub(super) fn path(&self) -> &Path {
+    pub(in crate::gui::app::state) fn path(&self) -> &Path {
         &self.path
     }
 
-    pub(super) fn label(&self) -> &str {
+    pub(in crate::gui::app::state) fn label(&self) -> &str {
         &self.label
     }
 
-    pub(super) fn kind(&self) -> FileSidebarEntryKind {
+    pub(in crate::gui::app::state) fn kind(&self) -> FileSidebarEntryKind {
         self.kind
     }
 
-    pub(super) const fn expanded(&self) -> bool {
+    pub(in crate::gui::app::state) const fn expanded(&self) -> bool {
         self.expanded
     }
 
-    pub(super) const fn selected(&self) -> bool {
+    pub(in crate::gui::app::state) const fn selected(&self) -> bool {
         self.selected
     }
 }
 
 #[cfg(test)]
-pub(super) fn gui_file_tree_rows_snapshot(
+pub(in crate::gui::app::state) fn gui_file_tree_rows_snapshot(
     root: &Path,
     expanded_paths: &HashSet<PathBuf>,
     selected_path: Option<&Path>,

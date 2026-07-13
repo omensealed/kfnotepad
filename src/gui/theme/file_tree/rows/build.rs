@@ -1,4 +1,8 @@
-pub(super) fn gui_file_tree_rows(
+//! Recursive file-tree row model construction.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_file_tree_rows(
     root: &Path,
     expanded_paths: &HashSet<PathBuf>,
     selected_path: Option<&Path>,
