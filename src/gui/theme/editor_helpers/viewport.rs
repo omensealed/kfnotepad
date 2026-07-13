@@ -1,5 +1,7 @@
+use super::*;
+
 #[cfg(test)]
-pub(super) fn gui_editor_viewport_slice(
+pub(in crate::gui::app::state) fn gui_editor_viewport_slice(
     text: &str,
     line_count: usize,
     viewport: GuiEditorViewportState,
@@ -10,7 +12,7 @@ pub(super) fn gui_editor_viewport_slice(
     gui_editor_viewport_slice_from_lines(&document_lines, line_count, viewport, cursor, selection)
 }
 
-pub(super) fn gui_editor_viewport_slice_from_lines(
+pub(in crate::gui::app::state) fn gui_editor_viewport_slice_from_lines(
     document_lines: &[String],
     line_count: usize,
     viewport: GuiEditorViewportState,
@@ -49,7 +51,10 @@ pub(super) fn gui_editor_viewport_slice_from_lines(
 }
 
 #[cfg(test)]
-pub(super) fn gui_document_lines(text: &str, line_count: usize) -> Vec<String> {
+pub(in crate::gui::app::state) fn gui_document_lines(
+    text: &str,
+    line_count: usize,
+) -> Vec<String> {
     let total = line_count.max(1);
     let mut lines = text
         .split('\n')
@@ -60,7 +65,7 @@ pub(super) fn gui_document_lines(text: &str, line_count: usize) -> Vec<String> {
     lines
 }
 
-pub(super) fn gui_editor_viewport_slice_with_cached_syntax(
+pub(in crate::gui::app::state) fn gui_editor_viewport_slice_with_cached_syntax(
     mut slice: GuiEditorViewportSlice,
     syntax_cache: Option<&GuiSyntaxCache>,
 ) -> GuiEditorViewportSlice {
