@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_replacement_cursor_from_mouse_point(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_replacement_cursor_from_mouse_point(
     buffer: &TextBuffer,
     viewport: GuiEditorViewportState,
     point: GuiEditorReplacementMousePoint,

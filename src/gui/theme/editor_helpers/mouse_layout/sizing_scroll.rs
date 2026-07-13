@@ -1,20 +1,29 @@
-pub(super) fn gui_editor_replacement_character_width(settings: EditorSettings) -> f32 {
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_replacement_character_width(
+    settings: EditorSettings,
+) -> f32 {
     (f32::from(settings.gui_font_size) * 0.62).max(1.0)
 }
 
-pub(super) fn gui_editor_replacement_row_height(settings: EditorSettings) -> f32 {
+pub(in crate::gui::app::state) fn gui_editor_replacement_row_height(
+    settings: EditorSettings,
+) -> f32 {
     (f32::from(settings.gui_font_size) * GUI_EDITOR_LINE_HEIGHT)
         .ceil()
         .max(1.0)
 }
 
-pub(super) fn gui_editor_visible_row_budget(surface_height: f32, row_height: f32) -> usize {
+pub(in crate::gui::app::state) fn gui_editor_visible_row_budget(
+    surface_height: f32,
+    row_height: f32,
+) -> usize {
     (surface_height.max(row_height) / row_height.max(1.0))
         .floor()
         .max(1.0) as usize
 }
 
-pub(super) fn gui_editor_replacement_scroll_delta_lines(
+pub(in crate::gui::app::state) fn gui_editor_replacement_scroll_delta_lines(
     delta: mouse::ScrollDelta,
     settings: EditorSettings,
 ) -> i32 {

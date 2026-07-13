@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_replacement_mouse_click(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_click(
     document: &TextDocument,
     cursor: &mut DocumentCursor,
     viewport: &mut GuiEditorViewportState,
@@ -9,7 +11,7 @@ pub(super) fn gui_editor_replacement_mouse_click(
     *selection = None;
 }
 
-pub(super) fn gui_editor_replacement_mouse_drag(
+pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_drag(
     document: &TextDocument,
     cursor: &mut DocumentCursor,
     viewport: &mut GuiEditorViewportState,

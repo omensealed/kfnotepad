@@ -1,5 +1,7 @@
+use super::*;
+
 #[cfg(test)]
-pub(super) fn gui_editor_replacement_mouse_point_from_line_point(
+pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_point_from_line_point(
     point: iced::Point,
     viewport_row: usize,
     settings: EditorSettings,
@@ -30,7 +32,7 @@ pub(super) fn gui_editor_replacement_mouse_point_from_line_point(
     }
 }
 
-pub(super) fn gui_editor_replacement_mouse_point_from_visual_row_point(
+pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_point_from_visual_row_point(
     point: iced::Point,
     viewport_row: usize,
     source_column_start: usize,
@@ -48,7 +50,7 @@ pub(super) fn gui_editor_replacement_mouse_point_from_visual_row_point(
     }
 }
 
-pub(super) fn gui_editor_replacement_mouse_point_from_body_point(
+pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_point_from_body_point(
     point: iced::Point,
     source_lines: &[GuiEditorViewportLine],
     first_line: usize,
@@ -85,7 +87,7 @@ pub(super) fn gui_editor_replacement_mouse_point_from_body_point(
     }
 }
 
-pub(super) fn gui_editor_drag_edge_from_body_point(
+pub(in crate::gui::app::state) fn gui_editor_drag_edge_from_body_point(
     pane: pane_grid::Pane,
     point: iced::Point,
     surface_height: f32,
