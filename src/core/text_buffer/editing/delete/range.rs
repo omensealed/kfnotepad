@@ -32,29 +32,19 @@ impl TextBuffer {
         }
 
         self.break_undo_group();
-        let use_delta_history = matches!(self.compound_edit, CompoundEditState::Inactive);
-        if !use_delta_history {
-            self.record_undo();
-        }
-        let deleted_text = if use_delta_history {
-            Some(self.text_in_range_without_normalization(start, end)?)
-        } else {
-            None
-        };
+        let deleted_text = self.text_in_range_without_normalization(start, end)?;
         let trailing_newline_before = self.trailing_newline;
         let trailing_newline_after = trailing_newline_before && !remove_trailing_newline;
 
         self.delete_range_without_history(start, end)?;
         self.trailing_newline = trailing_newline_after;
-        if let Some(text) = deleted_text {
-            self.record_delete_text_undo(
-                start,
-                end,
-                text,
-                trailing_newline_before,
-                trailing_newline_after,
-            );
-        }
+        self.record_delete_text_undo(
+            start,
+            end,
+            deleted_text,
+            trailing_newline_before,
+            trailing_newline_after,
+        );
         self.mark_changed();
         Ok(())
     }

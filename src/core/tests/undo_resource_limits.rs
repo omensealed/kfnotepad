@@ -169,7 +169,7 @@ fn coalescing_timeout_breaks_typed_insert_undo_group() {
 }
 
 #[test]
-fn compound_edit_records_one_snapshot_for_multiple_edit_kinds() {
+fn compound_edit_records_one_delta_group_for_multiple_edit_kinds() {
     let mut document = TextDocument {
         path: PathBuf::from("compound.txt"),
         buffer: TextBuffer::from_text("hello world"),
@@ -198,11 +198,138 @@ fn compound_edit_records_one_snapshot_for_multiple_edit_kinds() {
     assert_eq!(document.buffer.undo_history.len(), 1);
     assert!(matches!(
         document.buffer.undo_history.back(),
-        Some(HistoryEntry::Snapshot(_))
+        Some(HistoryEntry::Group(group))
+            if group.deltas.len() == 1
+                && group.deltas[0].before == " world"
+                && group.deltas[0].after == "\nxy"
     ));
     assert!(document.buffer.undo_last_edit());
     assert_eq!(document.buffer.to_text(), "hello world");
     assert!(!document.buffer.undo_last_edit());
+    assert!(document.buffer.redo_last_undo());
+    assert_eq!(document.buffer.to_text(), "hello\nxy");
+}
+
+#[test]
+fn nested_compound_edits_commit_only_at_outer_boundary() {
+    let mut document = TextDocument {
+        path: PathBuf::from("nested-compound.txt"),
+        buffer: TextBuffer::from_text("abc"),
+    };
+
+    document.with_compound_edit(|document| {
+        document
+            .buffer
+            .insert_text(Cursor { row: 0, column: 3 }, "d")
+            .expect("insert outer text");
+        document.with_compound_edit(|document| {
+            document
+                .buffer
+                .insert_text(Cursor { row: 0, column: 4 }, "e")
+                .expect("insert nested text");
+            assert!(document.buffer.undo_history.is_empty());
+        });
+        assert!(document.buffer.undo_history.is_empty());
+    });
+
+    assert_eq!(document.buffer.to_text(), "abcde");
+    assert_eq!(document.buffer.undo_history.len(), 1);
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), "abc");
+    assert!(document.buffer.redo_last_undo());
+    assert_eq!(document.buffer.to_text(), "abcde");
+}
+
+#[test]
+fn compound_delta_history_scales_with_changed_text_in_large_document() {
+    let base = "a".repeat(1024 * 1024);
+    let mut document = TextDocument {
+        path: PathBuf::from("large-compound.txt"),
+        buffer: TextBuffer::from_text(&base),
+    };
+
+    document.with_compound_edit(|document| {
+        document
+            .buffer
+            .delete_range(Cursor { row: 0, column: 0 }, Cursor { row: 0, column: 1 })
+            .expect("delete first character");
+        document
+            .buffer
+            .insert_text(Cursor { row: 0, column: 0 }, "z")
+            .expect("insert replacement character");
+    });
+
+    assert_eq!(document.buffer.undo_history.len(), 1);
+    assert!(document.buffer.undo_bytes < 1024);
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), base);
+    assert!(document.buffer.redo_last_undo());
+    assert_eq!(document.buffer.lines[0].as_bytes()[0], b'z');
+}
+
+#[test]
+fn noncontiguous_compound_deltas_replay_in_order() {
+    let mut document = TextDocument {
+        path: PathBuf::from("noncontiguous-compound.txt"),
+        buffer: TextBuffer::from_text("abcdef"),
+    };
+
+    document.with_compound_edit(|document| {
+        document
+            .buffer
+            .replace_char(0, 0, 'x')
+            .expect("replace first character");
+        document
+            .buffer
+            .replace_char(0, 5, 'y')
+            .expect("replace last character");
+    });
+
+    assert_eq!(document.buffer.to_text(), "xbcdey");
+    assert!(matches!(
+        document.buffer.undo_history.back(),
+        Some(HistoryEntry::Group(group)) if group.deltas.len() == 2
+    ));
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), "abcdef");
+    assert!(document.buffer.redo_last_undo());
+    assert_eq!(document.buffer.to_text(), "xbcdey");
+}
+
+#[test]
+fn failed_group_redo_rolls_back_partial_application_and_restores_history() {
+    let mut buffer = TextBuffer::from_text("abc");
+    let group = EditGroup {
+        deltas: vec![
+            EditDelta::insertion(
+                Cursor { row: 0, column: 3 },
+                Cursor { row: 0, column: 4 },
+                "d".to_string(),
+                false,
+            ),
+            EditDelta::insertion(
+                Cursor { row: 9, column: 0 },
+                Cursor { row: 9, column: 1 },
+                "x".to_string(),
+                false,
+            ),
+        ],
+    };
+    let entry = HistoryEntry::Group(group);
+    buffer.redo_bytes = entry.byte_size();
+    buffer.redo_history.push_back(entry);
+
+    assert!(!buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "abc");
+    assert_eq!(buffer.redo_history.len(), 1);
+    assert_eq!(
+        buffer.redo_bytes,
+        buffer
+            .redo_history
+            .iter()
+            .map(HistoryEntry::byte_size)
+            .sum::<usize>()
+    );
 }
 
 #[test]
@@ -606,8 +733,15 @@ fn mixed_delta_count_eviction_keeps_newest_reversible_suffix() {
 fn mixed_history_byte_eviction_tracks_payloads_and_keeps_newest_suffix() {
     fn marker(entry: &HistoryEntry) -> u8 {
         let text = match entry {
-            HistoryEntry::Snapshot(snapshot) => &snapshot.lines[0],
             HistoryEntry::Edit(delta) => {
+                if delta.before.is_empty() {
+                    &delta.after
+                } else {
+                    &delta.before
+                }
+            }
+            HistoryEntry::Group(group) => {
+                let delta = &group.deltas[0];
                 if delta.before.is_empty() {
                     &delta.after
                 } else {
@@ -657,10 +791,13 @@ fn mixed_history_byte_eviction_tracks_payloads_and_keeps_newest_suffix() {
                     false,
                 ))
             }
-            _ => HistoryEntry::Snapshot(BufferSnapshot {
-                lines: vec![String::from_utf8(vec![byte; 64]).expect("ASCII snapshot payload")],
-                trailing_newline: false,
-                byte_size: 64,
+            _ => HistoryEntry::Group(EditGroup {
+                deltas: vec![EditDelta::insertion(
+                    Cursor { row: 0, column: 0 },
+                    Cursor { row: 0, column: 64 },
+                    String::from_utf8(vec![byte; 64]).expect("ASCII group payload"),
+                    false,
+                )],
             }),
         };
         push_history_entry(&mut history, &mut used_bytes, entry, 12, max_bytes);
@@ -680,7 +817,7 @@ fn mixed_history_byte_eviction_tracks_payloads_and_keeps_newest_suffix() {
     }
     assert!(history
         .iter()
-        .any(|entry| matches!(entry, HistoryEntry::Snapshot(_))));
+        .any(|entry| matches!(entry, HistoryEntry::Group(_))));
     assert!(history
         .iter()
         .any(|entry| matches!(entry, HistoryEntry::Edit(delta) if delta.before.is_empty())));
@@ -705,42 +842,29 @@ fn mixed_history_byte_eviction_tracks_payloads_and_keeps_newest_suffix() {
 
 #[test]
 fn history_push_prefers_latest_entries_and_tracks_byte_budget() {
-    let snapshots = [
-        BufferSnapshot {
-            lines: vec!["a".to_string()],
-            trailing_newline: false,
-            byte_size: 60,
-        },
-        BufferSnapshot {
-            lines: vec!["b".to_string()],
-            trailing_newline: false,
-            byte_size: 60,
-        },
-        BufferSnapshot {
-            lines: vec!["c".to_string()],
-            trailing_newline: false,
-            byte_size: 60,
-        },
-        BufferSnapshot {
-            lines: vec!["d".to_string()],
-            trailing_newline: false,
-            byte_size: 60,
-        },
-    ];
+    let entries = (*b"abcd").map(|marker| {
+        HistoryEntry::Edit(EditDelta::insertion(
+            Cursor { row: 0, column: 0 },
+            Cursor { row: 0, column: 60 },
+            String::from_utf8(vec![marker; 60]).expect("ASCII history payload"),
+            false,
+        ))
+    });
+    let entry_bytes = entries[0].byte_size();
     let mut history = VecDeque::new();
     let mut used_bytes = 0;
-    for snapshot in snapshots {
-        push_history_snapshot(&mut history, &mut used_bytes, snapshot, 4, 120);
+    for entry in entries {
+        push_history_entry(&mut history, &mut used_bytes, entry, 4, entry_bytes * 2);
     }
 
     assert_eq!(history.len(), 2);
-    assert_eq!(used_bytes, 120);
+    assert_eq!(used_bytes, entry_bytes * 2);
     assert!(matches!(
         &history[0],
-        HistoryEntry::Snapshot(snapshot) if snapshot.lines[0] == "c"
+        HistoryEntry::Edit(delta) if delta.after.as_bytes()[0] == b'c'
     ));
     assert!(matches!(
         &history[1],
-        HistoryEntry::Snapshot(snapshot) if snapshot.lines[0] == "d"
+        HistoryEntry::Edit(delta) if delta.after.as_bytes()[0] == b'd'
     ));
 }

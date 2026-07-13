@@ -16,15 +16,9 @@ impl TextBuffer {
             byte_index_for_char_column(line, cursor.column)?
         };
         self.break_undo_group();
-        let use_delta_history = matches!(self.compound_edit, CompoundEditState::Inactive);
-        if !use_delta_history {
-            self.record_undo();
-        }
 
         let next_cursor = self.insert_text_without_history(cursor, byte_index, text);
-        if use_delta_history {
-            self.record_insert_text_undo(cursor, next_cursor, text);
-        }
+        self.record_insert_text_undo(cursor, next_cursor, text);
 
         self.mark_changed();
         let final_segment = text.rsplit('\n').next().unwrap_or(text);
@@ -107,17 +101,23 @@ impl TextBuffer {
         let next_bytes = self.byte_len().saturating_add(value.len_utf8());
         self.ensure_byte_len(next_bytes)?;
 
-        let use_delta_history = matches!(self.compound_edit, CompoundEditState::Inactive);
-        if !use_delta_history {
-            self.record_undo();
-        }
+        let standalone_edit = matches!(self.compound_edit, CompoundEditState::Inactive);
         let line = self
             .lines
             .get_mut(row)
             .ok_or(BufferError::RowOutOfBounds { row, rows })?;
         line.insert(byte_index, value);
-        if use_delta_history {
+        if standalone_edit {
             self.record_typed_insert_undo(row, column, value);
+        } else {
+            self.record_insert_text_undo(
+                Cursor { row, column },
+                Cursor {
+                    row,
+                    column: column.saturating_add(1),
+                },
+                &value.to_string(),
+            );
         }
         self.mark_changed();
         Ok(())
@@ -185,20 +185,10 @@ impl TextBuffer {
             row,
             column: start_column.saturating_add(1),
         };
-        let use_delta_history = matches!(self.compound_edit, CompoundEditState::Inactive);
-        let before = if use_delta_history {
-            Some(self.text_in_range_without_normalization(start_cursor, before_end)?)
-        } else {
-            None
-        };
+        let before = self.text_in_range_without_normalization(start_cursor, before_end)?;
         self.break_undo_group();
-        if !use_delta_history {
-            self.record_undo();
-        }
         self.replace_range_without_history(start_cursor, before_end, &after)?;
-        if let Some(before) = before {
-            self.record_replace_text_undo(start_cursor, before_end, after_end, before, after);
-        }
+        self.record_replace_text_undo(start_cursor, before_end, after_end, before, after);
         self.mark_changed();
         Ok(())
     }

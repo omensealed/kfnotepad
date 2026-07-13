@@ -1,4 +1,4 @@
-//! Text-buffer state, undo entries, snapshots, and public error types.
+//! Text-buffer state, exact undo entries, and public error types.
 
 use super::*;
 
@@ -32,13 +32,6 @@ pub(crate) struct InsertUndoGroup {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) struct BufferSnapshot {
-    pub(crate) lines: Vec<String>,
-    pub(crate) trailing_newline: bool,
-    pub(crate) byte_size: usize,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) struct EditDelta {
     pub(crate) start: Cursor,
     pub(crate) before_end: Cursor,
@@ -47,7 +40,6 @@ pub(crate) struct EditDelta {
     pub(crate) after: String,
     pub(crate) trailing_newline_before: bool,
     pub(crate) trailing_newline_after: bool,
-    pub(crate) byte_size: usize,
 }
 
 impl EditDelta {
@@ -114,7 +106,7 @@ impl EditDelta {
         trailing_newline_before: bool,
         trailing_newline_after: bool,
     ) -> Self {
-        let mut delta = Self {
+        Self {
             start,
             before_end,
             after_end,
@@ -122,32 +114,75 @@ impl EditDelta {
             after,
             trailing_newline_before,
             trailing_newline_after,
-            byte_size: 0,
-        };
-        delta.refresh_byte_size();
-        delta
+        }
     }
 
-    pub(crate) fn refresh_byte_size(&mut self) {
-        self.byte_size = self
-            .before
-            .capacity()
-            .saturating_add(self.after.capacity())
-            .saturating_add(std::mem::size_of::<HistoryEntry>());
+    fn payload_bytes(&self) -> usize {
+        self.before.capacity().saturating_add(self.after.capacity())
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct EditGroup {
+    pub(crate) deltas: Vec<EditDelta>,
+}
+
+impl EditGroup {
+    pub(crate) fn push(&mut self, delta: EditDelta) {
+        if let Some(previous) = self.deltas.last_mut() {
+            let contiguous = previous.after_end == delta.start
+                && previous.trailing_newline_after == delta.trailing_newline_before;
+            if contiguous {
+                previous.before.push_str(&delta.before);
+                previous.after.push_str(&delta.after);
+                previous.before_end = cursor_after_text(previous.start, &previous.before);
+                previous.after_end = cursor_after_text(previous.start, &previous.after);
+                previous.trailing_newline_after = delta.trailing_newline_after;
+                return;
+            }
+        }
+        self.deltas.push(delta);
+    }
+
+    pub(crate) fn byte_size(&self) -> usize {
+        std::mem::size_of::<HistoryEntry>()
+            .saturating_add(
+                self.deltas
+                    .capacity()
+                    .saturating_mul(std::mem::size_of::<EditDelta>()),
+            )
+            .saturating_add(
+                self.deltas
+                    .iter()
+                    .map(EditDelta::payload_bytes)
+                    .sum::<usize>(),
+            )
+    }
+}
+
+fn cursor_after_text(start: Cursor, text: &str) -> Cursor {
+    let mut segments = text.split('\n');
+    let first = segments.next().unwrap_or_default();
+    let mut row = start.row;
+    let mut column = start.column.saturating_add(first.chars().count());
+    for segment in segments {
+        row = row.saturating_add(1);
+        column = segment.chars().count();
+    }
+    Cursor { row, column }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum HistoryEntry {
-    Snapshot(BufferSnapshot),
     Edit(EditDelta),
+    Group(EditGroup),
 }
 
 impl HistoryEntry {
     pub(crate) fn byte_size(&self) -> usize {
         match self {
-            Self::Snapshot(snapshot) => snapshot.byte_size,
-            Self::Edit(delta) => delta.byte_size,
+            Self::Edit(delta) => std::mem::size_of::<Self>().saturating_add(delta.payload_bytes()),
+            Self::Group(group) => group.byte_size(),
         }
     }
 }
@@ -155,12 +190,9 @@ impl HistoryEntry {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum CompoundEditState {
     Inactive,
-    Pending {
+    Active {
         depth: usize,
-        snapshot: Box<BufferSnapshot>,
-    },
-    Recorded {
-        depth: usize,
+        group: Option<EditGroup>,
     },
 }
 

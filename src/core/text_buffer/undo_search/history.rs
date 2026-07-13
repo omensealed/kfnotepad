@@ -33,7 +33,6 @@ impl TextBuffer {
                     {
                         delta.after.push(value);
                         delta.after_end = end;
-                        delta.refresh_byte_size();
                         push_history_entry(
                             &mut self.undo_history,
                             &mut self.undo_bytes,
@@ -87,71 +86,39 @@ impl TextBuffer {
             match std::mem::replace(&mut self.compound_edit, CompoundEditState::Inactive) {
                 CompoundEditState::Inactive => {
                     self.break_undo_group();
-                    CompoundEditState::Pending {
+                    CompoundEditState::Active {
                         depth: 1,
-                        snapshot: Box::new(BufferSnapshot::from_buffer(self)),
+                        group: Some(EditGroup { deltas: Vec::new() }),
                     }
                 }
-                CompoundEditState::Pending { depth, snapshot } => CompoundEditState::Pending {
+                CompoundEditState::Active { depth, group } => CompoundEditState::Active {
                     depth: depth.saturating_add(1),
-                    snapshot,
-                },
-                CompoundEditState::Recorded { depth } => CompoundEditState::Recorded {
-                    depth: depth.saturating_add(1),
+                    group,
                 },
             };
     }
 
     pub(crate) fn end_compound_edit(&mut self) {
-        self.compound_edit =
-            match std::mem::replace(&mut self.compound_edit, CompoundEditState::Inactive) {
-                CompoundEditState::Pending { depth, snapshot } if depth > 1 => {
-                    CompoundEditState::Pending {
-                        depth: depth - 1,
-                        snapshot,
-                    }
-                }
-                CompoundEditState::Recorded { depth } if depth > 1 => {
-                    CompoundEditState::Recorded { depth: depth - 1 }
-                }
-                _ => {
-                    self.break_undo_group();
-                    CompoundEditState::Inactive
-                }
-            };
-        if matches!(self.compound_edit, CompoundEditState::Inactive) {
-            self.break_undo_group();
+        match std::mem::replace(&mut self.compound_edit, CompoundEditState::Inactive) {
+            CompoundEditState::Active { depth, group } if depth > 1 => {
+                self.compound_edit = CompoundEditState::Active {
+                    depth: depth - 1,
+                    group,
+                };
+            }
+            CompoundEditState::Active {
+                group: Some(group), ..
+            } if !group.deltas.is_empty() => {
+                self.push_undo_entry(HistoryEntry::Group(group));
+                self.break_undo_group();
+            }
+            _ => self.break_undo_group(),
         }
     }
 
     pub(in crate::core::text_buffer) fn mark_changed(&mut self) {
         self.dirty = true;
         self.edit_revision = self.edit_revision.wrapping_add(1);
-    }
-
-    pub(in crate::core::text_buffer) fn record_undo(&mut self) {
-        self.insert_undo_group = None;
-        let snapshot = match std::mem::replace(&mut self.compound_edit, CompoundEditState::Inactive)
-        {
-            CompoundEditState::Pending { depth, snapshot } => {
-                self.compound_edit = CompoundEditState::Recorded { depth };
-                *snapshot
-            }
-            recorded @ CompoundEditState::Recorded { .. } => {
-                self.compound_edit = recorded;
-                return;
-            }
-            CompoundEditState::Inactive => BufferSnapshot::from_buffer(self),
-        };
-        push_history_snapshot(
-            &mut self.undo_history,
-            &mut self.undo_bytes,
-            snapshot,
-            MAX_UNDO_HISTORY,
-            MAX_UNDO_BYTES,
-        );
-        self.redo_history.clear();
-        self.redo_bytes = 0;
     }
 
     pub(in crate::core::text_buffer) fn record_insert_text_undo(
@@ -204,10 +171,25 @@ impl TextBuffer {
     }
 
     fn record_edit_delta(&mut self, delta: EditDelta) {
+        if let CompoundEditState::Active { group, .. } = &mut self.compound_edit {
+            if let Some(active_group) = group {
+                active_group.push(delta);
+                if active_group.byte_size() > MAX_UNDO_BYTES {
+                    *group = None;
+                }
+            }
+            self.redo_history.clear();
+            self.redo_bytes = 0;
+            return;
+        }
+        self.push_undo_entry(HistoryEntry::Edit(delta));
+    }
+
+    fn push_undo_entry(&mut self, entry: HistoryEntry) {
         push_history_entry(
             &mut self.undo_history,
             &mut self.undo_bytes,
-            HistoryEntry::Edit(delta),
+            entry,
             MAX_UNDO_HISTORY,
             MAX_UNDO_BYTES,
         );
