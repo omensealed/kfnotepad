@@ -1,3 +1,5 @@
+//! Event forwarding and active IME request submission.
+
 macro_rules! gui_input_method_update_methods {
     () => {
         fn update(
@@ -34,3 +36,5 @@ macro_rules! gui_input_method_update_methods {
         }
     };
 }
+
+pub(super) use gui_input_method_update_methods;

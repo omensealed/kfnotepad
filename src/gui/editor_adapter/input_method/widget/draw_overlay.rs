@@ -1,3 +1,5 @@
+//! Drawing, pointer interaction, and overlay forwarding methods.
+
 macro_rules! gui_input_method_draw_overlay_methods {
     () => {
         fn draw(
@@ -56,3 +58,5 @@ macro_rules! gui_input_method_draw_overlay_methods {
         }
     };
 }
+
+pub(super) use gui_input_method_draw_overlay_methods;

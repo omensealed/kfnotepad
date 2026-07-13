@@ -1,3 +1,5 @@
+//! Layout and widget-operation forwarding methods.
+
 macro_rules! gui_input_method_layout_operate_methods {
     () => {
         fn layout(
@@ -18,9 +20,14 @@ macro_rules! gui_input_method_layout_operate_methods {
             renderer: &iced::Renderer,
             operation: &mut dyn AdvancedOperation,
         ) {
-            self.content
-                .as_widget_mut()
-                .operate(&mut tree.children[0], layout, renderer, operation);
+            self.content.as_widget_mut().operate(
+                &mut tree.children[0],
+                layout,
+                renderer,
+                operation,
+            );
         }
     };
 }
+
+pub(super) use gui_input_method_layout_operate_methods;

@@ -1,3 +1,5 @@
+//! Widget tree lifecycle and size forwarding methods.
+
 macro_rules! gui_input_method_tree_size_methods {
     () => {
         fn children(&self) -> Vec<Tree> {
@@ -17,3 +19,5 @@ macro_rules! gui_input_method_tree_size_methods {
         }
     };
 }
+
+pub(super) use gui_input_method_tree_size_methods;
