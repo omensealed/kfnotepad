@@ -1,4 +1,11 @@
-fn gui_pane_grid_view(state: &KfnotepadGui) -> Element<'_, Message> {
+//! Live pane-grid composition, title state, and interaction routing.
+
+use super::super::*;
+use super::{gui_pane_body, gui_pane_controls};
+
+pub(in crate::gui::app::state::view) fn gui_pane_grid_view(
+    state: &KfnotepadGui,
+) -> Element<'_, Message> {
     pane_grid(&state.panes, |pane, pane_state, is_maximized| {
         let Some(tile) = state.workspace.tile(pane_state.tile_id) else {
             return pane_grid::Content::new(text("Missing tile"));
@@ -15,7 +22,8 @@ fn gui_pane_grid_view(state: &KfnotepadGui) -> Element<'_, Message> {
                 format!("{save_status} | locked")
             };
         }
-        let title = gui_tile_title_label(&tile.document.path, pane == state.active_pane, &save_status);
+        let title =
+            gui_tile_title_label(&tile.document.path, pane == state.active_pane, &save_status);
         let title_tooltip = tile.document.path.display().to_string();
         let tile_palette = gui_theme_palette(state.settings.theme_id);
         let active_tile = pane == state.active_pane;

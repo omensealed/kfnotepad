@@ -9,9 +9,11 @@ use iced::widget;
 include!("view/shell.rs");
 #[path = "view/left_panel.rs"]
 mod left_panel;
+#[path = "view/panes.rs"]
+mod panes;
 #[path = "view/top_panels.rs"]
 mod top_panels;
-include!("view/panes.rs");
 
 use left_panel::*;
+use panes::*;
 use top_panels::*;

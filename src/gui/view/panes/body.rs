@@ -1,4 +1,8 @@
-fn gui_pane_body<'a>(
+//! Minimized and editable tile body rendering.
+
+use super::super::*;
+
+pub(in crate::gui::app::state::view) fn gui_pane_body<'a>(
     state: &'a KfnotepadGui,
     pane: pane_grid::Pane,
     tile_id: GuiTileId,
@@ -42,7 +46,10 @@ fn gui_pane_body<'a>(
                 .size(editor_surface.editor_size)
                 .line_height(GUI_EDITOR_LINE_HEIGHT)
                 .wrapping(editor_surface.wrapping)
-                .highlight(&editor_surface.syntax_token, editor_surface.highlighter_theme)
+                .highlight(
+                    &editor_surface.syntax_token,
+                    editor_surface.highlighter_theme,
+                )
                 .style(move |_theme, status| {
                     gui_native_editor_style(tile_palette, status, search_highlight_active)
                 })

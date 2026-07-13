@@ -1,4 +1,8 @@
-fn gui_pane_controls(
+//! Pane movement, minimize, maximize, close, and unlock controls.
+
+use super::super::*;
+
+pub(in crate::gui::app::state::view) fn gui_pane_controls(
     state: &KfnotepadGui,
     pane: pane_grid::Pane,
     tile_id: GuiTileId,
