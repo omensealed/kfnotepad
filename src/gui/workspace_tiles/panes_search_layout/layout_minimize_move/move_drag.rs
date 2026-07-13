@@ -7,7 +7,11 @@ impl KfnotepadGui {
         self.move_pane(self.active_pane, direction);
     }
 
-    pub(in crate::gui::app::state) fn move_pane(&mut self, pane: pane_grid::Pane, direction: pane_grid::Direction) {
+    pub(in crate::gui::app::state) fn move_pane(
+        &mut self,
+        pane: pane_grid::Pane,
+        direction: pane_grid::Direction,
+    ) {
         if !self.focus_pane(pane) {
             self.status_message = "move failed: no such pane".to_string();
             return;
