@@ -1,4 +1,8 @@
-pub(super) fn gui_layout_from_state(
+//! Saved geometry extraction from the live Iced pane grid.
+
+use super::super::*;
+
+pub(in crate::gui::app::state) fn gui_layout_from_state(
     panes: &pane_grid::State<GuiPane>,
     workspace: &GuiWorkspace,
     browser_visible: bool,
@@ -21,7 +25,7 @@ pub(super) fn gui_layout_from_state(
     })
 }
 
-pub(super) fn gui_layout_with_minimized_leaves(
+pub(in crate::gui::app::state) fn gui_layout_with_minimized_leaves(
     mut root: GuiLayoutNode,
     minimized_ordinals: &[usize],
 ) -> GuiLayoutNode {
@@ -36,15 +40,15 @@ pub(super) fn gui_layout_with_minimized_leaves(
     root
 }
 
-pub(super) fn clamp_browser_width(width: f32) -> f32 {
+pub(in crate::gui::app::state) fn clamp_browser_width(width: f32) -> f32 {
     width.clamp(GUI_BROWSER_WIDTH_MIN, GUI_BROWSER_WIDTH_MAX)
 }
 
-pub(super) fn persisted_browser_width(width: f32) -> u16 {
+pub(in crate::gui::app::state) fn persisted_browser_width(width: f32) -> u16 {
     clamp_browser_width(width).round() as u16
 }
 
-pub(super) fn gui_layout_node_from_iced(
+pub(in crate::gui::app::state) fn gui_layout_node_from_iced(
     node: &pane_grid::Node,
     panes: &pane_grid::State<GuiPane>,
     workspace: &GuiWorkspace,
@@ -66,14 +70,14 @@ pub(super) fn gui_layout_node_from_iced(
     }
 }
 
-pub(super) fn gui_layout_axis(axis: pane_grid::Axis) -> GuiLayoutAxis {
+pub(in crate::gui::app::state) fn gui_layout_axis(axis: pane_grid::Axis) -> GuiLayoutAxis {
     match axis {
         pane_grid::Axis::Horizontal => GuiLayoutAxis::Horizontal,
         pane_grid::Axis::Vertical => GuiLayoutAxis::Vertical,
     }
 }
 
-pub(super) fn pane_for_tile_id(
+pub(in crate::gui::app::state) fn pane_for_tile_id(
     panes: &pane_grid::State<GuiPane>,
     tile_id: GuiTileId,
 ) -> Option<pane_grid::Pane> {

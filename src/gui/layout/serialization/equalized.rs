@@ -1,4 +1,10 @@
-pub(super) fn equalized_tile_layout_node(count: usize) -> Option<GuiLayoutNode> {
+//! Balanced grid-like saved layout construction.
+
+use super::super::*;
+
+pub(in crate::gui::app::state) fn equalized_tile_layout_node(
+    count: usize,
+) -> Option<GuiLayoutNode> {
     if count == 0 {
         return None;
     }
@@ -26,7 +32,7 @@ pub(super) fn equalized_tile_layout_node(count: usize) -> Option<GuiLayoutNode> 
     Some(equalized_axis_node(GuiLayoutAxis::Vertical, column_nodes))
 }
 
-pub(super) fn equalized_axis_node(
+pub(in crate::gui::app::state) fn equalized_axis_node(
     axis: GuiLayoutAxis,
     mut nodes: Vec<GuiLayoutNode>,
 ) -> GuiLayoutNode {

@@ -1,4 +1,8 @@
-pub(super) fn panes_from_gui_layout(
+//! Iced pane-grid reconstruction from validated saved geometry.
+
+use super::super::*;
+
+pub(in crate::gui::app::state) fn panes_from_gui_layout(
     layout: GuiLayout,
     pane_states: Vec<GuiPane>,
 ) -> (pane_grid::State<GuiPane>, pane_grid::Pane) {
@@ -19,14 +23,14 @@ pub(super) fn panes_from_gui_layout(
     (panes, first_pane)
 }
 
-pub(super) fn first_layout_ordinal(node: &GuiLayoutNode) -> usize {
+pub(in crate::gui::app::state) fn first_layout_ordinal(node: &GuiLayoutNode) -> usize {
     match node {
         GuiLayoutNode::Leaf { ordinal } => *ordinal,
         GuiLayoutNode::Split { first, .. } => first_layout_ordinal(first),
     }
 }
 
-pub(super) fn apply_gui_layout_node(
+pub(in crate::gui::app::state) fn apply_gui_layout_node(
     node: &GuiLayoutNode,
     pane: pane_grid::Pane,
     pane_states: &mut [Option<GuiPane>],
@@ -56,7 +60,7 @@ pub(super) fn apply_gui_layout_node(
     }
 }
 
-pub(super) fn iced_axis(axis: GuiLayoutAxis) -> pane_grid::Axis {
+pub(in crate::gui::app::state) fn iced_axis(axis: GuiLayoutAxis) -> pane_grid::Axis {
     match axis {
         GuiLayoutAxis::Horizontal => pane_grid::Axis::Horizontal,
         GuiLayoutAxis::Vertical => pane_grid::Axis::Vertical,
