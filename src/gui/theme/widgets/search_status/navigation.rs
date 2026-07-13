@@ -1,3 +1,5 @@
+use super::*;
+
 pub(super) fn gui_navigation_controls<'a>(
     state: &'a KfnotepadGui,
     field_width: f32,

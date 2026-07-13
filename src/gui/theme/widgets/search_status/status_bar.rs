@@ -1,4 +1,6 @@
-pub(super) fn gui_status_bar<'a>(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_status_bar<'a>(
     status_message: &'a str,
     settings: EditorSettings,
 ) -> Element<'a, Message> {

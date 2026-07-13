@@ -1,3 +1,5 @@
+use super::*;
+
 pub(super) fn gui_find_controls<'a>(
     state: &'a KfnotepadGui,
     field_width: f32,
@@ -72,7 +74,7 @@ pub(super) fn gui_find_controls<'a>(
     .into()
 }
 
-pub(super) fn gui_find_history_style(palette: iced::theme::Palette) -> container::Style {
+fn gui_find_history_style(palette: iced::theme::Palette) -> container::Style {
     container::Style {
         text_color: Some(palette.text),
         background: Some(palette.background.into()),

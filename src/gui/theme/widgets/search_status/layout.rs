@@ -1,4 +1,6 @@
-pub(super) fn gui_search_controls<'a>(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_search_controls<'a>(
     state: &'a KfnotepadGui,
     viewport_width: f32,
 ) -> Element<'a, Message> {
