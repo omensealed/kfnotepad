@@ -1,3 +1,7 @@
+//! Iced messages covering GUI state transitions and asynchronous results.
+
+use super::*;
+
 #[derive(Debug, Clone)]
 pub(crate) enum Message {
     Edit(pane_grid::Pane, text_editor::Action),

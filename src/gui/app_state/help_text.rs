@@ -1,3 +1,5 @@
+//! Built-in local help document content.
+
 pub(crate) const GUI_HELP_DOCUMENT_TEXT: &str = r#"# kfnotepad help
 
 kfnotepad is a local UTF-8 text-file editor. The terminal editor and Iced GUI both edit normal files on disk; there is no database, account, sync service, or autosave.

@@ -1,3 +1,7 @@
+//! Embedded Nerd Font icon constants used by GUI controls.
+
+use super::nf;
+
 #[cfg(test)]
 pub(crate) const ICON_VIEW_MENU: &str = nf::cod::COD_EYE;
 pub(crate) const ICON_NEW_TILE: &str = nf::fa::FA_PLUS;

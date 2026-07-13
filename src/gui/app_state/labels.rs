@@ -1,3 +1,5 @@
+//! Shared concise GUI action and control labels.
+
 pub(crate) const LABEL_SAVE: &str = "Save";
 pub(crate) const LABEL_SAVE_AS: &str = "Save as";
 pub(crate) const LABEL_SAVE_AS_PATH: &str = "Save as path";

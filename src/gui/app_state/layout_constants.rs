@@ -1,3 +1,7 @@
+//! Stable GUI dimensions, spacing, timing, and rendering limits.
+
+use super::Size;
+
 pub(crate) const GUI_BROWSER_WIDTH_DEFAULT: f32 = 220.0;
 pub(crate) const GUI_BROWSER_WIDTH_MIN: f32 = 160.0;
 pub(crate) const GUI_BROWSER_WIDTH_MAX: f32 = 360.0;

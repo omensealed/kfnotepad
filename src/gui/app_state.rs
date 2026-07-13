@@ -16,9 +16,22 @@ use super::{
     GuiEditorScrollbarModel, GuiExternalFileCheckResult,
 };
 
-include!("app_state/types.rs");
-include!("app_state/labels.rs");
-include!("app_state/icons.rs");
-include!("app_state/layout_constants.rs");
-include!("app_state/help_text.rs");
-include!("app_state/messages.rs");
+#[path = "app_state/help_text.rs"]
+mod help_text;
+#[path = "app_state/icons.rs"]
+mod icons;
+#[path = "app_state/labels.rs"]
+mod labels;
+#[path = "app_state/layout_constants.rs"]
+mod layout_constants;
+#[path = "app_state/messages.rs"]
+mod messages;
+#[path = "app_state/types.rs"]
+mod types;
+
+pub(super) use help_text::*;
+pub(super) use icons::*;
+pub(super) use labels::*;
+pub(super) use layout_constants::*;
+pub(super) use messages::*;
+pub(super) use types::*;

@@ -1,3 +1,7 @@
+//! GUI prompts, menus, layout modes, browser models, and save results.
+
+use super::*;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum GuiPathPrompt {
     Open,
@@ -89,33 +93,33 @@ pub(crate) struct GuiMenuItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(super) struct GuiFileTreeRowModel {
-    pub(super) path: PathBuf,
-    pub(super) label: String,
-    pub(super) kind: FileSidebarEntryKind,
-    pub(super) depth: usize,
-    pub(super) expanded: bool,
-    pub(super) selected: bool,
-    pub(super) error: bool,
+pub(in crate::gui::app::state) struct GuiFileTreeRowModel {
+    pub(in crate::gui::app::state) path: PathBuf,
+    pub(in crate::gui::app::state) label: String,
+    pub(in crate::gui::app::state) kind: FileSidebarEntryKind,
+    pub(in crate::gui::app::state) depth: usize,
+    pub(in crate::gui::app::state) expanded: bool,
+    pub(in crate::gui::app::state) selected: bool,
+    pub(in crate::gui::app::state) error: bool,
 }
 
 #[cfg(test)]
 impl GuiFileTreeRowModel {
-    pub(super) fn path(&self) -> &std::path::Path {
+    pub(in crate::gui::app::state) fn path(&self) -> &std::path::Path {
         &self.path
     }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]
-pub(super) struct GuiBrowserLoadResult {
-    pub(super) browser: kfnotepad::GuiFileBrowser,
-    pub(super) rows: Vec<GuiFileTreeRowModel>,
-    pub(super) selected_path: Option<PathBuf>,
-    pub(super) expanded_paths: HashSet<PathBuf>,
+pub(in crate::gui::app::state) struct GuiBrowserLoadResult {
+    pub(in crate::gui::app::state) browser: kfnotepad::GuiFileBrowser,
+    pub(in crate::gui::app::state) rows: Vec<GuiFileTreeRowModel>,
+    pub(in crate::gui::app::state) selected_path: Option<PathBuf>,
+    pub(in crate::gui::app::state) expanded_paths: HashSet<PathBuf>,
 }
 
 #[derive(Clone, Debug)]
-pub(super) struct GuiSaveResult {
-    pub(super) source_revision: u64,
-    pub(super) snapshot: kfnotepad::FileSnapshot,
+pub(in crate::gui::app::state) struct GuiSaveResult {
+    pub(in crate::gui::app::state) source_revision: u64,
+    pub(in crate::gui::app::state) snapshot: kfnotepad::FileSnapshot,
 }
