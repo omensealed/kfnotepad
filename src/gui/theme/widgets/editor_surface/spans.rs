@@ -1,4 +1,8 @@
-pub(super) fn gui_editor_read_only_line_spans(
+//! Styled read-only editor spans and selection/search overlays.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_read_only_line_spans(
     line: &GuiEditorViewportLine,
     palette: iced::theme::Palette,
     search_highlight_active: bool,
@@ -26,7 +30,7 @@ pub(super) fn gui_editor_read_only_line_spans(
         .collect()
 }
 
-pub(super) fn gui_replacement_editor_overlay_color(
+pub(in crate::gui::app::state) fn gui_replacement_editor_overlay_color(
     palette: iced::theme::Palette,
     search_highlight_active: bool,
 ) -> Color {

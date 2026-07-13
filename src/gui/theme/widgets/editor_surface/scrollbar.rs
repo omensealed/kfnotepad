@@ -1,4 +1,8 @@
-pub(super) fn gui_editor_scrollbar_view(
+//! Replacement-editor scrollbar view and track segments.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_scrollbar_view(
     pane: pane_grid::Pane,
     model: GuiEditorScrollbarModel,
     palette: iced::theme::Palette,
@@ -33,7 +37,7 @@ pub(super) fn gui_editor_scrollbar_view(
     .into()
 }
 
-pub(super) fn gui_scrollbar_track_segment(
+pub(in crate::gui::app::state) fn gui_scrollbar_track_segment(
     height: f32,
     palette: iced::theme::Palette,
     enabled: bool,

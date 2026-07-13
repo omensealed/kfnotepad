@@ -1,4 +1,4 @@
-pub(super) fn gui_editor_read_only_view(
+pub(in crate::gui::app::state) fn gui_editor_read_only_view(
     pane: pane_grid::Pane,
     editor_surface: &GuiEditorSurfaceModel<'_>,
     settings: EditorSettings,
