@@ -1,4 +1,8 @@
-pub(super) fn gui_mix_syntax_rgb(
+//! Syntax color contrast measurement and correction.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_mix_syntax_rgb(
     red: u8,
     green: u8,
     blue: u8,
@@ -12,7 +16,7 @@ pub(super) fn gui_mix_syntax_rgb(
     )
 }
 
-pub(super) fn gui_ensure_syntax_contrast_rgb(
+pub(in crate::gui::app::state) fn gui_ensure_syntax_contrast_rgb(
     mut rgb: (u8, u8, u8),
     background: Color,
 ) -> (u8, u8, u8) {
@@ -36,7 +40,7 @@ pub(super) fn gui_ensure_syntax_contrast_rgb(
     rgb
 }
 
-pub(super) fn gui_color_to_rgb(color: Color) -> (u8, u8, u8) {
+pub(in crate::gui::app::state) fn gui_color_to_rgb(color: Color) -> (u8, u8, u8) {
     (
         (color.r * 255.0).round() as u8,
         (color.g * 255.0).round() as u8,
@@ -44,7 +48,7 @@ pub(super) fn gui_color_to_rgb(color: Color) -> (u8, u8, u8) {
     )
 }
 
-pub(super) fn gui_contrast_ratio(foreground: (u8, u8, u8), background: (u8, u8, u8)) -> f32 {
+pub(in crate::gui::app::state) fn gui_contrast_ratio(foreground: (u8, u8, u8), background: (u8, u8, u8)) -> f32 {
     let foreground = gui_relative_luminance(foreground);
     let background = gui_relative_luminance(background);
     let lighter = foreground.max(background);
@@ -52,7 +56,7 @@ pub(super) fn gui_contrast_ratio(foreground: (u8, u8, u8), background: (u8, u8, 
     (lighter + 0.05) / (darker + 0.05)
 }
 
-pub(super) fn gui_relative_luminance((red, green, blue): (u8, u8, u8)) -> f32 {
+pub(in crate::gui::app::state) fn gui_relative_luminance((red, green, blue): (u8, u8, u8)) -> f32 {
     fn channel(value: u8) -> f32 {
         let value = f32::from(value) / 255.0;
         if value <= 0.03928 {

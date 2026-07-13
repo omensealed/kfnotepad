@@ -2,7 +2,7 @@
 
 use super::*;
 
-pub(super) fn gui_syntax_role_rgb(
+pub(in crate::gui::app::state::theme) fn gui_syntax_role_rgb(
     theme_id: EditorThemeId,
     role: GuiSyntaxColorRole,
 ) -> (u8, u8, u8) {

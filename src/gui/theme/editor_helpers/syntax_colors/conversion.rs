@@ -1,4 +1,8 @@
-pub(super) fn gui_syntax_segments_from_syntect(
+//! Syntect segment conversion and theme-aware syntax RGB mapping.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_syntax_segments_from_syntect(
     segments: Vec<(SyntectStyle, String)>,
     theme_id: EditorThemeId,
 ) -> Vec<GuiEditorSyntaxSegment> {
@@ -13,7 +17,7 @@ pub(super) fn gui_syntax_segments_from_syntect(
         .collect()
 }
 
-pub(super) fn gui_color_from_syntect(
+pub(in crate::gui::app::state) fn gui_color_from_syntect(
     color: syntect::highlighting::Color,
     theme_id: EditorThemeId,
 ) -> Color {
@@ -21,7 +25,7 @@ pub(super) fn gui_color_from_syntect(
     Color::from_rgba8(r, g, b, f32::from(color.a) / 255.0)
 }
 
-pub(super) fn gui_syntax_rgb_for_theme(
+pub(in crate::gui::app::state) fn gui_syntax_rgb_for_theme(
     red: u8,
     green: u8,
     blue: u8,
