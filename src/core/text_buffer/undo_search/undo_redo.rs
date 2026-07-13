@@ -1,56 +1,128 @@
-//! Byte-budgeted undo and redo snapshot application.
+//! Byte-budgeted undo and redo entry application.
 
 use super::*;
 
 impl TextBuffer {
     pub fn undo_last_edit(&mut self) -> bool {
-        let Some(snapshot) = pop_history_snapshot(&mut self.undo_history, &mut self.undo_bytes)
-        else {
+        let Some(entry) = pop_history_entry(&mut self.undo_history, &mut self.undo_bytes) else {
             return false;
         };
         self.break_undo_group();
 
-        let redo_snapshot = BufferSnapshot {
-            lines: self.lines.clone(),
-            trailing_newline: self.trailing_newline,
-            byte_size: buffer_bytes(&self.lines, self.trailing_newline),
-        };
-        push_history_snapshot(
-            &mut self.redo_history,
-            &mut self.redo_bytes,
-            redo_snapshot,
-            MAX_UNDO_HISTORY,
-            MAX_UNDO_BYTES,
-        );
-
-        self.lines = snapshot.lines;
-        self.trailing_newline = snapshot.trailing_newline;
+        match entry {
+            HistoryEntry::Snapshot(snapshot) => {
+                let redo_snapshot = BufferSnapshot::from_buffer(self);
+                push_history_snapshot(
+                    &mut self.redo_history,
+                    &mut self.redo_bytes,
+                    redo_snapshot,
+                    MAX_UNDO_HISTORY,
+                    MAX_UNDO_BYTES,
+                );
+                self.lines = snapshot.lines;
+                self.trailing_newline = snapshot.trailing_newline;
+            }
+            HistoryEntry::InsertText {
+                start,
+                end,
+                text,
+                byte_size,
+            } => {
+                let entry = HistoryEntry::InsertText {
+                    start,
+                    end,
+                    text,
+                    byte_size,
+                };
+                if self
+                    .delete_inserted_text_without_history(start, end)
+                    .is_err()
+                {
+                    push_history_entry(
+                        &mut self.undo_history,
+                        &mut self.undo_bytes,
+                        entry,
+                        MAX_UNDO_HISTORY,
+                        MAX_UNDO_BYTES,
+                    );
+                    return false;
+                }
+                push_history_entry(
+                    &mut self.redo_history,
+                    &mut self.redo_bytes,
+                    entry,
+                    MAX_UNDO_HISTORY,
+                    MAX_UNDO_BYTES,
+                );
+            }
+        }
         self.mark_changed();
         true
     }
 
     pub fn redo_last_undo(&mut self) -> bool {
-        let Some(snapshot) = pop_history_snapshot(&mut self.redo_history, &mut self.redo_bytes)
-        else {
+        let Some(entry) = pop_history_entry(&mut self.redo_history, &mut self.redo_bytes) else {
             return false;
         };
         self.break_undo_group();
 
-        let undo_snapshot = BufferSnapshot {
-            lines: self.lines.clone(),
-            trailing_newline: self.trailing_newline,
-            byte_size: buffer_bytes(&self.lines, self.trailing_newline),
-        };
-        push_history_snapshot(
-            &mut self.undo_history,
-            &mut self.undo_bytes,
-            undo_snapshot,
-            MAX_UNDO_HISTORY,
-            MAX_UNDO_BYTES,
-        );
-
-        self.lines = snapshot.lines;
-        self.trailing_newline = snapshot.trailing_newline;
+        match entry {
+            HistoryEntry::Snapshot(snapshot) => {
+                let undo_snapshot = BufferSnapshot::from_buffer(self);
+                push_history_snapshot(
+                    &mut self.undo_history,
+                    &mut self.undo_bytes,
+                    undo_snapshot,
+                    MAX_UNDO_HISTORY,
+                    MAX_UNDO_BYTES,
+                );
+                self.lines = snapshot.lines;
+                self.trailing_newline = snapshot.trailing_newline;
+            }
+            HistoryEntry::InsertText {
+                start,
+                end,
+                text,
+                byte_size,
+            } => {
+                let Ok(byte_index) = self
+                    .lines
+                    .get(start.row)
+                    .ok_or(BufferError::RowOutOfBounds {
+                        row: start.row,
+                        rows: self.lines.len(),
+                    })
+                    .and_then(|line| byte_index_for_char_column(line, start.column))
+                else {
+                    push_history_entry(
+                        &mut self.redo_history,
+                        &mut self.redo_bytes,
+                        HistoryEntry::InsertText {
+                            start,
+                            end,
+                            text,
+                            byte_size,
+                        },
+                        MAX_UNDO_HISTORY,
+                        MAX_UNDO_BYTES,
+                    );
+                    return false;
+                };
+                self.insert_text_without_history(start, byte_index, &text);
+                push_history_entry(
+                    &mut self.undo_history,
+                    &mut self.undo_bytes,
+                    HistoryEntry::InsertText {
+                        start,
+                        end,
+                        text,
+                        byte_size,
+                    },
+                    MAX_UNDO_HISTORY,
+                    MAX_UNDO_BYTES,
+                );
+            }
+        }
         self.mark_changed();
         true
     }

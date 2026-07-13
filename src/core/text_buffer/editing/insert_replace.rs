@@ -15,46 +15,99 @@ impl TextBuffer {
             let line = &self.lines[cursor.row];
             byte_index_for_char_column(line, cursor.column)?
         };
-        let segments = text.split('\n').collect::<Vec<_>>();
-
         self.break_undo_group();
-        self.record_undo();
+        let use_delta_history = matches!(self.compound_edit, CompoundEditState::Inactive);
+        if !use_delta_history {
+            self.record_undo();
+        }
 
-        let next_cursor = if segments.len() == 1 {
-            self.lines[cursor.row].insert_str(byte_index, text);
-            Cursor {
-                row: cursor.row,
-                column: cursor.column.saturating_add(text.chars().count()),
-            }
-        } else {
-            let remainder = self.lines[cursor.row].split_off(byte_index);
-            self.lines[cursor.row].push_str(segments[0]);
-
-            let last_index = segments.len() - 1;
-            let mut inserted_lines = Vec::with_capacity(last_index);
-            inserted_lines.extend(
-                segments[1..last_index]
-                    .iter()
-                    .map(|line| (*line).to_string()),
-            );
-            inserted_lines.push(format!("{}{remainder}", segments[last_index]));
-            self.lines
-                .splice((cursor.row + 1)..(cursor.row + 1), inserted_lines);
-
-            Cursor {
-                row: cursor.row.saturating_add(last_index),
-                column: segments[last_index].chars().count(),
-            }
-        };
+        let next_cursor = self.insert_text_without_history(cursor, byte_index, text);
+        if use_delta_history {
+            self.record_insert_text_undo(cursor, next_cursor, text);
+        }
 
         self.mark_changed();
-        let column = self
-            .grapheme_range_end_boundary_column(next_cursor.row, next_cursor.column)
-            .unwrap_or(next_cursor.column);
+        let final_segment = text.rsplit('\n').next().unwrap_or(text);
+        let end_byte = if next_cursor.row == cursor.row {
+            byte_index.saturating_add(text.len())
+        } else {
+            final_segment.len()
+        };
+        let next_byte_is_ascii = self.lines[next_cursor.row]
+            .as_bytes()
+            .get(end_byte)
+            .is_none_or(u8::is_ascii);
+        let column = if final_segment.is_empty() || (final_segment.is_ascii() && next_byte_is_ascii)
+        {
+            next_cursor.column
+        } else {
+            self.grapheme_range_end_boundary_column(next_cursor.row, next_cursor.column)
+                .unwrap_or(next_cursor.column)
+        };
         Ok(Cursor {
             column,
             ..next_cursor
         })
+    }
+
+    pub(in crate::core::text_buffer) fn insert_text_without_history(
+        &mut self,
+        cursor: Cursor,
+        byte_index: usize,
+        text: &str,
+    ) -> Cursor {
+        let segments = text.split('\n').collect::<Vec<_>>();
+        if segments.len() == 1 {
+            self.lines[cursor.row].insert_str(byte_index, text);
+            return Cursor {
+                row: cursor.row,
+                column: cursor.column.saturating_add(text.chars().count()),
+            };
+        }
+
+        let remainder = self.lines[cursor.row].split_off(byte_index);
+        self.lines[cursor.row].push_str(segments[0]);
+
+        let last_index = segments.len() - 1;
+        let mut inserted_lines = Vec::with_capacity(last_index);
+        inserted_lines.extend(
+            segments[1..last_index]
+                .iter()
+                .map(|line| (*line).to_string()),
+        );
+        inserted_lines.push(format!("{}{remainder}", segments[last_index]));
+        self.lines
+            .splice((cursor.row + 1)..(cursor.row + 1), inserted_lines);
+
+        Cursor {
+            row: cursor.row.saturating_add(last_index),
+            column: segments[last_index].chars().count(),
+        }
+    }
+
+    pub(in crate::core::text_buffer) fn delete_inserted_text_without_history(
+        &mut self,
+        start: Cursor,
+        end: Cursor,
+    ) -> Result<(), BufferError> {
+        self.validate_cursor(start)?;
+        self.validate_cursor(end)?;
+
+        if start.row == end.row {
+            let line = &mut self.lines[start.row];
+            let start_byte = byte_index_for_char_column(line, start.column)?;
+            let end_byte = byte_index_for_char_column(line, end.column)?;
+            line.replace_range(start_byte..end_byte, "");
+            return Ok(());
+        }
+
+        let start_byte = byte_index_for_char_column(&self.lines[start.row], start.column)?;
+        let end_byte = byte_index_for_char_column(&self.lines[end.row], end.column)?;
+        let end_suffix = self.lines[end.row][end_byte..].to_owned();
+        self.lines[start.row].truncate(start_byte);
+        self.lines[start.row].push_str(&end_suffix);
+        self.lines.drain((start.row + 1)..=end.row);
+        Ok(())
     }
 
     pub fn insert_char(

@@ -34,8 +34,9 @@ pub(crate) use instrumentation::{
 #[cfg(all(test, feature = "gui"))]
 use instrumentation::{FROM_TEXT_CALL_COUNT, TO_TEXT_CALL_COUNT};
 use search_helpers::*;
-use snapshot_history::buffer_bytes;
-pub(crate) use snapshot_history::{pop_history_snapshot, push_history_snapshot};
+pub(crate) use snapshot_history::push_history_snapshot;
+use snapshot_history::{buffer_bytes, pop_history_entry, push_history_entry};
 pub(crate) use types::BufferSnapshot;
+pub(crate) use types::HistoryEntry;
 pub use types::{BufferError, FileSnapshot, TextBuffer};
 use types::{CompoundEditState, InsertUndoGroup};

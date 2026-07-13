@@ -102,8 +102,8 @@ fn compound_edit_records_one_snapshot_for_multiple_edit_kinds() {
             .expect("insert newline");
         document
             .buffer
-            .insert_char(1, 0, 'x')
-            .expect("insert character");
+            .insert_text(Cursor { row: 1, column: 0 }, "x")
+            .expect("insert bulk text");
     });
 
     assert_eq!(document.buffer.to_text(), "hello\nx");
@@ -142,6 +142,8 @@ fn bulk_insert_text_updates_lines_cursor_revision_and_undo_once() {
     assert_eq!(buffer.undo_history.len(), 1);
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), "hello world");
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "hello there\nfriend\n world");
 }
 
 #[test]
@@ -154,6 +156,86 @@ fn bulk_insert_text_advances_to_combining_grapheme_end() {
 
     assert_eq!(buffer.to_text(), "e\u{301}");
     assert_eq!(cursor, Cursor { row: 0, column: 2 });
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "e");
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "e\u{301}");
+}
+
+#[test]
+fn bulk_ascii_insert_before_combining_mark_still_normalizes_cursor() {
+    let mut buffer = TextBuffer::from_text("\u{301}x");
+
+    let cursor = buffer
+        .insert_text(Cursor { row: 0, column: 0 }, "e")
+        .expect("insert base before combining mark");
+
+    assert_eq!(buffer.to_text(), "e\u{301}x");
+    assert_eq!(cursor, Cursor { row: 0, column: 2 });
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "\u{301}x");
+}
+
+#[test]
+fn bulk_insert_delta_undo_preserves_adjacent_graphemes_and_trailing_newline() {
+    let mut buffer = TextBuffer::from_text("eX\n");
+
+    buffer
+        .insert_text(Cursor { row: 0, column: 1 }, "\u{301}\nfriend")
+        .expect("insert text ending beside existing content");
+    assert_eq!(buffer.to_text(), "e\u{301}\nfriendX\n");
+    assert!(buffer.has_trailing_newline());
+
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "eX\n");
+    assert!(buffer.has_trailing_newline());
+
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "e\u{301}\nfriendX\n");
+    assert!(buffer.has_trailing_newline());
+}
+
+#[test]
+fn bulk_insert_delta_history_scales_with_insert_instead_of_document() {
+    let base = "a".repeat(128 * 1024);
+    let inserted = "paste".repeat(4 * 1024);
+    let mut buffer = TextBuffer::from_text(&base);
+
+    buffer
+        .insert_text(
+            Cursor {
+                row: 0,
+                column: base.len(),
+            },
+            &inserted,
+        )
+        .expect("insert 20 KiB paste");
+
+    assert_eq!(buffer.undo_history.len(), 1);
+    assert!(buffer.undo_bytes >= inserted.len());
+    assert!(buffer.undo_bytes < base.len());
+    assert!(matches!(
+        buffer.undo_history.back(),
+        Some(HistoryEntry::InsertText { .. })
+    ));
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), base);
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), format!("{base}{inserted}"));
+}
+
+#[test]
+fn new_edit_clears_bulk_insert_delta_redo_history() {
+    let mut buffer = TextBuffer::from_text("base");
+
+    buffer
+        .insert_text(Cursor { row: 0, column: 4 }, " paste")
+        .expect("insert paste");
+    assert!(buffer.undo_last_edit());
+    buffer.insert_char(0, 4, '!').expect("insert new edit");
+
+    assert!(!buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "base!");
 }
 
 #[test]
@@ -254,7 +336,7 @@ fn large_file_undo_history_uses_byte_budget_and_remains_responsive() {
     let undo_budget = buffer
         .undo_history
         .iter()
-        .map(|snapshot| snapshot.byte_size)
+        .map(HistoryEntry::byte_size)
         .sum::<usize>();
     assert_eq!(buffer.undo_bytes, undo_budget);
     assert!(
@@ -328,6 +410,12 @@ fn history_push_prefers_latest_entries_and_tracks_byte_budget() {
 
     assert_eq!(history.len(), 2);
     assert_eq!(used_bytes, 120);
-    assert_eq!(history[0].lines[0], "c");
-    assert_eq!(history[1].lines[0], "d");
+    assert!(matches!(
+        &history[0],
+        HistoryEntry::Snapshot(snapshot) if snapshot.lines[0] == "c"
+    ));
+    assert!(matches!(
+        &history[1],
+        HistoryEntry::Snapshot(snapshot) if snapshot.lines[0] == "d"
+    ));
 }

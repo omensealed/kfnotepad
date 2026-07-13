@@ -1,4 +1,4 @@
-//! Text-buffer state, snapshots, and public error types.
+//! Text-buffer state, undo entries, snapshots, and public error types.
 
 use super::*;
 
@@ -8,8 +8,8 @@ pub struct TextBuffer {
     pub(crate) trailing_newline: bool,
     pub(crate) dirty: bool,
     pub(super) edit_revision: u64,
-    pub(crate) undo_history: VecDeque<BufferSnapshot>,
-    pub(crate) redo_history: VecDeque<BufferSnapshot>,
+    pub(crate) undo_history: VecDeque<HistoryEntry>,
+    pub(crate) redo_history: VecDeque<HistoryEntry>,
     pub(crate) undo_bytes: usize,
     pub(crate) redo_bytes: usize,
     pub(crate) insert_undo_group: Option<InsertUndoGroup>,
@@ -36,6 +36,26 @@ pub(crate) struct BufferSnapshot {
     pub(crate) lines: Vec<String>,
     pub(crate) trailing_newline: bool,
     pub(crate) byte_size: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum HistoryEntry {
+    Snapshot(BufferSnapshot),
+    InsertText {
+        start: Cursor,
+        end: Cursor,
+        text: String,
+        byte_size: usize,
+    },
+}
+
+impl HistoryEntry {
+    pub(crate) fn byte_size(&self) -> usize {
+        match self {
+            Self::Snapshot(snapshot) => snapshot.byte_size,
+            Self::InsertText { byte_size, .. } => *byte_size,
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

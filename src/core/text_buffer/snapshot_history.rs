@@ -1,4 +1,4 @@
-//! Snapshot sizing and byte-budgeted history queue operations.
+//! Snapshot sizing and byte-budgeted mixed history queue operations.
 
 use super::*;
 
@@ -20,27 +20,43 @@ pub(super) fn buffer_bytes(lines: &[String], trailing_newline: bool) -> usize {
 }
 
 pub(crate) fn push_history_snapshot(
-    history: &mut VecDeque<BufferSnapshot>,
+    history: &mut VecDeque<HistoryEntry>,
     used_bytes: &mut usize,
     snapshot: BufferSnapshot,
     max_entries: usize,
     max_bytes: usize,
 ) {
-    *used_bytes = used_bytes.saturating_add(snapshot.byte_size);
-    history.push_back(snapshot);
+    push_history_entry(
+        history,
+        used_bytes,
+        HistoryEntry::Snapshot(snapshot),
+        max_entries,
+        max_bytes,
+    );
+}
+
+pub(crate) fn push_history_entry(
+    history: &mut VecDeque<HistoryEntry>,
+    used_bytes: &mut usize,
+    entry: HistoryEntry,
+    max_entries: usize,
+    max_bytes: usize,
+) {
+    *used_bytes = used_bytes.saturating_add(entry.byte_size());
+    history.push_back(entry);
 
     while (history.len() > max_entries || *used_bytes > max_bytes) && !history.is_empty() {
         if let Some(removed) = history.pop_front() {
-            *used_bytes = used_bytes.saturating_sub(removed.byte_size);
+            *used_bytes = used_bytes.saturating_sub(removed.byte_size());
         }
     }
 }
 
-pub(crate) fn pop_history_snapshot(
-    history: &mut VecDeque<BufferSnapshot>,
+pub(crate) fn pop_history_entry(
+    history: &mut VecDeque<HistoryEntry>,
     used_bytes: &mut usize,
-) -> Option<BufferSnapshot> {
-    let snapshot = history.pop_back()?;
-    *used_bytes = used_bytes.saturating_sub(snapshot.byte_size);
-    Some(snapshot)
+) -> Option<HistoryEntry> {
+    let entry = history.pop_back()?;
+    *used_bytes = used_bytes.saturating_sub(entry.byte_size());
+    Some(entry)
 }

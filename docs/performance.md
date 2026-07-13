@@ -59,6 +59,24 @@ Captured 2026-07-13 on Linux 7.1.3-2-cachyos, an Intel Xeon E5-2690 v4, and Rust
 The paste baseline includes the current snapshot-based undo cost and is the first optimization target. These values
 are local comparison data, not performance guarantees.
 
+## Bulk insertion improvement
+
+Captured 2026-07-13 on the same host and compiler with
+`cargo bench --locked --no-default-features --bench core_text -- paste_100_kib --sample-count 10 --max-time 0.5`.
+The 100 KiB paste median fell from 314.60 ms to 123.3 us.
+
+Standalone bulk insertion now records a byte-budgeted delta containing the inserted text and exact range instead of
+cloning the document into undo history. Snapshot history remains the fallback for compound edits and other edit
+kinds. Undo removes the exact inserted range without expanding across adjacent grapheme clusters, and redo reapplies
+the stored text. For the benchmark's 1 MiB document and 100 KiB paste, history payload therefore scales with roughly
+100 KiB of inserted text instead of the pre-edit document.
+
+The remaining elapsed-time improvement comes from avoiding a full-line Unicode grapheme scan when the inserted final
+segment and following byte are both ASCII (or the insertion ends the line). Unicode text and non-ASCII adjacency keep
+the full grapheme-boundary normalization path. Focused tests cover multiline text, combining marks, trailing newlines,
+redo invalidation, compound-edit fallback, and history-byte accounting. The result is a local comparison, not a
+portable performance guarantee.
+
 ## External-change polling improvement
 
 The first polling correction kept the one-second responsiveness contract but compared symlink-safe file metadata
