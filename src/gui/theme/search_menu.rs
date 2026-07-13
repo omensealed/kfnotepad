@@ -1,4 +1,6 @@
 // Search semantics, menu models, chrome labels, and pane styles.
+use super::*;
+
 #[path = "search_menu/labels_layout.rs"]
 mod labels_layout;
 #[path = "search_menu/menu_items.rs"]

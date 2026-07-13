@@ -1,11 +1,15 @@
-pub(super) fn gui_theme(theme_id: EditorThemeId) -> Theme {
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_theme(theme_id: EditorThemeId) -> Theme {
     Theme::custom(
         format!("kfnotepad {}", theme_id.label()),
         gui_theme_palette(theme_id),
     )
 }
 
-pub(super) fn gui_theme_palette(theme_id: EditorThemeId) -> iced::theme::Palette {
+pub(in crate::gui::app::state) fn gui_theme_palette(
+    theme_id: EditorThemeId,
+) -> iced::theme::Palette {
     match theme_id {
         EditorThemeId::Nocturne => iced::theme::Palette {
             background: color(10, 12, 24),
@@ -58,7 +62,9 @@ pub(super) fn gui_theme_palette(theme_id: EditorThemeId) -> iced::theme::Palette
     }
 }
 
-pub(super) fn gui_highlighter_theme(theme_id: EditorThemeId) -> highlighter::Theme {
+pub(in crate::gui::app::state) fn gui_highlighter_theme(
+    theme_id: EditorThemeId,
+) -> highlighter::Theme {
     match theme_id {
         EditorThemeId::Paper => highlighter::Theme::InspiredGitHub,
         EditorThemeId::Terminal => highlighter::Theme::Base16Mocha,
@@ -68,7 +74,7 @@ pub(super) fn gui_highlighter_theme(theme_id: EditorThemeId) -> highlighter::The
     }
 }
 
-pub(super) fn gui_editor_font(font_family: GuiFontFamily) -> Font {
+pub(in crate::gui::app::state) fn gui_editor_font(font_family: GuiFontFamily) -> Font {
     match font_family {
         GuiFontFamily::Monospace => Font::MONOSPACE,
         GuiFontFamily::SansSerif => Font::DEFAULT,
@@ -81,7 +87,7 @@ pub(super) fn gui_editor_font(font_family: GuiFontFamily) -> Font {
     }
 }
 
-pub(super) fn gui_editor_wrapping(wrap_lines: bool) -> Wrapping {
+pub(in crate::gui::app::state) fn gui_editor_wrapping(wrap_lines: bool) -> Wrapping {
     if wrap_lines {
         Wrapping::WordOrGlyph
     } else {
@@ -89,12 +95,15 @@ pub(super) fn gui_editor_wrapping(wrap_lines: bool) -> Wrapping {
     }
 }
 
-pub(super) fn gui_editor_effective_wrapping(wrap_lines: bool, show_line_numbers: bool) -> Wrapping {
+pub(in crate::gui::app::state) fn gui_editor_effective_wrapping(
+    wrap_lines: bool,
+    show_line_numbers: bool,
+) -> Wrapping {
     let _ = show_line_numbers;
     gui_editor_wrapping(wrap_lines)
 }
 
-pub(super) fn gui_editor_surface_model<'a>(
+pub(in crate::gui::app::state) fn gui_editor_surface_model<'a>(
     settings: EditorSettings,
     document: &TextDocument,
     editor: &'a GuiEditorAdapter,
@@ -121,39 +130,39 @@ pub(super) fn gui_editor_surface_model<'a>(
     }
 }
 
-pub(super) fn gui_ui_font_size(settings: EditorSettings) -> u32 {
+pub(in crate::gui::app::state) fn gui_ui_font_size(settings: EditorSettings) -> u32 {
     settings.gui_ui_font_size.into()
 }
 
-pub(super) fn gui_ui_text_size(settings: EditorSettings) -> u32 {
+pub(in crate::gui::app::state) fn gui_ui_text_size(settings: EditorSettings) -> u32 {
     gui_ui_font_size(settings)
 }
 
-pub(super) fn gui_ui_small_text_size(settings: EditorSettings) -> u32 {
+pub(in crate::gui::app::state) fn gui_ui_small_text_size(settings: EditorSettings) -> u32 {
     gui_ui_font_size(settings)
         .saturating_sub(2)
         .max(MIN_GUI_FONT_SIZE.into())
 }
 
-pub(super) fn gui_ui_heading_text_size(settings: EditorSettings) -> u32 {
+pub(in crate::gui::app::state) fn gui_ui_heading_text_size(settings: EditorSettings) -> u32 {
     gui_ui_font_size(settings)
         .saturating_add(4)
         .min(MAX_GUI_FONT_SIZE.into())
 }
 
-pub(super) fn gui_ui_icon_text_size(settings: EditorSettings) -> u32 {
+pub(in crate::gui::app::state) fn gui_ui_icon_text_size(settings: EditorSettings) -> u32 {
     gui_ui_font_size(settings)
         .saturating_add(1)
         .min(MAX_GUI_FONT_SIZE.into())
 }
 
-pub(super) fn gui_ui_tooltip_text_size(settings: EditorSettings) -> u32 {
+pub(in crate::gui::app::state) fn gui_ui_tooltip_text_size(settings: EditorSettings) -> u32 {
     gui_ui_font_size(settings)
         .saturating_sub(2)
         .max(MIN_GUI_FONT_SIZE.into())
 }
 
-pub(super) fn gui_line_number_gutter_text(
+pub(in crate::gui::app::state) fn gui_line_number_gutter_text(
     first_line: usize,
     line_count: usize,
     visible_lines: usize,
@@ -168,7 +177,10 @@ pub(super) fn gui_line_number_gutter_text(
         .join("\n")
 }
 
-pub(super) fn gui_line_number_gutter_width(line_count: usize, editor_font_size: u16) -> f32 {
+pub(in crate::gui::app::state) fn gui_line_number_gutter_width(
+    line_count: usize,
+    editor_font_size: u16,
+) -> f32 {
     let digits = line_count.max(1).to_string().len() as f32;
     let digit_width = f32::from(editor_font_size) * 0.62;
     GUI_LINE_NUMBER_GUTTER_HORIZONTAL_PADDING + digits * digit_width

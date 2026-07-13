@@ -1,5 +1,7 @@
 // GUI widget style callbacks, controls, and composed chrome helpers.
 
+use super::*;
+
 #[path = "widgets/buttons.rs"]
 mod widget_buttons;
 #[path = "widgets/chrome.rs"]

@@ -1,5 +1,7 @@
+use super::*;
+
 #[cfg(test)]
-pub(super) fn gui_action_descriptors() -> Vec<GuiActionDescriptor> {
+pub(in crate::gui::app::state) fn gui_action_descriptors() -> Vec<GuiActionDescriptor> {
     vec![
         GuiActionDescriptor {
             label: LABEL_NEW_TILE,
@@ -135,7 +137,7 @@ pub(super) fn gui_action_descriptors() -> Vec<GuiActionDescriptor> {
 }
 
 #[cfg(test)]
-pub(super) fn gui_focus_order_descriptors(
+pub(in crate::gui::app::state) fn gui_focus_order_descriptors(
     browser_visible: bool,
     tile_minimized: bool,
 ) -> Vec<GuiFocusStep> {

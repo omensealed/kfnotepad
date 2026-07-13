@@ -1,4 +1,6 @@
 // File-tree model construction, rendering, path validation, and deletion.
+use super::*;
+
 #[path = "file_tree/delete.rs"]
 mod tree_delete;
 #[path = "file_tree/paths.rs"]
