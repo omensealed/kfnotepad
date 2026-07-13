@@ -25,25 +25,19 @@ impl TextBuffer {
         if can_merge {
             if let Some(entry) = pop_history_entry(&mut self.undo_history, &mut self.undo_bytes) {
                 match entry {
-                    HistoryEntry::InsertText {
-                        start: entry_start,
-                        end: entry_end,
-                        mut text,
-                        ..
-                    } if entry_end == start => {
-                        text.push(value);
-                        let byte_size = text
-                            .capacity()
-                            .saturating_add(std::mem::size_of::<HistoryEntry>());
+                    HistoryEntry::Edit(mut delta)
+                        if delta.before.is_empty()
+                            && delta.before_end == delta.start
+                            && delta.after_end == start
+                            && delta.trailing_newline_before == delta.trailing_newline_after =>
+                    {
+                        delta.after.push(value);
+                        delta.after_end = end;
+                        delta.refresh_byte_size();
                         push_history_entry(
                             &mut self.undo_history,
                             &mut self.undo_bytes,
-                            HistoryEntry::InsertText {
-                                start: entry_start,
-                                end,
-                                text,
-                                byte_size,
-                            },
+                            HistoryEntry::Edit(delta),
                             MAX_UNDO_HISTORY,
                             MAX_UNDO_BYTES,
                         );
@@ -61,19 +55,15 @@ impl TextBuffer {
         }
 
         if !merged {
-            let text = value.to_string();
-            let byte_size = text
-                .capacity()
-                .saturating_add(std::mem::size_of::<HistoryEntry>());
             push_history_entry(
                 &mut self.undo_history,
                 &mut self.undo_bytes,
-                HistoryEntry::InsertText {
+                HistoryEntry::Edit(EditDelta::insertion(
                     start,
                     end,
-                    text,
-                    byte_size,
-                },
+                    value.to_string(),
+                    self.trailing_newline,
+                )),
                 MAX_UNDO_HISTORY,
                 MAX_UNDO_BYTES,
             );
@@ -170,24 +160,12 @@ impl TextBuffer {
         end: Cursor,
         text: &str,
     ) {
-        let text = text.to_owned();
-        let byte_size = text
-            .capacity()
-            .saturating_add(std::mem::size_of::<HistoryEntry>());
-        push_history_entry(
-            &mut self.undo_history,
-            &mut self.undo_bytes,
-            HistoryEntry::InsertText {
-                start,
-                end,
-                text,
-                byte_size,
-            },
-            MAX_UNDO_HISTORY,
-            MAX_UNDO_BYTES,
-        );
-        self.redo_history.clear();
-        self.redo_bytes = 0;
+        self.record_edit_delta(EditDelta::insertion(
+            start,
+            end,
+            text.to_owned(),
+            self.trailing_newline,
+        ));
     }
 
     pub(in crate::core::text_buffer) fn record_delete_text_undo(
@@ -198,25 +176,13 @@ impl TextBuffer {
         trailing_newline_before: bool,
         trailing_newline_after: bool,
     ) {
-        let byte_size = text
-            .capacity()
-            .saturating_add(std::mem::size_of::<HistoryEntry>());
-        push_history_entry(
-            &mut self.undo_history,
-            &mut self.undo_bytes,
-            HistoryEntry::DeleteText {
-                start,
-                end,
-                text,
-                trailing_newline_before,
-                trailing_newline_after,
-                byte_size,
-            },
-            MAX_UNDO_HISTORY,
-            MAX_UNDO_BYTES,
-        );
-        self.redo_history.clear();
-        self.redo_bytes = 0;
+        self.record_edit_delta(EditDelta::deletion(
+            start,
+            end,
+            text,
+            trailing_newline_before,
+            trailing_newline_after,
+        ));
     }
 
     pub(in crate::core::text_buffer) fn record_replace_text_undo(
@@ -227,21 +193,21 @@ impl TextBuffer {
         before: String,
         after: String,
     ) {
-        let byte_size = before
-            .capacity()
-            .saturating_add(after.capacity())
-            .saturating_add(std::mem::size_of::<HistoryEntry>());
+        self.record_edit_delta(EditDelta::replacement(
+            start,
+            before_end,
+            after_end,
+            before,
+            after,
+            self.trailing_newline,
+        ));
+    }
+
+    fn record_edit_delta(&mut self, delta: EditDelta) {
         push_history_entry(
             &mut self.undo_history,
             &mut self.undo_bytes,
-            HistoryEntry::ReplaceText {
-                start,
-                before_end,
-                after_end,
-                before,
-                after,
-                byte_size,
-            },
+            HistoryEntry::Edit(delta),
             MAX_UNDO_HISTORY,
             MAX_UNDO_BYTES,
         );

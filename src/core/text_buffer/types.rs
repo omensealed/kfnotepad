@@ -39,39 +39,115 @@ pub(crate) struct BufferSnapshot {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub(crate) enum HistoryEntry {
-    Snapshot(BufferSnapshot),
-    InsertText {
+pub(crate) struct EditDelta {
+    pub(crate) start: Cursor,
+    pub(crate) before_end: Cursor,
+    pub(crate) after_end: Cursor,
+    pub(crate) before: String,
+    pub(crate) after: String,
+    pub(crate) trailing_newline_before: bool,
+    pub(crate) trailing_newline_after: bool,
+    pub(crate) byte_size: usize,
+}
+
+impl EditDelta {
+    pub(crate) fn insertion(
         start: Cursor,
-        end: Cursor,
-        text: String,
-        byte_size: usize,
-    },
-    DeleteText {
+        after_end: Cursor,
+        after: String,
+        trailing_newline: bool,
+    ) -> Self {
+        Self::new(
+            start,
+            start,
+            after_end,
+            String::new(),
+            after,
+            trailing_newline,
+            trailing_newline,
+        )
+    }
+
+    pub(crate) fn deletion(
         start: Cursor,
-        end: Cursor,
-        text: String,
+        before_end: Cursor,
+        before: String,
         trailing_newline_before: bool,
         trailing_newline_after: bool,
-        byte_size: usize,
-    },
-    ReplaceText {
+    ) -> Self {
+        Self::new(
+            start,
+            before_end,
+            start,
+            before,
+            String::new(),
+            trailing_newline_before,
+            trailing_newline_after,
+        )
+    }
+
+    pub(crate) fn replacement(
         start: Cursor,
         before_end: Cursor,
         after_end: Cursor,
         before: String,
         after: String,
-        byte_size: usize,
-    },
+        trailing_newline: bool,
+    ) -> Self {
+        Self::new(
+            start,
+            before_end,
+            after_end,
+            before,
+            after,
+            trailing_newline,
+            trailing_newline,
+        )
+    }
+
+    fn new(
+        start: Cursor,
+        before_end: Cursor,
+        after_end: Cursor,
+        before: String,
+        after: String,
+        trailing_newline_before: bool,
+        trailing_newline_after: bool,
+    ) -> Self {
+        let mut delta = Self {
+            start,
+            before_end,
+            after_end,
+            before,
+            after,
+            trailing_newline_before,
+            trailing_newline_after,
+            byte_size: 0,
+        };
+        delta.refresh_byte_size();
+        delta
+    }
+
+    pub(crate) fn refresh_byte_size(&mut self) {
+        self.byte_size = self
+            .before
+            .capacity()
+            .saturating_add(self.after.capacity())
+            .saturating_add(std::mem::size_of::<HistoryEntry>());
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) enum HistoryEntry {
+    Snapshot(BufferSnapshot),
+    Edit(EditDelta),
 }
 
 impl HistoryEntry {
     pub(crate) fn byte_size(&self) -> usize {
         match self {
             Self::Snapshot(snapshot) => snapshot.byte_size,
-            Self::InsertText { byte_size, .. }
-            | Self::DeleteText { byte_size, .. }
-            | Self::ReplaceText { byte_size, .. } => *byte_size,
+            Self::Edit(delta) => delta.byte_size,
         }
     }
 }

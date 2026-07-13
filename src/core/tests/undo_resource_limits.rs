@@ -12,7 +12,7 @@ fn consecutive_typed_inserts_coalesce_as_one_undo_step() {
     assert_eq!(buffer.undo_history.len(), 1);
     assert!(matches!(
         buffer.undo_history.back(),
-        Some(HistoryEntry::InsertText { text, .. }) if text == "abc"
+        Some(HistoryEntry::Edit(delta)) if delta.before.is_empty() && delta.after == "abc"
     ));
 
     assert!(buffer.undo_last_edit());
@@ -68,7 +68,7 @@ fn insert_newline_uses_exact_insert_delta_and_preserves_trailing_newline() {
     assert!(buffer.has_trailing_newline());
     assert!(matches!(
         buffer.undo_history.back(),
-        Some(HistoryEntry::InsertText { text, .. }) if text == "\n"
+        Some(HistoryEntry::Edit(delta)) if delta.before.is_empty() && delta.after == "\n"
     ));
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), "abc\n");
@@ -87,8 +87,8 @@ fn replace_delta_restores_entire_unicode_grapheme() {
     assert_eq!(buffer.to_text(), "axz\n");
     assert!(matches!(
         buffer.undo_history.back(),
-        Some(HistoryEntry::ReplaceText { before, after, .. })
-            if before == "\u{1f1fa}\u{1f1f8}" && after == "x"
+        Some(HistoryEntry::Edit(delta))
+            if delta.before == "\u{1f1fa}\u{1f1f8}" && delta.after == "x"
     ));
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), "a\u{1f1fa}\u{1f1f8}z\n");
@@ -109,8 +109,7 @@ fn replace_delta_history_scales_with_replacement_instead_of_document() {
     assert!(buffer.undo_bytes < 1024);
     assert!(matches!(
         buffer.undo_history.back(),
-        Some(HistoryEntry::ReplaceText { before, after, .. })
-            if before == "a" && after == "z"
+        Some(HistoryEntry::Edit(delta)) if delta.before == "a" && delta.after == "z"
     ));
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), base);
@@ -309,7 +308,7 @@ fn bulk_insert_delta_history_scales_with_insert_instead_of_document() {
     assert!(buffer.undo_bytes < base.len());
     assert!(matches!(
         buffer.undo_history.back(),
-        Some(HistoryEntry::InsertText { .. })
+        Some(HistoryEntry::Edit(delta)) if delta.before.is_empty() && !delta.after.is_empty()
     ));
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), base);
@@ -342,8 +341,8 @@ fn multiline_unicode_delete_delta_undoes_and_redoes_exactly() {
     assert_eq!(buffer.to_text(), "az\n");
     assert!(matches!(
         buffer.undo_history.back(),
-        Some(HistoryEntry::DeleteText { text, .. })
-            if text == "\u{1f1fa}\u{1f1f8}\nmid\ne\u{301}"
+        Some(HistoryEntry::Edit(delta))
+            if delta.before == "\u{1f1fa}\u{1f1f8}\nmid\ne\u{301}" && delta.after.is_empty()
     ));
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), "a\u{1f1fa}\u{1f1f8}\nmid\ne\u{301}z\n");
@@ -359,7 +358,7 @@ fn newline_join_delete_delta_restores_line_boundary() {
     assert_eq!(buffer.to_text(), "abcdef");
     assert!(matches!(
         buffer.undo_history.back(),
-        Some(HistoryEntry::DeleteText { text, .. }) if text == "\n"
+        Some(HistoryEntry::Edit(delta)) if delta.before == "\n" && delta.after.is_empty()
     ));
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), "abc\ndef");
@@ -577,15 +576,15 @@ fn mixed_delta_count_eviction_keeps_newest_reversible_suffix() {
     assert!(buffer
         .undo_history
         .iter()
-        .any(|entry| matches!(entry, HistoryEntry::InsertText { .. })));
+        .any(|entry| matches!(entry, HistoryEntry::Edit(delta) if delta.before.is_empty())));
     assert!(buffer
         .undo_history
         .iter()
-        .any(|entry| matches!(entry, HistoryEntry::DeleteText { .. })));
+        .any(|entry| matches!(entry, HistoryEntry::Edit(delta) if delta.after.is_empty())));
     assert!(buffer
         .undo_history
         .iter()
-        .any(|entry| matches!(entry, HistoryEntry::ReplaceText { .. })));
+        .any(|entry| matches!(entry, HistoryEntry::Edit(delta) if !delta.before.is_empty() && !delta.after.is_empty())));
 
     let evicted = edit_count - MAX_UNDO_HISTORY;
     for expected in states[evicted..edit_count].iter().rev() {
@@ -608,8 +607,13 @@ fn mixed_history_byte_eviction_tracks_payloads_and_keeps_newest_suffix() {
     fn marker(entry: &HistoryEntry) -> u8 {
         let text = match entry {
             HistoryEntry::Snapshot(snapshot) => &snapshot.lines[0],
-            HistoryEntry::InsertText { text, .. } | HistoryEntry::DeleteText { text, .. } => text,
-            HistoryEntry::ReplaceText { before, .. } => before,
+            HistoryEntry::Edit(delta) => {
+                if delta.before.is_empty() {
+                    &delta.after
+                } else {
+                    &delta.before
+                }
+            }
         };
         text.as_bytes()[0]
     }
@@ -624,38 +628,34 @@ fn mixed_history_byte_eviction_tracks_payloads_and_keeps_newest_suffix() {
         let entry = match id % 4 {
             0 => {
                 let text = String::from_utf8(vec![byte; 64]).expect("ASCII insert payload");
-                let byte_size = text.capacity() + entry_overhead;
-                HistoryEntry::InsertText {
-                    start: Cursor { row: 0, column: 0 },
-                    end: Cursor { row: 0, column: 64 },
+                HistoryEntry::Edit(EditDelta::insertion(
+                    Cursor { row: 0, column: 0 },
+                    Cursor { row: 0, column: 64 },
                     text,
-                    byte_size,
-                }
+                    false,
+                ))
             }
             1 => {
                 let text = String::from_utf8(vec![byte; 64]).expect("ASCII delete payload");
-                let byte_size = text.capacity() + entry_overhead;
-                HistoryEntry::DeleteText {
-                    start: Cursor { row: 0, column: 0 },
-                    end: Cursor { row: 0, column: 64 },
+                HistoryEntry::Edit(EditDelta::deletion(
+                    Cursor { row: 0, column: 0 },
+                    Cursor { row: 0, column: 64 },
                     text,
-                    trailing_newline_before: false,
-                    trailing_newline_after: false,
-                    byte_size,
-                }
+                    false,
+                    false,
+                ))
             }
             2 => {
                 let before = String::from_utf8(vec![byte; 32]).expect("ASCII before payload");
                 let after = String::from_utf8(vec![byte; 32]).expect("ASCII after payload");
-                let byte_size = before.capacity() + after.capacity() + entry_overhead;
-                HistoryEntry::ReplaceText {
-                    start: Cursor { row: 0, column: 0 },
-                    before_end: Cursor { row: 0, column: 32 },
-                    after_end: Cursor { row: 0, column: 32 },
+                HistoryEntry::Edit(EditDelta::replacement(
+                    Cursor { row: 0, column: 0 },
+                    Cursor { row: 0, column: 32 },
+                    Cursor { row: 0, column: 32 },
                     before,
                     after,
-                    byte_size,
-                }
+                    false,
+                ))
             }
             _ => HistoryEntry::Snapshot(BufferSnapshot {
                 lines: vec![String::from_utf8(vec![byte; 64]).expect("ASCII snapshot payload")],
@@ -683,13 +683,13 @@ fn mixed_history_byte_eviction_tracks_payloads_and_keeps_newest_suffix() {
         .any(|entry| matches!(entry, HistoryEntry::Snapshot(_))));
     assert!(history
         .iter()
-        .any(|entry| matches!(entry, HistoryEntry::InsertText { .. })));
+        .any(|entry| matches!(entry, HistoryEntry::Edit(delta) if delta.before.is_empty())));
     assert!(history
         .iter()
-        .any(|entry| matches!(entry, HistoryEntry::DeleteText { .. })));
+        .any(|entry| matches!(entry, HistoryEntry::Edit(delta) if delta.after.is_empty())));
     assert!(history
         .iter()
-        .any(|entry| matches!(entry, HistoryEntry::ReplaceText { .. })));
+        .any(|entry| matches!(entry, HistoryEntry::Edit(delta) if !delta.before.is_empty() && !delta.after.is_empty())));
 
     let mut expected = b'L';
     while let Some(entry) = pop_history_entry(&mut history, &mut used_bytes) {

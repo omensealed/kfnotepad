@@ -37,6 +37,6 @@ use search_helpers::*;
 use snapshot_history::buffer_bytes;
 pub(crate) use snapshot_history::{pop_history_entry, push_history_entry, push_history_snapshot};
 pub(crate) use types::BufferSnapshot;
-pub(crate) use types::HistoryEntry;
 pub use types::{BufferError, FileSnapshot, TextBuffer};
 use types::{CompoundEditState, InsertUndoGroup};
+pub(crate) use types::{EditDelta, HistoryEntry};
