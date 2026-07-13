@@ -1,3 +1,7 @@
+//! Scrollbar pointer, paging, thumb dragging, and viewport updates.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn replacement_editor_scrollbar_moved(
         &mut self,

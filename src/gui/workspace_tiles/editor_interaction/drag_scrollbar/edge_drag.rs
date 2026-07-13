@@ -1,3 +1,7 @@
+//! Edge-drag viewport scrolling and selection extension.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn replacement_editor_drag_tick(&mut self) {
         let Some(edge) = self.replacement_drag_edge else {
