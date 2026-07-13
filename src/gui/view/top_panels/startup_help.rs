@@ -1,4 +1,10 @@
-fn startup_help_panel(state: &KfnotepadGui) -> Option<Element<'_, Message>> {
+//! First-run help panel shown for an empty GUI launch.
+
+use super::super::*;
+
+pub(in crate::gui::app::state::view) fn startup_help_panel(
+    state: &KfnotepadGui,
+) -> Option<Element<'_, Message>> {
     if !state.show_startup_help_panel {
         return None;
     }
@@ -36,7 +42,8 @@ fn startup_help_panel(state: &KfnotepadGui) -> Option<Element<'_, Message>> {
             ),
         ]
         .spacing(8),
-        text("Press F1 at any time to open built-in help.").size(gui_ui_small_text_size(state.settings)),
+        text("Press F1 at any time to open built-in help.")
+            .size(gui_ui_small_text_size(state.settings)),
     ]
     .spacing(8);
 

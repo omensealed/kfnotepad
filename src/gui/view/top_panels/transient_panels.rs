@@ -1,4 +1,10 @@
-fn gui_path_prompt_panel(state: &KfnotepadGui) -> Option<Element<'_, Message>> {
+//! Path prompt and managed-note transient panels.
+
+use super::super::*;
+
+pub(in crate::gui::app::state::view) fn gui_path_prompt_panel(
+    state: &KfnotepadGui,
+) -> Option<Element<'_, Message>> {
     let palette = gui_theme_palette(state.settings.theme_id);
     state.path_prompt.map(|prompt| {
         container(
@@ -32,7 +38,9 @@ fn gui_path_prompt_panel(state: &KfnotepadGui) -> Option<Element<'_, Message>> {
     })
 }
 
-fn gui_notes_panel(state: &KfnotepadGui) -> Option<Element<'_, Message>> {
+pub(in crate::gui::app::state::view) fn gui_notes_panel(
+    state: &KfnotepadGui,
+) -> Option<Element<'_, Message>> {
     state.notes_panel.as_ref().map(|notes| {
         let mut items = row![text("Notes").size(gui_ui_text_size(state.settings))]
             .spacing(8)
