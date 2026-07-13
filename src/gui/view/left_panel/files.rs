@@ -1,4 +1,8 @@
-fn gui_files_panel<'a>(
+//! Files mode controls and asynchronous directory tree surface.
+
+use super::super::*;
+
+pub(in crate::gui::app::state::view) fn gui_files_panel<'a>(
     state: &'a KfnotepadGui,
     panel_tabs: Element<'a, Message>,
 ) -> Element<'a, Message> {

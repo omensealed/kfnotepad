@@ -1,4 +1,11 @@
-fn gui_left_panel_view(state: &KfnotepadGui) -> Option<Element<'_, Message>> {
+//! Active left-panel selection, scrolling, dimensions, and padding.
+
+use super::super::*;
+use super::{gui_files_panel, gui_left_panel_tabs, gui_preferences_panel, gui_workspaces_panel};
+
+pub(in crate::gui::app::state::view) fn gui_left_panel_view(
+    state: &KfnotepadGui,
+) -> Option<Element<'_, Message>> {
     if !state.left_panel.visible {
         return None;
     }

@@ -1,4 +1,8 @@
-fn gui_preferences_panel<'a>(
+//! Editor, UI, search, reader, and restore preference controls.
+
+use super::super::*;
+
+pub(in crate::gui::app::state::view) fn gui_preferences_panel<'a>(
     state: &'a KfnotepadGui,
     panel_tabs: Element<'a, Message>,
     palette: iced::theme::Palette,

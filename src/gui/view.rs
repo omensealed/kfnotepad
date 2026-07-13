@@ -7,9 +7,11 @@ use crate::GuiDocumentTile;
 use iced::widget;
 
 include!("view/shell.rs");
+#[path = "view/left_panel.rs"]
+mod left_panel;
 #[path = "view/top_panels.rs"]
 mod top_panels;
-include!("view/left_panel.rs");
 include!("view/panes.rs");
 
+use left_panel::*;
 use top_panels::*;

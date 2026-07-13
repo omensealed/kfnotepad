@@ -1,4 +1,10 @@
-fn gui_left_panel_tabs(state: &KfnotepadGui) -> Element<'_, Message> {
+//! Icon tabs for selecting the active left-panel mode.
+
+use super::super::*;
+
+pub(in crate::gui::app::state::view) fn gui_left_panel_tabs(
+    state: &KfnotepadGui,
+) -> Element<'_, Message> {
     row![
         gui_icon_tooltip_button(
             ICON_FILES,

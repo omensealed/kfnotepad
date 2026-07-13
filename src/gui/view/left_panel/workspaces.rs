@@ -1,4 +1,8 @@
-fn gui_workspaces_panel<'a>(
+//! Workspace project save, list, open, and delete controls.
+
+use super::super::*;
+
+pub(in crate::gui::app::state::view) fn gui_workspaces_panel<'a>(
     state: &'a KfnotepadGui,
     panel_tabs: Element<'a, Message>,
 ) -> Element<'a, Message> {
@@ -48,8 +52,8 @@ fn gui_workspaces_panel<'a>(
     .spacing(5);
 
     if state.workspace_projects.is_empty() {
-        projects =
-            projects.push(text("No saved workspace projects").size(gui_ui_text_size(state.settings)));
+        projects = projects
+            .push(text("No saved workspace projects").size(gui_ui_text_size(state.settings)));
     } else {
         for (index, entry) in state.workspace_projects.iter().enumerate() {
             projects = projects.push(
