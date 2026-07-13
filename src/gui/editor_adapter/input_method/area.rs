@@ -1,3 +1,7 @@
+//! Element wrapper carrying the active IME request.
+
+use super::*;
+
 pub(crate) struct GuiInputMethodArea<'a> {
     pub(crate) content: Element<'a, Message>,
     pub(crate) request: Option<GuiImeInputMethodRequest>,

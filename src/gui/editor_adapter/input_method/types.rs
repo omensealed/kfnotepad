@@ -1,3 +1,7 @@
+//! Syntax cache, search highlight, and transient IME preedit state.
+
+use super::*;
+
 pub(crate) struct GuiSyntaxCache {
     pub(crate) path: PathBuf,
     pub(crate) line_count: usize,

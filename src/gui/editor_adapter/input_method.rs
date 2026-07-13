@@ -2,7 +2,15 @@
 
 use super::*;
 
-include!("input_method/types.rs");
-include!("input_method/request.rs");
-include!("input_method/area.rs");
-include!("input_method/widget.rs");
+#[path = "input_method/area.rs"]
+mod area;
+#[path = "input_method/request.rs"]
+mod request;
+#[path = "input_method/types.rs"]
+mod types;
+#[path = "input_method/widget.rs"]
+mod widget;
+
+pub(crate) use area::*;
+pub(crate) use request::*;
+pub(crate) use types::*;

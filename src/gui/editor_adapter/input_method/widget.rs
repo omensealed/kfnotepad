@@ -1,3 +1,7 @@
+//! Advanced Iced widget implementation that forwards IME requests.
+
+use super::*;
+
 include!("widget/tree_size.rs");
 include!("widget/layout_operate.rs");
 include!("widget/update.rs");

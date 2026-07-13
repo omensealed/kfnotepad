@@ -1,3 +1,7 @@
+//! IME cursor geometry and preedit request state.
+
+use super::*;
+
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct GuiImeInputMethodRequest {
     pub(crate) visual_row: usize,
