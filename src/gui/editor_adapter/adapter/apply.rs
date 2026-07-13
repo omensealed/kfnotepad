@@ -1,3 +1,7 @@
+//! Command dispatch for native and replacement editor backends.
+
+use super::*;
+
 impl GuiEditorAdapter {
     pub(crate) fn apply(&mut self, command: GuiEditorCommand) {
         if GUI_USE_READ_ONLY_EDITOR_RENDERER {

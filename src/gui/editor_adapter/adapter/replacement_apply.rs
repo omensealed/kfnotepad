@@ -1,3 +1,7 @@
+//! Replacement editor command application.
+
+use super::*;
+
 impl GuiEditorAdapter {
     pub(crate) fn apply_replacement_command(&mut self, command: GuiEditorCommand) {
         match command {

@@ -1,3 +1,7 @@
+//! Render snapshots, line-number state, and viewport synchronization.
+
+use super::*;
+
 impl GuiEditorAdapter {
     pub(crate) fn render_state(
         &self,

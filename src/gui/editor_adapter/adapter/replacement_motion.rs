@@ -1,3 +1,7 @@
+//! Replacement editor cursor and page motion.
+
+use super::*;
+
 impl GuiEditorAdapter {
     pub(crate) fn apply_text_editor_motion_to_replacement(&mut self, motion: text_editor::Motion) {
         let mut selection = self.replacement_selection;

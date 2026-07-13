@@ -1,3 +1,7 @@
+//! Text, cursor, selection, and document metadata accessors.
+
+use super::*;
+
 impl GuiEditorAdapter {
     pub(crate) fn text(&self) -> String {
         self.content.text()

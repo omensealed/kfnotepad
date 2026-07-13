@@ -2,10 +2,17 @@
 
 use super::*;
 
-include!("adapter/constructors.rs");
-include!("adapter/accessors.rs");
-include!("adapter/apply.rs");
-include!("adapter/replacement_apply.rs");
-include!("adapter/replacement_motion.rs");
-include!("adapter/viewport_control.rs");
-include!("adapter/render_state.rs");
+#[path = "adapter/accessors.rs"]
+mod accessors;
+#[path = "adapter/apply.rs"]
+mod apply;
+#[path = "adapter/constructors.rs"]
+mod constructors;
+#[path = "adapter/render_state.rs"]
+mod render_state;
+#[path = "adapter/replacement_apply.rs"]
+mod replacement_apply;
+#[path = "adapter/replacement_motion.rs"]
+mod replacement_motion;
+#[path = "adapter/viewport_control.rs"]
+mod viewport_control;

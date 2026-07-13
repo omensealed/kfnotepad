@@ -1,3 +1,7 @@
+//! Editor adapter construction and test fixtures.
+
+use super::*;
+
 impl GuiEditorAdapter {
     pub(crate) fn new(content: text_editor::Content) -> Self {
         let mut adapter = Self {

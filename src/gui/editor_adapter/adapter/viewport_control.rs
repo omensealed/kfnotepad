@@ -1,3 +1,7 @@
+//! Cursor selection and viewport scrolling controls.
+
+use super::*;
+
 impl GuiEditorAdapter {
     pub(crate) fn move_to(&mut self, cursor: DocumentCursor) {
         self.apply(GuiEditorCommand::MoveTo(cursor));
