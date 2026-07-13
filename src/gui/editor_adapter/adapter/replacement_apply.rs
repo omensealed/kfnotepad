@@ -18,30 +18,14 @@ impl GuiEditorAdapter {
                 }
             },
             GuiEditorCommand::Delete => {
-                if self.replacement_selection.is_none() {
+                if let Some(removes_complete_text) = self.materialize_replacement_selection() {
                     self.content
                         .perform(text_editor::Action::Edit(text_editor::Edit::Delete));
+                    if removes_complete_text {
+                        self.content
+                            .perform(text_editor::Action::Edit(text_editor::Edit::Delete));
+                    }
                     self.sync_viewport_to_cursor();
-                } else {
-                    let mut document = TextDocument {
-                        path: PathBuf::from("replacement-delete.txt"),
-                        buffer: TextBuffer::from_text(&self.text()),
-                    };
-                    let mut cursor = self.document_cursor();
-                    let mut selection = self.replacement_selection;
-                    let mut viewport = self.viewport;
-                    apply_gui_editor_replacement_input(
-                        &mut document,
-                        &mut cursor,
-                        &mut viewport,
-                        &mut selection,
-                        GuiEditorReplacementInput::DeleteForward,
-                    );
-                    self.content = text_editor::Content::with_text(&document.buffer.to_text());
-                    self.content.move_to(editor_cursor_from_document(cursor));
-                    self.viewport = viewport;
-                    self.viewport_tracks_cursor = true;
-                    self.replacement_selection = selection;
                 }
             }
             GuiEditorCommand::MoveTo(cursor) => {
@@ -50,32 +34,16 @@ impl GuiEditorAdapter {
                 self.sync_viewport_to_cursor();
             }
             GuiEditorCommand::Paste(contents) => {
-                if self.replacement_selection.is_none() {
+                if let Some(removes_complete_text) = self.materialize_replacement_selection() {
                     self.content
                         .perform(text_editor::Action::Edit(text_editor::Edit::Paste(
                             Arc::new(contents),
                         )));
+                    if removes_complete_text {
+                        self.content
+                            .perform(text_editor::Action::Edit(text_editor::Edit::Delete));
+                    }
                     self.sync_viewport_to_cursor();
-                } else {
-                    let mut document = TextDocument {
-                        path: PathBuf::from("replacement-paste.txt"),
-                        buffer: TextBuffer::from_text(&self.text()),
-                    };
-                    let mut cursor = self.document_cursor();
-                    let mut selection = self.replacement_selection;
-                    let mut viewport = self.viewport;
-                    gui_editor_replacement_paste_text(
-                        &mut document,
-                        &mut cursor,
-                        &mut viewport,
-                        &mut selection,
-                        &contents,
-                    );
-                    self.content = text_editor::Content::with_text(&document.buffer.to_text());
-                    self.content.move_to(editor_cursor_from_document(cursor));
-                    self.viewport = viewport;
-                    self.viewport_tracks_cursor = true;
-                    self.replacement_selection = selection;
                 }
             }
             GuiEditorCommand::ScrollViewportLines(delta) => {
@@ -114,6 +82,79 @@ impl GuiEditorAdapter {
                 self.replacement_selection = GuiEditorReplacementSelection::new(start, focus);
                 self.sync_viewport_to_cursor();
             }
+        }
+    }
+
+    fn materialize_replacement_selection(&mut self) -> Option<bool> {
+        let Some(selection) = self.replacement_selection else {
+            return Some(false);
+        };
+        let original_cursor = self.document_cursor();
+        let (start, end) = selection.normalized();
+        self.content.move_to(editor_cursor_from_document(end));
+        let positioned_at_end = self.iced_selection_focus() == end;
+        self.content
+            .perform(text_editor::Action::Move(text_editor::Motion::DocumentEnd));
+        let iced_document_end = self.iced_selection_focus();
+        let ends_before_trailing_line_ending = iced_document_end
+            == (DocumentCursor {
+                row: end.row.saturating_add(1),
+                column: 0,
+            });
+        let removes_complete_text = start == (DocumentCursor { row: 0, column: 0 })
+            && positioned_at_end
+            && (iced_document_end == end || ends_before_trailing_line_ending);
+        self.content
+            .move_to(editor_cursor_from_document(selection.anchor));
+
+        let moves_right = (selection.anchor.row, selection.anchor.column)
+            < (selection.focus.row, selection.focus.column);
+        let edge_motion = if moves_right {
+            text_editor::Motion::DocumentEnd
+        } else {
+            text_editor::Motion::DocumentStart
+        };
+        self.content
+            .perform(text_editor::Action::Select(edge_motion));
+        if self.iced_selection_focus() == selection.focus {
+            self.replacement_selection = None;
+            return Some(removes_complete_text);
+        }
+        self.content
+            .move_to(editor_cursor_from_document(selection.anchor));
+
+        while self.iced_selection_focus() != selection.focus {
+            let before = self.iced_selection_focus();
+            let moves_right =
+                (before.row, before.column) < (selection.focus.row, selection.focus.column);
+            let motion = if moves_right {
+                text_editor::Motion::Right
+            } else {
+                text_editor::Motion::Left
+            };
+            self.content.perform(text_editor::Action::Select(motion));
+            let after = self.iced_selection_focus();
+            let passed_focus = if moves_right {
+                (after.row, after.column) > (selection.focus.row, selection.focus.column)
+            } else {
+                (after.row, after.column) < (selection.focus.row, selection.focus.column)
+            };
+            if after == before || passed_focus {
+                self.content
+                    .move_to(editor_cursor_from_document(original_cursor));
+                return None;
+            }
+        }
+
+        self.replacement_selection = None;
+        Some(removes_complete_text)
+    }
+
+    fn iced_selection_focus(&self) -> DocumentCursor {
+        let position = self.cursor().position;
+        DocumentCursor {
+            row: position.line,
+            column: position.column,
         }
     }
 }

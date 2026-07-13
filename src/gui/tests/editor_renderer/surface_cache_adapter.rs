@@ -334,7 +334,11 @@ fn gui_editor_adapter_exposes_parity_boundary_without_changing_backend() {
     adapter.apply(GuiEditorCommand::SelectAll);
     assert_eq!(adapter.selection().as_deref(), Some("one\ntwo\nthree\n"));
 
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
     adapter.apply(GuiEditorCommand::Paste("alpha".to_string()));
+    assert_eq!(kfnotepad::to_text_call_count(), 0);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
     assert_eq!(adapter.text(), "alpha");
     assert_eq!(
         adapter.document_cursor(),
@@ -346,8 +350,51 @@ fn gui_editor_adapter_exposes_parity_boundary_without_changing_backend() {
         column: 0,
     }));
     adapter.apply(GuiEditorCommand::SelectRightChars(1));
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
     adapter.apply(GuiEditorCommand::Delete);
+    assert_eq!(kfnotepad::to_text_call_count(), 0);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
     assert_eq!(adapter.text(), "lpha");
+}
+
+#[test]
+fn gui_editor_adapter_materializes_reverse_multiline_selection_without_reconstruction() {
+    let anchor = DocumentCursor { row: 1, column: 3 };
+    let focus = DocumentCursor { row: 0, column: 1 };
+    let mut paste_adapter = GuiEditorAdapter::from_text("one\ntwo\nthird");
+    paste_adapter.set_replacement_selection(anchor, focus, focus);
+
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
+    paste_adapter.apply(GuiEditorCommand::Paste("X".to_string()));
+
+    assert_eq!(kfnotepad::to_text_call_count(), 0);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
+    assert_eq!(paste_adapter.text(), "oX\nthird");
+    assert_eq!(paste_adapter.replacement_selection, None);
+
+    let mut delete_adapter = GuiEditorAdapter::from_text("one\ntwo\nthird");
+    delete_adapter.set_replacement_selection(anchor, focus, focus);
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
+    delete_adapter.apply(GuiEditorCommand::Delete);
+
+    assert_eq!(kfnotepad::to_text_call_count(), 0);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
+    assert_eq!(delete_adapter.text(), "o\nthird");
+    assert_eq!(delete_adapter.replacement_selection, None);
+
+    let mut full_delete_adapter = GuiEditorAdapter::from_text("alpha\n");
+    full_delete_adapter.apply(GuiEditorCommand::SelectAll);
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
+    full_delete_adapter.apply(GuiEditorCommand::Delete);
+
+    assert_eq!(kfnotepad::to_text_call_count(), 0);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
+    assert_eq!(full_delete_adapter.text(), "");
+    assert_eq!(full_delete_adapter.replacement_selection, None);
 }
 
 #[test]
