@@ -551,6 +551,159 @@ fn undo_history_is_bounded_and_redo_still_restores_latest_edit() {
 }
 
 #[test]
+fn mixed_delta_count_eviction_keeps_newest_reversible_suffix() {
+    let mut buffer = TextBuffer::from_text("root");
+    let mut states = vec![buffer.to_text()];
+    let edit_count = MAX_UNDO_HISTORY + 14;
+
+    for edit in 0..edit_count {
+        match edit % 3 {
+            0 => {
+                buffer
+                    .insert_text(Cursor { row: 0, column: 4 }, "a")
+                    .expect("insert mixed-history character");
+            }
+            1 => buffer
+                .replace_char(0, 4, 'b')
+                .expect("replace mixed-history character"),
+            _ => buffer
+                .delete_range(Cursor { row: 0, column: 4 }, Cursor { row: 0, column: 5 })
+                .expect("delete mixed-history character"),
+        }
+        states.push(buffer.to_text());
+    }
+
+    assert_eq!(buffer.undo_history.len(), MAX_UNDO_HISTORY);
+    assert!(buffer
+        .undo_history
+        .iter()
+        .any(|entry| matches!(entry, HistoryEntry::InsertText { .. })));
+    assert!(buffer
+        .undo_history
+        .iter()
+        .any(|entry| matches!(entry, HistoryEntry::DeleteText { .. })));
+    assert!(buffer
+        .undo_history
+        .iter()
+        .any(|entry| matches!(entry, HistoryEntry::ReplaceText { .. })));
+
+    let evicted = edit_count - MAX_UNDO_HISTORY;
+    for expected in states[evicted..edit_count].iter().rev() {
+        assert!(buffer.undo_last_edit());
+        assert_eq!(buffer.to_text(), *expected);
+    }
+    assert!(!buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), states[evicted]);
+
+    for expected in &states[(evicted + 1)..=edit_count] {
+        assert!(buffer.redo_last_undo());
+        assert_eq!(buffer.to_text(), *expected);
+    }
+    assert!(!buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), states[edit_count]);
+}
+
+#[test]
+fn mixed_history_byte_eviction_tracks_payloads_and_keeps_newest_suffix() {
+    fn marker(entry: &HistoryEntry) -> u8 {
+        let text = match entry {
+            HistoryEntry::Snapshot(snapshot) => &snapshot.lines[0],
+            HistoryEntry::InsertText { text, .. } | HistoryEntry::DeleteText { text, .. } => text,
+            HistoryEntry::ReplaceText { before, .. } => before,
+        };
+        text.as_bytes()[0]
+    }
+
+    let entry_overhead = std::mem::size_of::<HistoryEntry>();
+    let max_bytes = 6 * (entry_overhead + 64);
+    let mut history = VecDeque::new();
+    let mut used_bytes = 0;
+
+    for id in 0..12_u8 {
+        let byte = b'A' + id;
+        let entry = match id % 4 {
+            0 => {
+                let text = String::from_utf8(vec![byte; 64]).expect("ASCII insert payload");
+                let byte_size = text.capacity() + entry_overhead;
+                HistoryEntry::InsertText {
+                    start: Cursor { row: 0, column: 0 },
+                    end: Cursor { row: 0, column: 64 },
+                    text,
+                    byte_size,
+                }
+            }
+            1 => {
+                let text = String::from_utf8(vec![byte; 64]).expect("ASCII delete payload");
+                let byte_size = text.capacity() + entry_overhead;
+                HistoryEntry::DeleteText {
+                    start: Cursor { row: 0, column: 0 },
+                    end: Cursor { row: 0, column: 64 },
+                    text,
+                    trailing_newline_before: false,
+                    trailing_newline_after: false,
+                    byte_size,
+                }
+            }
+            2 => {
+                let before = String::from_utf8(vec![byte; 32]).expect("ASCII before payload");
+                let after = String::from_utf8(vec![byte; 32]).expect("ASCII after payload");
+                let byte_size = before.capacity() + after.capacity() + entry_overhead;
+                HistoryEntry::ReplaceText {
+                    start: Cursor { row: 0, column: 0 },
+                    before_end: Cursor { row: 0, column: 32 },
+                    after_end: Cursor { row: 0, column: 32 },
+                    before,
+                    after,
+                    byte_size,
+                }
+            }
+            _ => HistoryEntry::Snapshot(BufferSnapshot {
+                lines: vec![String::from_utf8(vec![byte; 64]).expect("ASCII snapshot payload")],
+                trailing_newline: false,
+                byte_size: 64,
+            }),
+        };
+        push_history_entry(&mut history, &mut used_bytes, entry, 12, max_bytes);
+        assert_eq!(
+            used_bytes,
+            history.iter().map(HistoryEntry::byte_size).sum::<usize>()
+        );
+        assert!(used_bytes <= max_bytes);
+    }
+
+    assert!(history.len() < 12);
+    assert!(history.len() >= 4);
+    let first_retained = 12 - history.len();
+    assert_eq!(marker(&history[0]), b'A' + first_retained as u8);
+    for (offset, entry) in history.iter().enumerate() {
+        assert_eq!(marker(entry), b'A' + (first_retained + offset) as u8);
+    }
+    assert!(history
+        .iter()
+        .any(|entry| matches!(entry, HistoryEntry::Snapshot(_))));
+    assert!(history
+        .iter()
+        .any(|entry| matches!(entry, HistoryEntry::InsertText { .. })));
+    assert!(history
+        .iter()
+        .any(|entry| matches!(entry, HistoryEntry::DeleteText { .. })));
+    assert!(history
+        .iter()
+        .any(|entry| matches!(entry, HistoryEntry::ReplaceText { .. })));
+
+    let mut expected = b'L';
+    while let Some(entry) = pop_history_entry(&mut history, &mut used_bytes) {
+        assert_eq!(marker(&entry), expected);
+        expected -= 1;
+        assert_eq!(
+            used_bytes,
+            history.iter().map(HistoryEntry::byte_size).sum::<usize>()
+        );
+    }
+    assert_eq!(used_bytes, 0);
+}
+
+#[test]
 fn history_push_prefers_latest_entries_and_tracks_byte_budget() {
     let snapshots = [
         BufferSnapshot {

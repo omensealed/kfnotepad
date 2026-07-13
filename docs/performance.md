@@ -104,6 +104,11 @@ forward state with an independent tokenized line model, then verifies the comple
 includes ASCII, CJK, emoji, combining graphemes, multiline insertion, line splitting/joining, deletion, backspace,
 and overwrite while remaining below the configured history-entry limit.
 
+Separate eviction tests exceed both history constraints. Real mixed insert, replace, and delete edits verify that the
+256-entry cap discards only the oldest prefix and that every retained edit still undoes and redoes in order. A
+mixed-entry queue test covers snapshots and all delta variants under a byte cap, checking exact accounting after
+every push and pop and confirming that eviction retains one contiguous newest suffix.
+
 ## External-change polling improvement
 
 The first polling correction kept the one-second responsiveness contract but compared symlink-safe file metadata
