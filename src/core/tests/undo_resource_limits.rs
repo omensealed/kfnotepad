@@ -1,0 +1,333 @@
+use super::*;
+
+#[test]
+fn consecutive_typed_inserts_coalesce_as_one_undo_step() {
+    let mut buffer = TextBuffer::from_text("");
+
+    buffer.insert_char(0, 0, 'a').expect("insert first");
+    buffer.insert_char(0, 1, 'b').expect("insert second");
+    buffer.insert_char(0, 2, 'c').expect("insert third");
+
+    assert_eq!(buffer.to_text(), "abc");
+    assert_eq!(buffer.undo_history.len(), 1);
+
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "");
+}
+
+#[test]
+fn insert_newline_breaks_typing_undo_group() {
+    let mut buffer = TextBuffer::from_text("");
+
+    buffer.insert_char(0, 0, 'a').expect("insert first");
+    buffer.insert_char(0, 1, 'b').expect("insert second");
+    buffer.insert_newline(0, 2).expect("insert newline");
+    buffer.insert_char(1, 0, 'c').expect("insert after newline");
+
+    assert_eq!(buffer.to_text(), "ab\nc");
+    assert_eq!(buffer.undo_history.len(), 3);
+
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "ab\n");
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "ab");
+}
+
+#[test]
+fn cursor_jumps_break_typed_insert_undo_coalescing() {
+    let mut buffer = TextBuffer::from_text("");
+
+    buffer.insert_char(0, 0, 'a').expect("insert first");
+    buffer.insert_char(0, 1, 'b').expect("insert contiguous");
+    buffer.insert_char(0, 0, 'c').expect("cursor jump insert");
+
+    assert_eq!(buffer.to_text(), "cab");
+    assert_eq!(buffer.undo_history.len(), 2);
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "ab");
+}
+
+#[test]
+fn explicit_undo_boundary_breaks_typed_insert_coalescing() {
+    let mut buffer = TextBuffer::from_text("");
+
+    buffer.insert_char(0, 0, 'a').expect("insert first");
+    buffer.insert_char(0, 1, 'b').expect("insert second");
+    assert_eq!(buffer.undo_history.len(), 1);
+
+    buffer.break_undo_group();
+
+    buffer
+        .insert_char(0, 2, 'c')
+        .expect("insert after boundary");
+    assert_eq!(buffer.undo_history.len(), 2);
+    buffer
+        .insert_char(0, 3, 'd')
+        .expect("insert after boundary contiguous");
+    assert_eq!(buffer.undo_history.len(), 2);
+}
+
+#[test]
+fn coalescing_timeout_breaks_typed_insert_undo_group() {
+    let mut buffer = TextBuffer::from_text("");
+
+    buffer.insert_char(0, 0, 'a').expect("insert first");
+    buffer.insert_char(0, 1, 'b').expect("insert contiguous");
+    std::thread::sleep(TYPING_UNDO_COALESCE_WINDOW + Duration::from_millis(25));
+    buffer.insert_char(0, 2, 'c').expect("insert after timeout");
+
+    assert_eq!(buffer.to_text(), "abc");
+    assert_eq!(buffer.undo_history.len(), 2);
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "ab");
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "");
+}
+
+#[test]
+fn compound_edit_records_one_snapshot_for_multiple_edit_kinds() {
+    let mut document = TextDocument {
+        path: PathBuf::from("compound.txt"),
+        buffer: TextBuffer::from_text("hello world"),
+    };
+
+    document.with_compound_edit(|document| {
+        document
+            .buffer
+            .delete_range(Cursor { row: 0, column: 5 }, Cursor { row: 0, column: 11 })
+            .expect("delete selection");
+        document
+            .buffer
+            .insert_newline(0, 5)
+            .expect("insert newline");
+        document
+            .buffer
+            .insert_char(1, 0, 'x')
+            .expect("insert character");
+    });
+
+    assert_eq!(document.buffer.to_text(), "hello\nx");
+    assert_eq!(document.buffer.undo_history.len(), 1);
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), "hello world");
+    assert!(!document.buffer.undo_last_edit());
+}
+
+#[test]
+fn compound_edit_without_buffer_changes_does_not_create_undo_history() {
+    let mut document = TextDocument {
+        path: PathBuf::from("unchanged.txt"),
+        buffer: TextBuffer::from_text("unchanged"),
+    };
+
+    document.with_compound_edit(|_| {});
+
+    assert!(document.buffer.undo_history.is_empty());
+    assert_eq!(document.buffer.undo_bytes, 0);
+    assert!(!document.buffer.is_dirty());
+}
+
+#[test]
+fn bulk_insert_text_updates_lines_cursor_revision_and_undo_once() {
+    let mut buffer = TextBuffer::from_text("hello world");
+    let initial_revision = buffer.edit_revision();
+
+    let cursor = buffer
+        .insert_text(Cursor { row: 0, column: 5 }, " there\nfriend\n")
+        .expect("insert multiline text");
+
+    assert_eq!(buffer.to_text(), "hello there\nfriend\n world");
+    assert_eq!(cursor, Cursor { row: 2, column: 0 });
+    assert_eq!(buffer.edit_revision(), initial_revision.wrapping_add(1));
+    assert_eq!(buffer.undo_history.len(), 1);
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "hello world");
+}
+
+#[test]
+fn bulk_insert_text_advances_to_combining_grapheme_end() {
+    let mut buffer = TextBuffer::from_text("e");
+
+    let cursor = buffer
+        .insert_text(Cursor { row: 0, column: 1 }, "\u{301}")
+        .expect("insert combining mark");
+
+    assert_eq!(buffer.to_text(), "e\u{301}");
+    assert_eq!(cursor, Cursor { row: 0, column: 2 });
+}
+
+#[test]
+fn bulk_insert_empty_text_is_unchanged() {
+    let mut buffer = TextBuffer::from_text("unchanged");
+
+    let cursor = buffer
+        .insert_text(Cursor { row: 0, column: 4 }, "")
+        .expect("accept empty insert");
+
+    assert_eq!(cursor, Cursor { row: 0, column: 4 });
+    assert_eq!(buffer.to_text(), "unchanged");
+    assert!(!buffer.is_dirty());
+    assert!(buffer.undo_history.is_empty());
+}
+
+#[test]
+fn insert_operations_reject_growth_beyond_text_limit_without_mutation() {
+    let limit = usize::try_from(MAX_TEXT_FILE_BYTES).expect("text limit fits usize");
+    let original = "x".repeat(limit);
+    let mut buffer = TextBuffer::from_text(&original);
+
+    assert_eq!(
+        buffer.insert_char(0, limit, 'y'),
+        Err(BufferError::TooLarge {
+            bytes: limit + 1,
+            limit,
+        })
+    );
+    assert_eq!(
+        buffer.insert_newline(0, limit),
+        Err(BufferError::TooLarge {
+            bytes: limit + 1,
+            limit,
+        })
+    );
+    assert_eq!(
+        buffer.insert_text(
+            Cursor {
+                row: 0,
+                column: limit
+            },
+            "yz"
+        ),
+        Err(BufferError::TooLarge {
+            bytes: limit + 2,
+            limit,
+        })
+    );
+
+    assert_eq!(buffer.to_text(), original);
+    assert!(!buffer.is_dirty());
+    assert!(buffer.undo_history.is_empty());
+}
+
+#[test]
+fn overwrite_at_text_limit_allows_equal_bytes_and_rejects_growth() {
+    let limit = usize::try_from(MAX_TEXT_FILE_BYTES).expect("text limit fits usize");
+    let mut buffer = TextBuffer::from_text(&"x".repeat(limit));
+
+    buffer
+        .replace_char(0, 0, 'y')
+        .expect("equal-byte overwrite remains within limit");
+    assert_eq!(buffer.byte_len(), limit);
+    assert_eq!(
+        buffer.replace_char(0, 1, '界'),
+        Err(BufferError::TooLarge {
+            bytes: limit + 2,
+            limit,
+        })
+    );
+    assert_eq!(
+        buffer.line(0).and_then(|line| line.chars().nth(1)),
+        Some('x')
+    );
+}
+
+#[test]
+fn large_file_undo_history_uses_byte_budget_and_remains_responsive() {
+    let base_size = usize::try_from(MAX_TEXT_FILE_BYTES.saturating_sub(1024))
+        .expect("max text byte limit fits in usize");
+    let initial_text = "a".repeat(base_size);
+    let mut buffer = TextBuffer::from_text(&initial_text);
+    assert_eq!(buffer.to_text().len(), base_size);
+    assert_eq!(buffer.to_text().chars().count(), base_size);
+
+    buffer.mark_clean();
+    assert!(!buffer.is_dirty());
+
+    for _ in 0..300 {
+        buffer
+            .insert_char(0, 0, 'x')
+            .expect("insert near large document");
+    }
+
+    assert!(buffer.is_dirty());
+
+    let undo_budget = buffer
+        .undo_history
+        .iter()
+        .map(|snapshot| snapshot.byte_size)
+        .sum::<usize>();
+    assert_eq!(buffer.undo_bytes, undo_budget);
+    assert!(
+        undo_budget <= MAX_UNDO_BYTES,
+        "undo budget {undo_budget} exceeds hard cap {MAX_UNDO_BYTES}"
+    );
+
+    assert!(buffer.undo_last_edit());
+    let after_edit_len = buffer.to_text().len();
+    assert!(after_edit_len > base_size);
+    assert!(after_edit_len <= base_size + 300);
+
+    let mut undo_steps = 0usize;
+    while buffer.undo_last_edit() {
+        undo_steps += 1;
+    }
+
+    assert!(undo_steps > 0);
+    let max_entries_by_budget = (MAX_UNDO_BYTES / (initial_text.len() + 1)) + 3;
+    assert!(undo_steps <= max_entries_by_budget);
+    assert!(!buffer.to_text().is_empty());
+    assert!(buffer.to_text().len() >= initial_text.len());
+    assert!(buffer.to_text().len() < after_edit_len);
+}
+
+#[test]
+fn undo_history_is_bounded_and_redo_still_restores_latest_edit() {
+    let mut buffer = TextBuffer::from_text("");
+
+    for _ in 0..(MAX_UNDO_HISTORY + 10) {
+        buffer.insert_char(0, 0, 'x').expect("insert");
+    }
+
+    assert_eq!(buffer.undo_history.len(), MAX_UNDO_HISTORY);
+    assert!(buffer.undo_last_edit());
+    let after_undo = buffer.to_text();
+    assert_eq!(after_undo.len(), MAX_UNDO_HISTORY + 9);
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text().len(), MAX_UNDO_HISTORY + 10);
+}
+
+#[test]
+fn history_push_prefers_latest_entries_and_tracks_byte_budget() {
+    let snapshots = [
+        BufferSnapshot {
+            lines: vec!["a".to_string()],
+            trailing_newline: false,
+            byte_size: 60,
+        },
+        BufferSnapshot {
+            lines: vec!["b".to_string()],
+            trailing_newline: false,
+            byte_size: 60,
+        },
+        BufferSnapshot {
+            lines: vec!["c".to_string()],
+            trailing_newline: false,
+            byte_size: 60,
+        },
+        BufferSnapshot {
+            lines: vec!["d".to_string()],
+            trailing_newline: false,
+            byte_size: 60,
+        },
+    ];
+    let mut history = VecDeque::new();
+    let mut used_bytes = 0;
+    for snapshot in snapshots {
+        push_history_snapshot(&mut history, &mut used_bytes, snapshot, 4, 120);
+    }
+
+    assert_eq!(history.len(), 2);
+    assert_eq!(used_bytes, 120);
+    assert_eq!(history[0].lines[0], "c");
+    assert_eq!(history[1].lines[0], "d");
+}
