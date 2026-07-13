@@ -5,8 +5,19 @@
 
 use super::*;
 
-include!("layout/paths_and_external.rs");
-include!("layout/workspace_restore.rs");
-include!("layout/panes.rs");
-include!("layout/serialization.rs");
-include!("layout/app_chrome.rs");
+#[path = "layout/app_chrome.rs"]
+mod app_chrome;
+#[path = "layout/panes.rs"]
+mod panes;
+#[path = "layout/paths_and_external.rs"]
+mod paths_and_external;
+#[path = "layout/serialization.rs"]
+mod serialization;
+#[path = "layout/workspace_restore.rs"]
+mod workspace_restore;
+
+pub(super) use app_chrome::*;
+pub(super) use panes::*;
+pub(super) use paths_and_external::*;
+pub(super) use serialization::*;
+pub(super) use workspace_restore::*;

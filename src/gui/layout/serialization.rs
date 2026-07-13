@@ -1,4 +1,4 @@
-// Persisted pane-layout conversion and equalized geometry helpers.
+//! Persisted pane-layout conversion and equalized geometry helpers.
 
 #[path = "serialization/equalized.rs"]
 mod equalized;

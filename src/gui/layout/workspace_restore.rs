@@ -1,14 +1,18 @@
+//! Workspace project loading, partial restore status, and launch command construction.
+
+use super::*;
+
 #[derive(Debug)]
-pub(super) struct RestoredGuiWorkspaceProject {
-    pub(super) project: GuiWorkspaceProject,
-    pub(super) documents: Vec<TextDocument>,
-    pub(super) active_loaded_ordinal: Option<usize>,
-    pub(super) skipped_files: Vec<String>,
-    pub(super) created_blank: bool,
+pub(in crate::gui::app::state) struct RestoredGuiWorkspaceProject {
+    pub(in crate::gui::app::state) project: GuiWorkspaceProject,
+    pub(in crate::gui::app::state) documents: Vec<TextDocument>,
+    pub(in crate::gui::app::state) active_loaded_ordinal: Option<usize>,
+    pub(in crate::gui::app::state) skipped_files: Vec<String>,
+    pub(in crate::gui::app::state) created_blank: bool,
 }
 
 impl RestoredGuiWorkspaceProject {
-    pub(super) fn skipped_status_message(&self) -> Option<String> {
+    pub(in crate::gui::app::state) fn skipped_status_message(&self) -> Option<String> {
         if self.skipped_files.is_empty() {
             return None;
         }
@@ -29,7 +33,7 @@ impl RestoredGuiWorkspaceProject {
     }
 }
 
-pub(super) fn load_workspace_project_launch_documents(
+pub(in crate::gui::app::state) fn load_workspace_project_launch_documents(
     path: &Path,
     current_dir: PathBuf,
 ) -> Result<RestoredGuiWorkspaceProject, String> {
@@ -40,7 +44,7 @@ pub(super) fn load_workspace_project_launch_documents(
     ))
 }
 
-pub(super) fn restore_gui_workspace_project_documents(
+pub(in crate::gui::app::state) fn restore_gui_workspace_project_documents(
     project: GuiWorkspaceProject,
     current_dir: PathBuf,
 ) -> RestoredGuiWorkspaceProject {
@@ -77,12 +81,16 @@ pub(super) fn restore_gui_workspace_project_documents(
     }
 }
 
-pub(super) fn workspace_project_launch_command(executable: &Path, project_path: &Path) -> Command {
+pub(in crate::gui::app::state) fn workspace_project_launch_command(
+    executable: &Path,
+    project_path: &Path,
+) -> Command {
     let mut command = Command::new(executable);
     command.env(WORKSPACE_PROJECT_ENV, project_path);
     command
 }
 
-pub(super) fn current_managed_notes_dir() -> Result<PathBuf, kfnotepad::ManagedNotesError> {
+pub(in crate::gui::app::state) fn current_managed_notes_dir(
+) -> Result<PathBuf, kfnotepad::ManagedNotesError> {
     kfnotepad::current_managed_notes_dir()
 }

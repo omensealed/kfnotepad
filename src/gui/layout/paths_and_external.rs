@@ -1,4 +1,8 @@
-pub(super) fn empty_document(current_dir: PathBuf) -> TextDocument {
+//! GUI path adapters and external-file snapshot checks.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn empty_document(current_dir: PathBuf) -> TextDocument {
     TextDocument {
         path: current_dir.join("untitled.txt"),
         buffer: TextBuffer::from_text(""),
@@ -6,32 +10,34 @@ pub(super) fn empty_document(current_dir: PathBuf) -> TextDocument {
 }
 
 #[cfg(not(test))]
-pub(super) fn current_editor_config_path() -> Option<PathBuf> {
+pub(in crate::gui::app::state) fn current_editor_config_path() -> Option<PathBuf> {
     kfnotepad::current_editor_config_path()
 }
 
 #[cfg(not(test))]
-pub(super) fn current_gui_layout_path() -> Option<PathBuf> {
+pub(in crate::gui::app::state) fn current_gui_layout_path() -> Option<PathBuf> {
     kfnotepad::current_gui_layout_path()
 }
 
 #[cfg(not(test))]
-pub(super) fn current_gui_workspace_projects_dir() -> Option<PathBuf> {
+pub(in crate::gui::app::state) fn current_gui_workspace_projects_dir() -> Option<PathBuf> {
     kfnotepad::current_gui_workspace_projects_dir()
 }
 
 #[cfg(not(test))]
-pub(super) fn current_gui_workspace_project_launch_path() -> Option<PathBuf> {
+pub(in crate::gui::app::state) fn current_gui_workspace_project_launch_path() -> Option<PathBuf> {
     env::var_os(WORKSPACE_PROJECT_ENV)
         .filter(|value| !value.is_empty())
         .map(PathBuf::from)
 }
 
-pub(super) fn gui_file_snapshot(path: &Path) -> io::Result<Option<GuiFileSnapshot>> {
+pub(in crate::gui::app::state) fn gui_file_snapshot(
+    path: &Path,
+) -> io::Result<Option<GuiFileSnapshot>> {
     snapshot_text_file(path)
 }
 
-pub(super) fn check_external_file_changes(
+pub(in crate::gui::app::state) fn check_external_file_changes(
     candidates: Vec<GuiExternalFileCheckCandidate>,
 ) -> Vec<GuiExternalFileCheckResult> {
     let mut results = Vec::new();
@@ -93,23 +99,24 @@ pub(super) fn check_external_file_changes(
     results
 }
 
-pub(super) fn external_file_snapshot_requires_deep_check(
+pub(in crate::gui::app::state) fn external_file_snapshot_requires_deep_check(
     metadata: &FileMetadataSnapshot,
     previous_snapshot: Option<&GuiFileSnapshot>,
     force_deep_check: bool,
 ) -> bool {
     force_deep_check
-        || previous_snapshot
-            .is_none_or(|previous| !metadata.matches_file_snapshot(previous))
+        || previous_snapshot.is_none_or(|previous| !metadata.matches_file_snapshot(previous))
 }
 
-pub(super) async fn check_external_file_changes_async(
+pub(in crate::gui::app::state) async fn check_external_file_changes_async(
     candidates: Vec<GuiExternalFileCheckCandidate>,
 ) -> Vec<GuiExternalFileCheckResult> {
     check_external_file_changes(candidates)
 }
 
-pub(super) fn load_workspace_project_launch(path: &Path) -> Result<GuiWorkspaceProject, String> {
+pub(in crate::gui::app::state) fn load_workspace_project_launch(
+    path: &Path,
+) -> Result<GuiWorkspaceProject, String> {
     let text = fs::read_to_string(path).map_err(|error| error.to_string())?;
     parse_gui_workspace_project(&text).ok_or_else(|| "invalid workspace project".to_string())
 }

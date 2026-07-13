@@ -1,9 +1,16 @@
-pub(super) fn load_gui_layout(path: &std::path::Path, pane_count: usize) -> Option<GuiLayout> {
+//! Pane-grid creation, minimized-pane extraction, and split-axis selection.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn load_gui_layout(
+    path: &std::path::Path,
+    pane_count: usize,
+) -> Option<GuiLayout> {
     let text = fs::read_to_string(path).ok()?;
     parse_gui_layout(&text, pane_count)
 }
 
-pub(super) fn default_panes(
+pub(in crate::gui::app::state) fn default_panes(
     mut pane_states: Vec<GuiPane>,
 ) -> (pane_grid::State<GuiPane>, pane_grid::Pane) {
     let first = pane_states.remove(0);
@@ -17,7 +24,7 @@ pub(super) fn default_panes(
     (panes, active_pane)
 }
 
-pub(super) fn close_minimized_panes_into_tray(
+pub(in crate::gui::app::state) fn close_minimized_panes_into_tray(
     mut panes: pane_grid::State<GuiPane>,
     workspace: &GuiWorkspace,
     mut active_pane: pane_grid::Pane,
@@ -47,7 +54,7 @@ pub(super) fn close_minimized_panes_into_tray(
     (panes, tray, active_pane)
 }
 
-pub(super) fn split_axis_for_pane(
+pub(in crate::gui::app::state) fn split_axis_for_pane(
     panes: &pane_grid::State<GuiPane>,
     pane: pane_grid::Pane,
 ) -> pane_grid::Axis {
