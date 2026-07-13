@@ -1,3 +1,7 @@
+//! Tile minimization, restoration, and minimized-tray modeling.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn toggle_active_minimize(&mut self) {
         self.toggle_pane_minimized(self.active_pane);

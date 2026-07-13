@@ -1,3 +1,7 @@
+//! Pane maximize/restore and equalized layout reconstruction.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn toggle_active_maximize(&mut self) {
         self.toggle_pane_maximized(self.active_pane);

@@ -1,3 +1,7 @@
+//! Keyboard pane movement and drag/drop layout updates.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn move_active_pane(&mut self, direction: pane_grid::Direction) {
         self.move_pane(self.active_pane, direction);
