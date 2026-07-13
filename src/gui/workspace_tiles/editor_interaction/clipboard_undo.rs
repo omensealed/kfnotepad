@@ -41,7 +41,7 @@ impl KfnotepadGui {
             return;
         }
         if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-            if self.apply_replacement_editor_paste_to_active_tile(&contents) {
+            if self.apply_replacement_editor_bulk_text_to_active_tile(&contents) {
                 self.status_message = "pasted clipboard".to_string();
             } else {
                 self.status_message = "paste could not be applied".to_string();

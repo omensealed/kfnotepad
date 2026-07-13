@@ -3,7 +3,7 @@
 use super::*;
 
 impl KfnotepadGui {
-    pub(in crate::gui::app::state) fn apply_replacement_editor_paste_to_active_tile(
+    pub(in crate::gui::app::state) fn apply_replacement_editor_bulk_text_to_active_tile(
         &mut self,
         text: &str,
     ) -> bool {
@@ -41,7 +41,7 @@ impl KfnotepadGui {
             text,
         );
         if !changed {
-            self.status_message = "paste could not be applied".to_string();
+            self.status_message = "edit could not be applied".to_string();
             return false;
         }
         let cursor = tile.state.cursor;
@@ -70,6 +70,19 @@ impl KfnotepadGui {
     ) {
         if inputs.is_empty() {
             return;
+        }
+        if self.replacement_overwrite_mode && inputs.len() > 1 {
+            let text = inputs
+                .iter()
+                .map(|input| match input {
+                    GuiEditorReplacementInput::InsertChar(value) => Some(*value),
+                    _ => None,
+                })
+                .collect::<Option<String>>();
+            if let Some(text) = text {
+                self.apply_replacement_editor_bulk_text_to_active_tile(&text);
+                return;
+            }
         }
         let invalidates_syntax = gui_replacement_inputs_invalidate_syntax(&inputs);
         let mutates_text = gui_replacement_inputs_mutates_text(&inputs);

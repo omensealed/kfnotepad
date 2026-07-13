@@ -485,6 +485,45 @@ fn gui_editor_replacement_ime_preedit_is_transient_until_commit() {
 }
 
 #[test]
+fn gui_editor_overwrite_ime_commit_uses_bulk_edit_and_preserves_filtering() {
+    let temp = TempArea::new("gui-replacement-overwrite-ime");
+    let file = temp.path("overwrite-ime.txt");
+    fs::write(&file, "alpha").expect("write overwrite ime");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: vec![file],
+        },
+        temp.root.clone(),
+    );
+    state.replacement_overwrite_mode = true;
+    state
+        .panes
+        .get_mut(state.active_pane)
+        .expect("active pane")
+        .editor
+        .move_to(DocumentCursor { row: 0, column: 1 });
+    state.sync_pane_cursor_to_document(state.active_pane);
+
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
+    let _ = update(
+        &mut state,
+        Message::ReplacementEditorIme(input_method::Event::Commit("か\nな".to_string())),
+    );
+
+    assert_eq!(state.active_editor().text(), "aかなha");
+    assert_eq!(
+        state.workspace.active_tile().state.cursor,
+        DocumentCursor { row: 0, column: 3 }
+    );
+    assert_eq!(kfnotepad::to_text_call_count(), 1);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
+
+    state.undo_active_edit();
+    assert_eq!(state.active_editor().text(), "alpha");
+}
+
+#[test]
 fn gui_editor_replacement_selection_persists_until_next_active_tile_edit() {
     let temp = TempArea::new("gui-replacement-selection");
     let file = temp.path("selection.txt");

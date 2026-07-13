@@ -25,7 +25,7 @@ pub(super) fn handle_editor_edit(
             if state.replacement_overwrite_mode {
                 if let text_editor::Edit::Paste(text) = edit {
                     state.sync_pane_cursor_to_document(pane);
-                    state.apply_replacement_editor_paste_to_active_tile(text);
+                    state.apply_replacement_editor_bulk_text_to_active_tile(text);
                     return Task::none();
                 }
             }

@@ -128,6 +128,8 @@ The GUI replacement editor uses the same bulk document operation for overwrite-m
 rebuilds the Iced editor mirror once after the shared edit because Iced's public editor API has no bulk arbitrary-range
 replacement operation; insert-mode editor paste retains its existing per-input delta synchronization and performs no
 full mirror rebuild. Both modes keep one shared undo step, including paste over an active selection.
+Multi-character IME commits use that bulk path in overwrite mode after the keyboard bridge removes control characters;
+single-character commits and mixed input batches retain the ordinary replacement-input path.
 
 A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
 undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt
