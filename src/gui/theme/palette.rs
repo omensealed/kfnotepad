@@ -62,6 +62,7 @@ pub(in crate::gui::app::state) fn gui_theme_palette(
     }
 }
 
+#[cfg(feature = "syntax")]
 pub(in crate::gui::app::state) fn gui_highlighter_theme(
     theme_id: EditorThemeId,
 ) -> highlighter::Theme {
@@ -110,6 +111,8 @@ pub(in crate::gui::app::state) fn gui_editor_surface_model<'a>(
     syntax_highlighter: &SyntaxHighlighter,
     syntax_cache: Option<&GuiSyntaxCache>,
 ) -> GuiEditorSurfaceModel<'a> {
+    #[cfg(not(feature = "syntax"))]
+    let _ = syntax_highlighter;
     let render_state =
         editor.render_state(GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES, settings.gui_font_size);
     let render_viewport_slice = editor
@@ -121,7 +124,9 @@ pub(in crate::gui::app::state) fn gui_editor_surface_model<'a>(
         editor_font: gui_editor_font(settings.gui_font_family),
         editor_size: u32::from(settings.gui_font_size),
         wrapping: gui_editor_effective_wrapping(settings.wrap_lines, settings.show_line_numbers),
+        #[cfg(feature = "syntax")]
         syntax_token: syntax_highlighter.syntax_token_for_document(document),
+        #[cfg(feature = "syntax")]
         highlighter_theme: gui_highlighter_theme(settings.syntax_theme_id),
         line_numbers: settings
             .show_line_numbers

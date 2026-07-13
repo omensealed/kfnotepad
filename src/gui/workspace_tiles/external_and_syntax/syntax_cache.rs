@@ -105,9 +105,9 @@ impl KfnotepadGui {
         };
         let theme_id = self.settings.syntax_theme_id;
         cache.lines.extend(
-            highlighted_lines.into_iter().map(|line| {
-                line.map(|segments| gui_syntax_segments_from_syntect(segments, theme_id))
-            }),
+            highlighted_lines
+                .into_iter()
+                .map(|line| line.map(|segments| gui_syntax_segments(segments, theme_id))),
         );
         cache.highlighted_until = cache.lines.len().min(line_count);
         cache.state = next_state;

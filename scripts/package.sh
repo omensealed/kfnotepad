@@ -203,8 +203,8 @@ EOF_APPRUN
   printf 'Created %s\n' "${appimage_file}.sha256"
 }
 
-cargo build --locked --release --no-default-features --features tui --bin kfnotepad
-cargo build --locked --release --no-default-features --features gui --bin kfnotepad-gui
+cargo build --locked --release --no-default-features --features 'tui syntax' --bin kfnotepad
+cargo build --locked --release --no-default-features --features 'gui syntax' --bin kfnotepad-gui
 
 build_tarball
 build_deb

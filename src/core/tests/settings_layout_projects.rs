@@ -513,3 +513,23 @@ fn shared_syntax_highlighter_detects_and_keeps_state_without_terminal_types() {
     assert_ne!(stateful_line[0].0.foreground, reset[0].0.foreground);
     assert_eq!(stateful_line[0].1, "inside");
 }
+
+#[test]
+#[cfg(not(feature = "syntax"))]
+fn shared_syntax_highlighter_falls_back_to_plain_text_without_feature() {
+    let highlighter = SyntaxHighlighter::default();
+    let document = TextDocument {
+        path: PathBuf::from("main.rs"),
+        buffer: TextBuffer::from_text("fn main() {}\n"),
+    };
+
+    assert_eq!(
+        highlighter.syntax_name_for_document(&document),
+        "Plain Text"
+    );
+    assert_eq!(highlighter.syntax_token_for_document(&document), "txt");
+    assert_eq!(highlighter.highlight_line(&document, "fn main() {}"), None);
+    let (lines, state) = highlighter.highlight_lines_incremental(&document, 0, 1, None);
+    assert_eq!(lines, vec![None]);
+    assert!(state.is_none());
+}

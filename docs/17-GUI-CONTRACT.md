@@ -193,8 +193,8 @@ kfnotepad-gui FILE1 FILE2
   newlines for full-document selections. Line
   numbers and text rows render from the same viewport slice, with a painted cursor cell in the text row; the old
   temporary `Ln current/total` status strip is not shown. Legacy native text-editor scroll actions still map to the
-  app-owned viewport without marking the document dirty. Shared syntax highlighting is mapped into per-row colored
-  spans in the replacement renderer, with cursor and selection overlays suppressing token color so active cells remain
+  app-owned viewport without marking the document dirty. When the `syntax` feature is enabled, shared syntax
+  highlighting is mapped into per-row colored spans in the replacement renderer, with cursor and selection overlays suppressing token color so active cells remain
   readable. Mouse click events on the replacement text body focus the pane and move the shared cursor, snapping to
   the nearest grapheme boundary for multi-codepoint characters, without
   changing the viewport when the clicked text is already visible. Mouse drag events set replacement selections
@@ -210,7 +210,8 @@ kfnotepad-gui FILE1 FILE2
   and pointer mapping. The renderer may build a larger bounded source-line slice than the logical scroll page so
   panes that grow after close/minimize can fill the newly available tile height without changing the app-owned
   viewport. That bounded slice is read from the existing `TextBuffer` line store instead of re-splitting the full
-  document text during GUI view construction. Syntax highlighting for GUI tiles is cached incrementally per tile:
+  document text during GUI view construction. Syntax highlighting for GUI tiles is cached incrementally per tile
+  when the `syntax` feature is enabled:
   scrolling extends the cached syntect state from the last highlighted source line, while edits, undo/redo, save-as
   retargeting, external file refresh, workspace project restores, and tile close/reset paths invalidate or refresh
   the visible cache range. The responsive renderer only emits complete fixed-height visual rows that fit the current
@@ -263,6 +264,9 @@ kfnotepad-gui FILE1 FILE2
   `nocturne`, `aurora`, `pastel`, `terminal`, `abyss`, and `terror`. Older config files that still say `paper`
   load as `pastel` for compatibility. Pastel keeps syntax text readable on its light background by darkening pale
   highlighter foregrounds at render time.
+- Syntax theme controls cycle independently when the `syntax` feature is enabled. A lean
+  `--no-default-features --features gui` build renders plain text and reports that syntax highlighting is unavailable;
+  native release packages use `--features "gui syntax"`.
 - Help: Help -> Open help opens a built-in `kfnotepad-help.md` Markdown tile with user-facing guidance for files,
   tiles, editing, search/navigation, reader mode, app/syntax themes, workspaces, preferences, managed notes,
   external file changes, and save/open safety rules. Opening Help again focuses the existing help tile instead of
@@ -379,7 +383,7 @@ Bounded launch smoke for automated/local checks:
 tmpdir=$(mktemp -d)
 printf 'first\n' > "$tmpdir/first.txt"
 printf 'second\n' > "$tmpdir/second.txt"
-XDG_CONFIG_HOME="$tmpdir/config" timeout 5s cargo run --locked --no-default-features --features gui --bin kfnotepad-gui -- "$tmpdir/first.txt" "$tmpdir/second.txt"
+XDG_CONFIG_HOME="$tmpdir/config" timeout 5s cargo run --locked --no-default-features --features "gui syntax" --bin kfnotepad-gui -- "$tmpdir/first.txt" "$tmpdir/second.txt"
 status=$?
 rm -rf "$tmpdir"
 test "$status" -eq 124

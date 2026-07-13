@@ -24,11 +24,7 @@ fn gui_test_syntax_cache_for_document(
         highlighted_until: highlighted.len(),
         lines: highlighted
             .into_iter()
-            .map(|line| {
-                line.map(|segments| {
-                    gui_syntax_segments_from_syntect(segments, EditorThemeId::Nocturne)
-                })
-            })
+            .map(|line| line.map(|segments| gui_syntax_segments(segments, EditorThemeId::Nocturne)))
             .collect(),
         state,
     }

@@ -42,6 +42,25 @@ The initial static baseline confirms that each GUI external-change tick schedule
 tile, and each snapshot reads and fingerprints the complete file. Timed and allocation baselines will be added beside
 the focused benchmark harness before changing the snapshot/save implementations.
 
+## Optional syntax build size
+
+Captured 2026-07-13 on Linux 7.1.3-2-cachyos, x86_64, with Rust 1.97.0. Each optimized binary was built in a separate
+empty `CARGO_TARGET_DIR` with `--locked --release --no-default-features` so feature artifacts could not be reused
+between measurements. Sizes are uncompressed ELF file sizes and are local comparison data, not package-size
+guarantees.
+
+| Binary and features | Bytes | Rounded disk size |
+| --- | ---: | ---: |
+| TUI, `tui` | 1,531,440 | 1.5 MiB |
+| TUI, `tui syntax` | 4,935,120 | 4.8 MiB |
+| GUI, `gui` | 27,708,520 | 27 MiB |
+| GUI, `gui syntax` | 31,103,672 | 30 MiB |
+
+Omitting syntax saves 3,403,680 bytes from the TUI binary and 3,395,152 bytes from the GUI binary on this host.
+`cargo tree -i syntect` confirms that Syntect is absent from both lean graphs; the syntax-enabled GUI also enables
+Iced's optional highlighter integration. Default TUI builds and native release packages continue to include syntax
+highlighting, while source builds can choose the smaller plain-text profile.
+
 ## Core text baseline
 
 Captured 2026-07-13 on Linux 7.1.3-2-cachyos, an Intel Xeon E5-2690 v4, and Rust 1.97.0. The short comparison run used

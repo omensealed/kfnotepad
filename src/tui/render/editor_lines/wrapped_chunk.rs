@@ -23,7 +23,7 @@ pub(super) struct WrappedEditorChunkView<'a> {
     pub(super) line: &'a str,
     pub(super) chunk: &'a str,
     pub(super) chunk_start_column: usize,
-    pub(super) highlighted_line: Option<Vec<(SyntectStyle, String)>>,
+    pub(super) highlighted_line: Option<Vec<(SyntaxStyle, String)>>,
     pub(super) settings: EditorSettings,
     pub(super) search_highlight: Option<SearchHighlightView<'a>>,
 }

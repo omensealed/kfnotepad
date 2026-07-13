@@ -33,10 +33,14 @@ pub(in crate::gui::app::state) fn gui_header_action_row<'a>(
             ICON_SYNTAX_THEME,
             LABEL_SYNTAX_THEME,
             Message::CycleSyntaxTheme,
-            format!(
-                "Cycle syntax theme: {} (Ctrl-Shift-T)",
-                state.settings.syntax_theme_id.label()
-            ),
+            if cfg!(feature = "syntax") {
+                format!(
+                    "Cycle syntax theme: {} (Ctrl-Shift-T)",
+                    state.settings.syntax_theme_id.label()
+                )
+            } else {
+                "Syntax highlighting unavailable in this build".to_string()
+            },
             state.settings,
         ),
         gui_icon_tooltip_button(

@@ -71,6 +71,6 @@ pub(crate) struct EditorLineView<'a> {
     pub(crate) line: &'a str,
     pub(crate) settings: EditorSettings,
     pub(crate) horizontal_offset: usize,
-    pub(crate) highlighted_line: Option<Vec<(SyntectStyle, String)>>,
+    pub(crate) highlighted_line: Option<Vec<(SyntaxStyle, String)>>,
     pub(crate) search_highlight: Option<SearchHighlightView<'a>>,
 }

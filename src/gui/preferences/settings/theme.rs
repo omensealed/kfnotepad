@@ -12,10 +12,18 @@ impl KfnotepadGui {
     }
 
     pub(in crate::gui) fn cycle_syntax_theme(&mut self) {
-        self.settings.syntax_theme_id = self.settings.syntax_theme_id.next();
-        self.status_message = format!("syntax theme: {}", self.settings.syntax_theme_id.label());
-        self.persist_settings();
-        self.invalidate_all_syntax_caches();
-        self.refresh_visible_syntax_caches();
+        #[cfg(feature = "syntax")]
+        {
+            self.settings.syntax_theme_id = self.settings.syntax_theme_id.next();
+            self.status_message =
+                format!("syntax theme: {}", self.settings.syntax_theme_id.label());
+            self.persist_settings();
+            self.invalidate_all_syntax_caches();
+            self.refresh_visible_syntax_caches();
+        }
+        #[cfg(not(feature = "syntax"))]
+        {
+            self.status_message = "syntax highlighting unavailable in this build".to_string();
+        }
     }
 }

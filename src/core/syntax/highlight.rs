@@ -23,7 +23,7 @@ impl SyntaxHighlighter {
         Some(
             highlighted
                 .into_iter()
-                .map(|(style, segment)| (style, segment.to_string()))
+                .map(|(style, segment)| (style.into(), segment.to_string()))
                 .collect(),
         )
     }
@@ -59,7 +59,7 @@ impl SyntaxHighlighter {
                     .map(|segments| {
                         segments
                             .into_iter()
-                            .map(|(style, segment)| (style, segment.to_string()))
+                            .map(|(style, segment)| (style.into(), segment.to_string()))
                             .collect()
                     });
             if index >= viewport_start {

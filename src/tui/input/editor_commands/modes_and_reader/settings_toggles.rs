@@ -22,9 +22,16 @@ pub(crate) fn cycle_theme(runtime: &mut EditorRuntime) {
 
 pub(crate) fn cycle_syntax_theme(runtime: &mut EditorRuntime) {
     runtime.quit_confirmation_pending = false;
-    runtime.settings.syntax_theme_id = runtime.settings.syntax_theme_id.next();
-    runtime.status = format!("Syntax theme: {}", runtime.settings.syntax_theme_id.label());
-    persist_runtime_settings(runtime);
+    #[cfg(feature = "syntax")]
+    {
+        runtime.settings.syntax_theme_id = runtime.settings.syntax_theme_id.next();
+        runtime.status = format!("Syntax theme: {}", runtime.settings.syntax_theme_id.label());
+        persist_runtime_settings(runtime);
+    }
+    #[cfg(not(feature = "syntax"))]
+    {
+        runtime.status = String::from("Syntax highlighting unavailable in this build");
+    }
 }
 
 pub(crate) fn toggle_search_case(runtime: &mut EditorRuntime) {

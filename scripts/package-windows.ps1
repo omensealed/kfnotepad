@@ -15,8 +15,8 @@ $target = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { "target" }
 $name = "kfnotepad-$version-windows-x86_64"
 $stage = Join-Path $target "package/$name"
 
-cargo build --locked --release --no-default-features --features tui --bin kfnotepad
-cargo build --locked --release --no-default-features --features gui --bin kfnotepad-gui
+cargo build --locked --release --no-default-features --features "tui,syntax" --bin kfnotepad
+cargo build --locked --release --no-default-features --features "gui,syntax" --bin kfnotepad-gui
 
 Remove-Item $stage -Recurse -Force -ErrorAction SilentlyContinue
 New-Item (Join-Path $stage "docs") -ItemType Directory -Force | Out-Null

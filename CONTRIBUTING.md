@@ -6,8 +6,10 @@ add or update tests for behavior changes, and run `./scripts/check.sh`.
 For feature-gated work, `./scripts/check.sh` now also runs:
 
 - Core-only (`--no-default-features`)
-- TUI-only (`--no-default-features --features tui`)
-- GUI-only (`--no-default-features --features gui`)
+- lean TUI (`--no-default-features --features tui`)
+- TUI with highlighting (`--no-default-features --features "tui syntax"`)
+- lean GUI (`--no-default-features --features gui`)
+- GUI with highlighting (`--no-default-features --features "gui syntax"`)
 - All-features coverage
 
 Run `cargo bench --locked --no-default-features --bench core_text` when changing text-buffer, search, or undo

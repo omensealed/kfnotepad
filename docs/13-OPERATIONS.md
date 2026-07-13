@@ -7,8 +7,10 @@
   - Tier 2: macOS and Windows (native feature-gated builds and tests run in CI; unsigned alpha packages are produced
     for tagged releases).
 - CLI/GUI build paths:
-  - TUI path: `--no-default-features --features tui` can build terminal-only.
-  - GUI path: `--no-default-features --features gui` builds GUI dependencies.
+  - TUI path: `--no-default-features --features tui` builds a lean plain-text terminal editor; add `syntax` for
+    Syntect highlighting.
+  - GUI path: `--no-default-features --features gui` builds a lean plain-text GUI; add `syntax` for highlighting.
+  - Native release packages build both front ends with `syntax` enabled.
   - GUI external-change checks use a long-lived debounced native watcher, metadata-first fallback polling, and
     independent save-time conflict detection.
 - CI runs checks for all supported platforms and the feature matrix described in `scripts/feature-check.sh`.
@@ -20,7 +22,7 @@
 ./scripts/check.sh
 ./scripts/run.sh --help
 ./scripts/run.sh README.md
-cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- --describe
+cargo run --locked --no-default-features --features "gui syntax" --release --bin kfnotepad-gui -- --describe
 ```
 
 `./scripts/run.sh` forwards arguments to `cargo run --locked --release --` by default. In an interactive terminal,
@@ -58,9 +60,9 @@ GUI contract, controls, manual smoke, and current feature gaps live in `docs/17-
 The GUI is a separate local review binary, not a replacement for the terminal editor:
 
 ```bash
-cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- --help
-cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- --describe
-cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- README.md
+cargo run --locked --no-default-features --features "gui syntax" --release --bin kfnotepad-gui -- --help
+cargo run --locked --no-default-features --features "gui syntax" --release --bin kfnotepad-gui -- --describe
+cargo run --locked --no-default-features --features "gui syntax" --release --bin kfnotepad-gui -- README.md
 ```
 
 Use a disposable config directory for manual verification when possible:
@@ -69,7 +71,7 @@ Use a disposable config directory for manual verification when possible:
 tmpdir=$(mktemp -d)
 printf 'first\n' > "$tmpdir/first.txt"
 printf 'second\n' > "$tmpdir/second.txt"
-XDG_CONFIG_HOME="$tmpdir/config" cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- "$tmpdir/first.txt" "$tmpdir/second.txt"
+XDG_CONFIG_HOME="$tmpdir/config" cargo run --locked --no-default-features --features "gui syntax" --release --bin kfnotepad-gui -- "$tmpdir/first.txt" "$tmpdir/second.txt"
 rm -rf "$tmpdir"
 ```
 

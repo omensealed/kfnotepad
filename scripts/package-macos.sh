@@ -22,8 +22,8 @@ for tool in cargo codesign hdiutil iconutil sips shasum; do
   command -v "$tool" >/dev/null 2>&1 || { printf 'Required packaging tool not found: %s\n' "$tool" >&2; exit 1; }
 done
 
-cargo build --locked --release --no-default-features --features tui --bin kfnotepad
-cargo build --locked --release --no-default-features --features gui --bin kfnotepad-gui
+cargo build --locked --release --no-default-features --features 'tui syntax' --bin kfnotepad
+cargo build --locked --release --no-default-features --features 'gui syntax' --bin kfnotepad-gui
 
 rm -rf "$package_root"
 mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources" "$dmg_root" "$dist_dir"

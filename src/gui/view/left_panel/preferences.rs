@@ -17,9 +17,17 @@ pub(in crate::gui::app::state::view) fn gui_preferences_panel<'a>(
             state.settings,
         ),
         gui_tooltip_button(
-            format!("Syntax: {}", state.settings.syntax_theme_id.label()),
+            if cfg!(feature = "syntax") {
+                format!("Syntax: {}", state.settings.syntax_theme_id.label())
+            } else {
+                "Syntax: unavailable".to_string()
+            },
             Message::CycleSyntaxTheme,
-            "Cycle syntax highlighting theme",
+            if cfg!(feature = "syntax") {
+                "Cycle syntax highlighting theme"
+            } else {
+                "Syntax highlighting unavailable in this build"
+            },
             state.settings,
         ),
         row![

@@ -8,7 +8,7 @@ publish = false
 
 [features]
 default = ["tui", "syntax"]
-tui = ["dep:crossterm", "dep:unicode-width", "syntax"]
+tui = ["dep:crossterm", "dep:unicode-width"]
 gui = [
     "dep:iced",
     "dep:iced_aw",
@@ -18,17 +18,17 @@ gui = [
     "dep:rfd",
     "dep:tokio",
     "dep:unicode-width",
-    "syntax",
 ]
 
 syntax = [
     "dep:syntect",
+    "iced?/highlighter",
 ]
 
 [dependencies]
 dirs = "6.0.0"
 crossterm = { version = "0.29.0", default-features = false, features = ["events", "bracketed-paste", "windows"], optional = true }
-iced = { version = "0.14.0", features = ["advanced", "highlighter", "tokio"], optional = true }
+iced = { version = "0.14.0", features = ["advanced", "tokio"], optional = true }
 iced_aw = { version = "0.14.1", default-features = false, features = ["menu", "drop_down"], optional = true }
 iced_fonts = { version = "0.3.0", default-features = false, features = ["nerd"], optional = true }
 nerd-font-symbols = { version = "0.3.0", optional = true }

@@ -65,6 +65,7 @@ fn text_buffer_revision_tracks_content_changes_for_render_caches() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn tui_syntax_cache_reuses_viewport_and_invalidates_after_edit() {
     let mut document = TextDocument {
         path: PathBuf::from("main.rs"),
@@ -183,29 +184,21 @@ fn display_column_helpers_preserve_grapheme_boundaries() {
 
 #[test]
 fn highlighted_segments_preserve_grapheme_clusters() {
-    let style_a = SyntectStyle {
-        foreground: syntect::highlighting::Color {
+    let style_a = SyntaxStyle {
+        foreground: SyntaxColor {
             r: 255,
             g: 0,
             b: 0,
             a: 255,
         },
-        background: syntect::highlighting::Color {
-            r: 0,
-            g: 0,
-            b: 0,
-            a: 255,
-        },
-        font_style: syntect::highlighting::FontStyle::empty(),
     };
-    let style_b = SyntectStyle {
-        foreground: syntect::highlighting::Color {
+    let style_b = SyntaxStyle {
+        foreground: SyntaxColor {
             r: 0,
             g: 255,
             b: 0,
             a: 255,
         },
-        ..style_a
     };
 
     let segments = grapheme_safe_highlight_segments(vec![

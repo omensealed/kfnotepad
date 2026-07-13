@@ -51,7 +51,7 @@ fn wrapped_visible_source_line_count(
 }
 pub(super) fn write_highlighted_line_window(
     writer: &mut impl Write,
-    segments: Vec<(SyntectStyle, String)>,
+    segments: Vec<(SyntaxStyle, String)>,
     start_column: usize,
     remaining: &mut usize,
     syntax_theme_id: EditorThemeId,
@@ -74,7 +74,7 @@ pub(super) fn write_highlighted_line_window(
         queue_set_foreground_color(
             writer,
             &frame,
-            syntect_color_to_terminal(style.foreground, syntax_theme_id),
+            syntax_color_to_terminal(style.foreground, syntax_theme_id),
         )?;
         print_line_window_with_search(
             writer,
@@ -85,7 +85,7 @@ pub(super) fn write_highlighted_line_window(
                 source_column: &mut source_column,
                 remaining_columns: remaining,
                 search_ranges,
-                base_fg: Some(syntect_color_to_terminal(style.foreground, syntax_theme_id)),
+                base_fg: Some(syntax_color_to_terminal(style.foreground, syntax_theme_id)),
                 frame,
             },
         )?;
@@ -94,8 +94,8 @@ pub(super) fn write_highlighted_line_window(
 }
 
 pub(crate) fn grapheme_safe_highlight_segments(
-    segments: Vec<(SyntectStyle, String)>,
-) -> Vec<(SyntectStyle, String)> {
+    segments: Vec<(SyntaxStyle, String)>,
+) -> Vec<(SyntaxStyle, String)> {
     use unicode_segmentation::UnicodeSegmentation;
 
     let mut text = String::new();
@@ -107,7 +107,7 @@ pub(crate) fn grapheme_safe_highlight_segments(
         }
     }
 
-    let mut safe = Vec::<(SyntectStyle, String)>::new();
+    let mut safe = Vec::<(SyntaxStyle, String)>::new();
     for (byte_index, grapheme) in text.grapheme_indices(true) {
         let start_column = text[..byte_index].chars().count();
         let Some(style) = styles.get(start_column).copied() else {

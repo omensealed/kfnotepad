@@ -38,16 +38,20 @@ jobs:
         run: cargo clippy --locked --all-targets --all-features -- -D warnings
       - name: Test default features
         run: cargo test --locked
-      - name: Test TUI-only
+      - name: Test lean TUI
         run: cargo test --locked --no-default-features --features tui
-      - name: Test GUI-only
+      - name: Test TUI with syntax
+        run: cargo test --locked --no-default-features --features "tui syntax"
+      - name: Test lean GUI
         run: cargo test --locked --no-default-features --features gui
+      - name: Test GUI with syntax
+        run: cargo test --locked --no-default-features --features "gui syntax"
       - name: Test all features
         run: cargo test --locked --all-features
       - name: Build release TUI
-        run: cargo build --locked --release --no-default-features --features tui --bin kfnotepad
+        run: cargo build --locked --release --no-default-features --features "tui syntax" --bin kfnotepad
       - name: Build release GUI
-        run: cargo build --locked --release --no-default-features --features gui --bin kfnotepad-gui
+        run: cargo build --locked --release --no-default-features --features "gui syntax" --bin kfnotepad-gui
 
   shell:
     runs-on: ubuntu-latest

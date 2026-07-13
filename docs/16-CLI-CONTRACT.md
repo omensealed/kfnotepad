@@ -125,6 +125,9 @@ kfnotepad --notes
   `abyss`, and `terror`.
 - Ctrl-Shift-T: cycle syntax highlighting themes independently from the chrome theme, using the same preset names
   and persisted `syntax_theme` key as the GUI.
+  Builds made with `--no-default-features --features tui` omit the syntax engine, render all files as plain text,
+  and report that syntax highlighting is unavailable when this action is requested. Default and release builds
+  include the `syntax` feature.
 - Ctrl-R: toggle reader mode for automatic downward viewport scrolling. Reader mode uses the persisted
   `gui_reader_lines_per_minute` speed, does not move the edit cursor, stops at the end of the document, and stops
   when the user edits or switches files/tabs. While reader mode is active, the viewport is clamped only to document
@@ -168,7 +171,8 @@ kfnotepad --notes
 - Note tags/folders/search/sync/import/export, in-app clipboard integration, drag selection, context menus, and
   automatic backup files are not part of the current contract.
 - Rendering uses ANSI color for a header, status bar, command bar, optional line-number gutter, cursor-following
-  vertical scrolling, line/column status, and extension-based syntax highlighting with plain fallback. Screen rows are
+  vertical scrolling, line/column status, and, when the `syntax` feature is enabled, extension-based syntax
+  highlighting with plain fallback. Screen rows are
   positioned explicitly. Long paths in the header are shortened from the left so the saved/modified state remains
   visible. Long lines scroll horizontally by default as the cursor moves; Ctrl-W toggles runtime word wrapping. The
   status line reserves critical metadata using compact labels: `num:on/off`, `wrap:on/off`, `x:N`, theme, and

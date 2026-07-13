@@ -49,6 +49,7 @@ fn gui_editor_surface_model_captures_backend_replacement_inputs() {
     assert_eq!(surface.content.text(), "fn main() {}\nsecond\n");
     assert_eq!(surface.editor_size, 18);
     assert_eq!(surface.wrapping, Wrapping::WordOrGlyph);
+    #[cfg(feature = "syntax")]
     assert_eq!(surface.syntax_token, "rs");
     assert_eq!(
         surface.line_numbers,
@@ -60,7 +61,10 @@ fn gui_editor_surface_model_captures_backend_replacement_inputs() {
         })
     );
     let mut viewport_without_syntax = surface.viewport_slice.clone();
+    #[cfg(feature = "syntax")]
     assert!(viewport_without_syntax.lines[0].syntax_segments.is_some());
+    #[cfg(not(feature = "syntax"))]
+    assert!(viewport_without_syntax.lines[0].syntax_segments.is_none());
     for line in &mut viewport_without_syntax.lines {
         line.syntax_segments = None;
     }
@@ -186,6 +190,7 @@ fn gui_editor_surface_model_bounds_large_document_source_slice() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn gui_syntax_cache_extends_to_visible_large_document_scroll() {
     let temp = TempArea::new("gui-syntax-cache-scroll");
     let path = temp.path("large.rs");

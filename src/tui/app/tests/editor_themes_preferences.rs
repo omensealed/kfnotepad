@@ -1,5 +1,6 @@
 use super::*;
 use crate::tui::input::*;
+#[cfg(feature = "syntax")]
 use crate::tui::menu::*;
 use crate::tui::render::*;
 use crate::tui::theme::*;
@@ -86,6 +87,7 @@ fn ctrl_t_cycles_builtin_themes() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn ctrl_shift_t_cycles_syntax_themes() {
     let mut document = TextDocument {
         path: PathBuf::from("main.rs"),
@@ -113,6 +115,7 @@ fn ctrl_shift_t_cycles_syntax_themes() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn view_menu_can_cycle_syntax_theme() {
     let mut document = TextDocument {
         path: PathBuf::from("main.rs"),
@@ -135,6 +138,33 @@ fn view_menu_can_cycle_syntax_theme() {
     ));
     assert_eq!(runtime.settings.syntax_theme_id, EditorThemeId::Aurora);
     assert_eq!(runtime.status, "Syntax theme: aurora");
+}
+
+#[test]
+#[cfg(not(feature = "syntax"))]
+fn syntax_theme_shortcut_reports_unavailable_in_lean_build() {
+    let mut document = TextDocument {
+        path: PathBuf::from("main.rs"),
+        buffer: kfnotepad::TextBuffer::from_text("fn main() {}\n"),
+    };
+    let mut cursor = Cursor { row: 0, column: 0 };
+    let mut runtime = EditorRuntime::default();
+    let original_theme = runtime.settings.syntax_theme_id;
+
+    assert!(!handle_key_event(
+        &mut document,
+        &mut cursor,
+        &mut runtime,
+        KeyEvent::new(
+            KeyCode::Char('t'),
+            KeyModifiers::CONTROL | KeyModifiers::SHIFT,
+        )
+    ));
+    assert_eq!(runtime.settings.syntax_theme_id, original_theme);
+    assert_eq!(
+        runtime.status,
+        "Syntax highlighting unavailable in this build"
+    );
 }
 
 #[test]
@@ -175,7 +205,7 @@ fn requested_theme_palettes_are_available() {
 
 #[test]
 fn terminal_syntax_themes_map_source_colors_to_distinct_palettes() {
-    let sample = syntect::highlighting::Color {
+    let sample = SyntaxColor {
         r: 120,
         g: 140,
         b: 230,
@@ -183,7 +213,7 @@ fn terminal_syntax_themes_map_source_colors_to_distinct_palettes() {
     };
 
     assert_eq!(
-        syntect_color_to_terminal(sample, EditorThemeId::Nocturne),
+        syntax_color_to_terminal(sample, EditorThemeId::Nocturne),
         Color::Rgb {
             r: 132,
             g: 172,
@@ -191,7 +221,7 @@ fn terminal_syntax_themes_map_source_colors_to_distinct_palettes() {
         }
     );
     assert_eq!(
-        syntect_color_to_terminal(sample, EditorThemeId::Terror),
+        syntax_color_to_terminal(sample, EditorThemeId::Terror),
         Color::Rgb {
             r: 136,
             g: 172,
@@ -199,7 +229,7 @@ fn terminal_syntax_themes_map_source_colors_to_distinct_palettes() {
         }
     );
     assert_ne!(
-        syntect_color_to_terminal(sample, EditorThemeId::Nocturne),
-        syntect_color_to_terminal(sample, EditorThemeId::Paper)
+        syntax_color_to_terminal(sample, EditorThemeId::Nocturne),
+        syntax_color_to_terminal(sample, EditorThemeId::Paper)
     );
 }

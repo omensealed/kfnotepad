@@ -34,7 +34,7 @@ See [`docs/16-CLI-CONTRACT.md`](docs/16-CLI-CONTRACT.md) for keybindings and cur
 Current GUI launch:
 
 ```bash
-cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- path/to/note.txt
+cargo run --locked --no-default-features --features "gui syntax" --release --bin kfnotepad-gui -- path/to/note.txt
 ```
 
 The GUI opens local files as tiled documents and uses the same file validation/save adapter as the terminal editor.
@@ -70,9 +70,11 @@ The crate supports feature gates for leaner builds:
 
 - `tui` (default): terminal editor dependencies
 - `gui`: Iced GUI dependencies for the separate GUI binary
-- `syntax`: shared Syntect highlighting implementation; the current TUI and GUI features enable it
+- `syntax` (default): shared Syntect highlighting implementation; it can be omitted from either front end for a
+  smaller plain-text build
 
 Default features are `["tui", "syntax"]`. GUI is intentionally excluded from defaults so terminal-only users can build without Iced/rfd.
+Release packages enable syntax highlighting for both binaries.
 
 Core-only tools and benchmarks can exclude both front ends and syntax with `--no-default-features`.
 
@@ -81,13 +83,15 @@ Default builds are terminal-capable. For an explicit minimal TUI-only build in c
 ```bash
 cargo build --locked --no-default-features --features tui
 cargo run --locked --no-default-features --features tui --bin kfnotepad -- --help
+cargo build --locked --no-default-features --features "tui syntax"
 ```
 
-To build the GUI binary explicitly:
+To build a lean plain-text GUI or the normal syntax-enabled GUI explicitly:
 
 ```bash
 cargo build --locked --no-default-features --features gui
-cargo run --locked --no-default-features --features gui --release --bin kfnotepad-gui -- --describe
+cargo build --locked --no-default-features --features "gui syntax"
+cargo run --locked --no-default-features --features "gui syntax" --release --bin kfnotepad-gui -- --describe
 ```
 
 External file changes are detected by a long-lived, debounced native watcher. Watcher events are revalidated through

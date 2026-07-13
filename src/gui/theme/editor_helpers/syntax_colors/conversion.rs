@@ -1,9 +1,9 @@
-//! Syntect segment conversion and theme-aware syntax RGB mapping.
+//! Shared syntax segment conversion and theme-aware RGB mapping.
 
 use super::*;
 
-pub(in crate::gui::app::state) fn gui_syntax_segments_from_syntect(
-    segments: Vec<(SyntectStyle, String)>,
+pub(in crate::gui::app::state) fn gui_syntax_segments(
+    segments: Vec<(SyntaxStyle, String)>,
     theme_id: EditorThemeId,
 ) -> Vec<GuiEditorSyntaxSegment> {
     segments
@@ -11,14 +11,14 @@ pub(in crate::gui::app::state) fn gui_syntax_segments_from_syntect(
         .filter_map(|(style, text)| {
             (!text.is_empty()).then_some(GuiEditorSyntaxSegment {
                 text,
-                color: gui_color_from_syntect(style.foreground, theme_id),
+                color: gui_color_from_syntax(style.foreground, theme_id),
             })
         })
         .collect()
 }
 
-pub(in crate::gui::app::state) fn gui_color_from_syntect(
-    color: syntect::highlighting::Color,
+pub(in crate::gui::app::state) fn gui_color_from_syntax(
+    color: SyntaxColor,
     theme_id: EditorThemeId,
 ) -> Color {
     let (r, g, b) = gui_syntax_rgb_for_theme(color.r, color.g, color.b, theme_id);

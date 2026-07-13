@@ -32,14 +32,14 @@ fn gui_theme_palettes_cover_existing_presets() {
 
 #[test]
 fn gui_pastel_syntax_colors_are_darkened_for_readability() {
-    let pale = syntect::highlighting::Color {
+    let pale = SyntaxColor {
         r: 220,
         g: 226,
         b: 232,
         a: 255,
     };
-    let normal = gui_color_from_syntect(pale, EditorThemeId::Nocturne);
-    let pastel = gui_color_from_syntect(pale, EditorThemeId::Paper);
+    let normal = gui_color_from_syntax(pale, EditorThemeId::Nocturne);
+    let pastel = gui_color_from_syntax(pale, EditorThemeId::Paper);
 
     assert_eq!(normal, Color::from_rgb8(213, 224, 246));
     assert!(pastel.r < normal.r);
@@ -111,6 +111,7 @@ fn gui_syntax_theme_role_palettes_stay_varied() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn gui_highlighter_uses_shared_syntax_tokens_and_preset_theme_mapping() {
     let temp = TempArea::new("gui-syntax-highlight");
     let rust_path = temp.path("main.rs");
@@ -185,6 +186,7 @@ fn gui_theme_cycle_updates_status_and_persists_existing_config_format() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn gui_syntax_theme_cycles_separately_from_app_theme_and_persists() {
     let temp = TempArea::new("gui-syntax-theme-cycle");
     let config = temp.path("config.toml");
@@ -209,4 +211,25 @@ fn gui_syntax_theme_cycles_separately_from_app_theme_and_persists() {
     let saved = fs::read_to_string(&config).expect("read config");
     assert!(saved.contains("theme = \"terminal\"\n"));
     assert!(saved.contains("syntax_theme = \"aurora\"\n"));
+}
+
+#[test]
+#[cfg(not(feature = "syntax"))]
+fn gui_syntax_theme_action_reports_unavailable_in_lean_build() {
+    let temp = TempArea::new("gui-syntax-unavailable");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: Vec::new(),
+        },
+        temp.root.clone(),
+    );
+    let original_theme = state.settings.syntax_theme_id;
+
+    let _ = update(&mut state, Message::CycleSyntaxTheme);
+
+    assert_eq!(state.settings.syntax_theme_id, original_theme);
+    assert_eq!(
+        state.status_message,
+        "syntax highlighting unavailable in this build"
+    );
 }

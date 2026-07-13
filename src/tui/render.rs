@@ -10,15 +10,14 @@ use crossterm::style::{
     Attribute, Color, Print, ResetColor, SetAttribute, SetBackgroundColor, SetForegroundColor,
 };
 use crossterm::terminal::{size, Clear, ClearType};
-use syntect::highlighting::Style as SyntectStyle;
 use unicode_width::UnicodeWidthChar;
 
 use crate::tui::menu::{MenuGroup, MenuItem, MenuState, MENU_GROUPS};
 use crate::tui::theme::EditorTheme;
 use kfnotepad::{
     case_insensitive_match_ranges, expand_range_to_grapheme_boundaries, Cursor, EditorSettings,
-    EditorThemeId, SearchMode, SyntaxHighlightCacheState, SyntaxHighlightedLines,
-    SyntaxHighlighter, TabStripItem, TextDocument,
+    EditorThemeId, SearchMode, SyntaxColor, SyntaxHighlightCacheState, SyntaxHighlightedLines,
+    SyntaxHighlighter, SyntaxStyle, TabStripItem, TextDocument,
 };
 
 const TAB_WIDTH: usize = 4;

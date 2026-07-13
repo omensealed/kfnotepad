@@ -16,15 +16,16 @@ use iced::advanced::{
     widget::{Operation as AdvancedOperation, Tree, Widget},
     Clipboard as AdvancedClipboard, Layout as AdvancedLayout, Shell as AdvancedShell,
 };
+#[cfg(feature = "syntax")]
+use iced::highlighter;
 use iced::keyboard::key::{Key, Named};
 use iced::widget::{
     button, checkbox, column, container, mouse_area, pane_grid, responsive, rich_text, row,
     scrollable, slider, span, text, text::Wrapping, text_editor, text_input,
 };
 use iced::{
-    clipboard, event, highlighter, keyboard, mouse, window, Alignment, Background, Border, Color,
-    Element, Event, Font, Length, Pixels, Rectangle, Shadow, Size, Subscription, Task, Theme,
-    Vector,
+    clipboard, event, keyboard, mouse, window, Alignment, Background, Border, Color, Element,
+    Event, Font, Length, Pixels, Rectangle, Shadow, Size, Subscription, Task, Theme, Vector,
 };
 use iced_aw::{menu, Menu, MenuBar};
 use kfnotepad::{
@@ -42,15 +43,14 @@ use kfnotepad::{
     GuiFontFamily, GuiLayout, GuiLayoutAxis, GuiLayoutNode, GuiLeftPanelMode, GuiLeftPanelState,
     GuiTileId, GuiTileSaveStatus, GuiWorkspace, GuiWorkspaceProject,
     GuiWorkspaceProjectDeleteResult, GuiWorkspaceProjectEntry, ManagedNoteDeleteResult,
-    ManagedNoteEntry, SearchRepeatResult, SyntaxHighlightCacheState, SyntaxHighlighter, TextBuffer,
-    TextDocument, UndoRedoResult, MAX_GUI_FONT_SIZE, MAX_GUI_READER_LINES_PER_MINUTE,
-    MIN_GUI_FONT_SIZE, MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
+    ManagedNoteEntry, SearchRepeatResult, SyntaxColor, SyntaxHighlightCacheState,
+    SyntaxHighlighter, SyntaxStyle, TextBuffer, TextDocument, UndoRedoResult, MAX_GUI_FONT_SIZE,
+    MAX_GUI_READER_LINES_PER_MINUTE, MIN_GUI_FONT_SIZE, MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
 };
 
 #[cfg(test)]
 use kfnotepad::save_text_document;
 use nerd_font_symbols as nf;
-use syntect::highlighting::Style as SyntectStyle;
 use unicode_width::UnicodeWidthChar;
 
 #[path = "app_state.rs"]

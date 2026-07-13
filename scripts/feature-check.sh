@@ -9,13 +9,21 @@ cargo check --locked --no-default-features --lib
 cargo test --locked --no-default-features --lib
 cargo check --locked --no-default-features --bench core_text
 
-printf '%s\n' '- TUI-only build (no GUI deps):'
+printf '%s\n' '- Lean TUI build (no GUI or syntax deps):'
 cargo check --locked --no-default-features --features tui
 cargo test --locked --no-default-features --features tui
 
-printf '%s\n' '- GUI-only build (no TUI build):'
+printf '%s\n' '- TUI with syntax highlighting:'
+cargo check --locked --no-default-features --features 'tui syntax'
+cargo test --locked --no-default-features --features 'tui syntax'
+
+printf '%s\n' '- Lean GUI build (no TUI or syntax deps):'
 cargo check --locked --no-default-features --features gui
 cargo test --locked --no-default-features --features gui
+
+printf '%s\n' '- GUI with syntax highlighting:'
+cargo check --locked --no-default-features --features 'gui syntax'
+cargo test --locked --no-default-features --features 'gui syntax'
 
 printf '%s\n' '- All features build/tests:'
 cargo check --locked --all-features --all-targets

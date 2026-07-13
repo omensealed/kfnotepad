@@ -44,6 +44,7 @@ fn page_up_and_down_move_by_visible_page() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn syntax_highlighter_detects_rust_and_falls_back_to_plain_text() {
     let highlighter = SyntaxHighlighter::default();
     let rust_document = TextDocument {
@@ -69,6 +70,7 @@ fn syntax_highlighter_detects_rust_and_falls_back_to_plain_text() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn syntax_highlighter_keeps_state_before_viewport() {
     let highlighter = SyntaxHighlighter::default();
     let document = TextDocument {
