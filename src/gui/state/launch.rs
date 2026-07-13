@@ -1,3 +1,7 @@
+//! GUI command-line parsing and Iced application startup.
+
+use super::*;
+
 pub fn run() -> iced::Result {
     let launch = match GuiLaunch::from_args(env::args().skip(1).collect()) {
         LaunchAction::Run(launch) => launch,
@@ -24,8 +28,8 @@ pub fn run() -> iced::Result {
 }
 
 #[derive(Clone)]
-struct GuiLaunch {
-    requested_paths: Vec<PathBuf>,
+pub(super) struct GuiLaunch {
+    pub(super) requested_paths: Vec<PathBuf>,
 }
 
 enum LaunchAction {

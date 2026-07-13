@@ -80,6 +80,10 @@ mod view;
 use update::{subscription, update};
 use view::view;
 
-include!("state/launch.rs");
+#[path = "state/launch.rs"]
+mod launch;
 include!("state/types.rs");
 include!("state/constructors.rs");
+
+pub use launch::run;
+use launch::GuiLaunch;
