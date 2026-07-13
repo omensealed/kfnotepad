@@ -1,3 +1,7 @@
+//! IME lifecycle, transient preedit, and committed text handling.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn apply_replacement_editor_ime_event(&mut self, event: input_method::Event) {
         let Some(tile_id) = self

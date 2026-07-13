@@ -1,3 +1,7 @@
+//! Batched replacement-editor input application and synchronization.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn apply_replacement_editor_inputs_to_active_tile(
         &mut self,

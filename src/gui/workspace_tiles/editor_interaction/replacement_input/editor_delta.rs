@@ -1,5 +1,9 @@
+//! Incremental bindings from replacement inputs to Iced editor actions.
+
+use super::*;
+
 impl KfnotepadGui {
-    fn gui_editor_replacement_input_has_editor_delta_binding(
+    pub(super) fn gui_editor_replacement_input_has_editor_delta_binding(
         input: &GuiEditorReplacementInput,
     ) -> bool {
         matches!(
@@ -11,7 +15,7 @@ impl KfnotepadGui {
         )
     }
 
-    fn gui_editor_replacement_input_apply_delta_to_editor(
+    pub(super) fn gui_editor_replacement_input_apply_delta_to_editor(
         editor: &mut GuiEditorAdapter,
         input: &GuiEditorReplacementInput,
     ) {
