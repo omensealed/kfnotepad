@@ -132,6 +132,8 @@ Multi-character IME commits use that bulk path in overwrite mode after the keybo
 single-character commits and mixed input batches retain the ordinary replacement-input path.
 Replacement-editor Cut deletes the selection in the shared document directly, retaining exact undo history and
 rebuilding the Iced mirror once instead of extracting adapter text into a temporary document and synchronizing it back.
+Search-result and Select All ranges are also formed from canonical shared-document cursors without reconstructing a
+temporary text buffer. Page movement updates the adapter viewport and clamps its cursor from line-count metadata only.
 
 A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
 undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt

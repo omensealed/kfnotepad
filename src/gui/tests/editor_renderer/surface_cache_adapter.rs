@@ -498,3 +498,24 @@ fn gui_editor_adapter_scrolls_viewport_and_clamps_cursor_to_visible_lines() {
         }
     );
 }
+
+#[test]
+fn gui_editor_adapter_page_motion_does_not_reconstruct_a_text_buffer() {
+    let mut adapter = GuiEditorAdapter::from_text(&numbered_lines(100));
+
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
+    adapter.apply(GuiEditorCommand::IcedAction(text_editor::Action::Move(
+        text_editor::Motion::PageDown,
+    )));
+
+    assert_eq!(kfnotepad::to_text_call_count(), 0);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
+    assert_eq!(
+        adapter.document_cursor(),
+        DocumentCursor {
+            row: GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES,
+            column: 0,
+        }
+    );
+}

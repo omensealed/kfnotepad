@@ -333,7 +333,11 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
         "clipboard menu actions should not write files"
     );
 
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::SelectAll));
+    assert_eq!(kfnotepad::to_text_call_count(), 0);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
     assert_eq!(state.status_message, "selected all");
     assert_eq!(
         state.active_editor().selection().as_deref(),

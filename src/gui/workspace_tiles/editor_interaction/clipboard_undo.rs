@@ -137,6 +137,34 @@ impl KfnotepadGui {
     }
 
     pub(in crate::gui::app::state) fn select_all_active_editor(&mut self) {
+        if GUI_USE_READ_ONLY_EDITOR_RENDERER {
+            let Some(tile_id) = self
+                .panes
+                .get(self.active_pane)
+                .map(|pane_state| pane_state.tile_id)
+            else {
+                return;
+            };
+            let Some(end) = self
+                .workspace
+                .tile(tile_id)
+                .map(|tile| gui_editor_replacement_document_end_cursor(&tile.document.buffer))
+            else {
+                return;
+            };
+            if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
+                pane_state.editor.set_replacement_selection(
+                    DocumentCursor { row: 0, column: 0 },
+                    end,
+                    end,
+                );
+            }
+            if let Some(tile) = self.workspace.tile_mut(tile_id) {
+                tile.state.cursor = end;
+            }
+            self.status_message = "selected all".to_string();
+            return;
+        }
         self.perform_active_editor_command(GuiEditorCommand::SelectAll, "selected all");
     }
 

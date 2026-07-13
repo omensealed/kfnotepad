@@ -10,8 +10,12 @@ fn gui_search_next_and_previous_update_shared_and_editor_cursor() {
     });
 
     let _ = update(&mut state, Message::SearchQueryChanged("alpha".to_string()));
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
     let _ = update(&mut state, Message::SearchNext);
 
+    assert_eq!(kfnotepad::to_text_call_count(), 0);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
     assert_eq!(
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 1, column: 5 }
