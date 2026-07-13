@@ -1,4 +1,8 @@
-pub(super) fn gui_header_action_row<'a>(state: &'a KfnotepadGui) -> Element<'a, Message> {
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_header_action_row<'a>(
+    state: &'a KfnotepadGui,
+) -> Element<'a, Message> {
     row![
         gui_icon_tooltip_button(
             ICON_NEW_TILE,
@@ -69,7 +73,9 @@ pub(super) fn gui_header_action_row<'a>(state: &'a KfnotepadGui) -> Element<'a, 
     .into()
 }
 
-pub(super) fn gui_minimized_tray<'a>(state: &'a KfnotepadGui) -> Option<Element<'a, Message>> {
+pub(in crate::gui::app::state) fn gui_minimized_tray<'a>(
+    state: &'a KfnotepadGui,
+) -> Option<Element<'a, Message>> {
     let items = state.minimized_tray_items();
     if items.is_empty() {
         return None;

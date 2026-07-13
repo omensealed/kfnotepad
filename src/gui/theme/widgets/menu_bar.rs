@@ -1,4 +1,6 @@
-pub(super) fn gui_menu_command_item<'a>(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_menu_command_item<'a>(
     item: GuiMenuItem,
     palette: iced::theme::Palette,
     settings: EditorSettings,
@@ -13,7 +15,7 @@ pub(super) fn gui_menu_command_item<'a>(
     .close_on_click(true)
 }
 
-pub(super) fn gui_menu_dropdown<'a>(
+pub(in crate::gui::app::state) fn gui_menu_dropdown<'a>(
     group: GuiMenuGroup,
     palette: iced::theme::Palette,
     settings: EditorSettings,
@@ -31,7 +33,7 @@ pub(super) fn gui_menu_dropdown<'a>(
         .close_on_background_click(true)
 }
 
-pub(super) fn gui_menu_root_item<'a>(
+pub(in crate::gui::app::state) fn gui_menu_root_item<'a>(
     group: GuiMenuGroup,
     palette: iced::theme::Palette,
     settings: EditorSettings,
@@ -55,7 +57,9 @@ pub(super) fn gui_menu_root_item<'a>(
     )
 }
 
-pub(super) fn gui_menu_bar<'a>(settings: EditorSettings) -> Element<'a, Message> {
+pub(in crate::gui::app::state) fn gui_menu_bar<'a>(
+    settings: EditorSettings,
+) -> Element<'a, Message> {
     let palette = gui_theme_palette(settings.theme_id);
     let roots = gui_menu_groups()
         .into_iter()

@@ -1,4 +1,6 @@
-pub(super) fn gui_tooltip<'a>(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_tooltip<'a>(
     content: impl Into<Element<'a, Message>>,
     tooltip_text: impl Into<String>,
     position: iced::widget::tooltip::Position,
@@ -35,7 +37,7 @@ pub(super) fn gui_tooltip<'a>(
     .into()
 }
 
-pub(super) fn gui_tooltip_button<'a>(
+pub(in crate::gui::app::state) fn gui_tooltip_button<'a>(
     label: impl Into<String>,
     message: Message,
     tooltip_text: impl Into<String>,
@@ -53,11 +55,11 @@ pub(super) fn gui_tooltip_button<'a>(
     )
 }
 
-pub(super) fn gui_icon_font() -> Font {
+pub(in crate::gui::app::state) fn gui_icon_font() -> Font {
     iced_fonts::NERD_FONT
 }
 
-pub(super) fn gui_labeled_icon_button<'a>(
+pub(in crate::gui::app::state) fn gui_labeled_icon_button<'a>(
     icon: &'static str,
     _icon_label: &'a str,
     settings: EditorSettings,
@@ -76,7 +78,7 @@ pub(super) fn gui_labeled_icon_button<'a>(
         .into()
 }
 
-pub(super) fn gui_icon_tooltip_button<'a>(
+pub(in crate::gui::app::state) fn gui_icon_tooltip_button<'a>(
     icon: &'static str,
     icon_label: &'a str,
     message: Message,

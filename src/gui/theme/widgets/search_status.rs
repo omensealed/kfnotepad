@@ -1,4 +1,6 @@
 // Search, navigation, and status controls for the editor shell.
+use super::*;
+
 #[path = "search_status/find.rs"]
 mod search_find;
 #[path = "search_status/layout.rs"]

@@ -1,4 +1,6 @@
 // Theme-aware style callbacks grouped by widget family.
+use super::*;
+
 #[path = "styles/buttons.rs"]
 mod button_styles;
 #[path = "styles/editor.rs"]
