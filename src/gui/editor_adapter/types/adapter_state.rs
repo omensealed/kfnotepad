@@ -1,3 +1,7 @@
+//! Canonical editor adapter and render-surface state.
+
+use super::*;
+
 pub(crate) struct GuiEditorAdapter {
     pub(crate) content: text_editor::Content,
     pub(crate) viewport: GuiEditorViewportState,

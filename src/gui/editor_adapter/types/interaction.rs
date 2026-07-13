@@ -1,3 +1,7 @@
+//! Pointer, drag, selection, and replacement-input state.
+
+use super::*;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct GuiEditorDragState {
     pub(crate) pane: pane_grid::Pane,

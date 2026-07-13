@@ -1,3 +1,7 @@
+//! Viewport, rendered-line, syntax-segment, and scrollbar models.
+
+use super::*;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct GuiEditorViewportState {
     pub(crate) first_line: usize,

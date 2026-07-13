@@ -1,3 +1,7 @@
+//! Editor commands and syntax/text invalidation classification.
+
+use super::*;
+
 pub(crate) enum GuiEditorCommand {
     IcedAction(text_editor::Action),
     Delete,
