@@ -37,14 +37,17 @@ jobs:
         with:
           ref: ${{ env.RELEASE_TAG }}
       - run: rustup toolchain install stable --profile minimal
-      - name: Install packaging tools
+      - name: Install Linux packaging prerequisites
         run: |
           sudo apt-get update
           sudo apt-get install -y libfuse2
-          curl --fail --location --output appimagetool.AppImage \
-            https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
-          chmod +x appimagetool.AppImage
-          sudo install appimagetool.AppImage /usr/local/bin/appimagetool
+      - name: Install verified AppImage tools
+        shell: bash
+        run: |
+          tools_dir="$RUNNER_TEMP/kfnotepad-appimage-tools"
+          ./scripts/install-pinned-appimage-tools.sh "$tools_dir"
+          printf '%s\n' "$tools_dir" >> "$GITHUB_PATH"
+          printf 'KFNOTEPAD_APPIMAGE_RUNTIME=%s/runtime-x86_64\n' "$tools_dir" >> "$GITHUB_ENV"
       - name: Build Linux packages
         env:
           KFNOTEPAD_PACKAGE_PLATFORM: linux-x86_64

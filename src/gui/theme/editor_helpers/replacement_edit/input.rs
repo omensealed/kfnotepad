@@ -1,5 +1,6 @@
 use super::*;
 
+#[cfg(test)]
 pub(in crate::gui::app::state) fn apply_gui_editor_replacement_input(
     document: &mut TextDocument,
     cursor: &mut DocumentCursor,

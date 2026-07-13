@@ -109,6 +109,13 @@ dist/SHA256SUMS
 
 The `.deb` requires `dpkg-deb`. The AppImage requires `appimagetool`. For fully offline AppImage builds, set
 `KFNOTEPAD_APPIMAGE_RUNTIME=/path/to/runtime-x86_64`; otherwise `appimagetool` may try to download the runtime.
+
+The GitHub release workflow does not trust the mutable upstream `continuous` download URLs directly. It uses
+`scripts/install-pinned-appimage-tools.sh` to download the x86-64 tool and runtime by GitHub release asset ID and
+checks their pinned SHA-256 digests before either file is executed or embedded. Updating either pin requires reviewing
+the upstream build, replacing its asset ID and digest together, and running the Linux packaging smoke from a clean
+tool directory.
+
 The script honors `CARGO_TARGET_DIR` for builds and staging. Set `KFNOTEPAD_DIST_DIR` to write artifacts outside the
 default `dist/` directory, which is useful for isolated release checks.
 Debian 11+ support is a build-environment commitment: build the release on Debian 11 or an equivalent older-glibc

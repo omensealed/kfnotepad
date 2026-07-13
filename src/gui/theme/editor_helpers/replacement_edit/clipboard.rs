@@ -22,6 +22,7 @@ pub(in crate::gui::app::state) fn gui_editor_replacement_cut_selection(
     Some(selected)
 }
 
+#[cfg(test)]
 pub(in crate::gui::app::state) fn gui_editor_replacement_paste_text(
     document: &mut TextDocument,
     cursor: &mut DocumentCursor,
