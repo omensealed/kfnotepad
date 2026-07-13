@@ -1,3 +1,7 @@
+//! Viewport line-number snapshots and cursor visibility behavior.
+
+use super::*;
+
 #[derive(Debug, Clone, PartialEq)]
 pub(crate) struct GuiEditorLineNumberSnapshot {
     pub(crate) line_count: usize,

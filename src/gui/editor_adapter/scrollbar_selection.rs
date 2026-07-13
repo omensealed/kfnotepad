@@ -1,3 +1,7 @@
+//! Scrollbar geometry and normalized replacement selections.
+
+use super::*;
+
 pub(crate) fn gui_editor_scrollbar_model(
     line_count: usize,
     first_line: usize,

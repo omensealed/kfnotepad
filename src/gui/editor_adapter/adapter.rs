@@ -1,3 +1,7 @@
+//! Editor construction, commands, replacement input, viewport control, and render state.
+
+use super::*;
+
 include!("adapter/constructors.rs");
 include!("adapter/accessors.rs");
 include!("adapter/apply.rs");
