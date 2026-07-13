@@ -1,4 +1,6 @@
-pub(super) fn apply_gui_editor_replacement_input(
+use super::*;
+
+pub(in crate::gui::app::state) fn apply_gui_editor_replacement_input(
     document: &mut TextDocument,
     cursor: &mut DocumentCursor,
     viewport: &mut GuiEditorViewportState,
@@ -10,7 +12,7 @@ pub(super) fn apply_gui_editor_replacement_input(
     );
 }
 
-pub(super) fn apply_gui_editor_replacement_input_with_mode(
+pub(in crate::gui::app::state) fn apply_gui_editor_replacement_input_with_mode(
     document: &mut TextDocument,
     cursor: &mut DocumentCursor,
     viewport: &mut GuiEditorViewportState,

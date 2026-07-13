@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_replacement_selected_text_from_text(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_replacement_selected_text_from_text(
     text: &str,
     selection: GuiEditorReplacementSelection,
 ) -> Option<String> {
@@ -77,7 +79,7 @@ pub(super) fn gui_editor_replacement_selected_text_from_text(
     Some(selected.join("\n"))
 }
 
-pub(super) fn gui_editor_replacement_copy_selection_from_text(
+pub(in crate::gui::app::state) fn gui_editor_replacement_copy_selection_from_text(
     text: &str,
     selection: Option<GuiEditorReplacementSelection>,
 ) -> Option<String> {
@@ -85,7 +87,7 @@ pub(super) fn gui_editor_replacement_copy_selection_from_text(
     (!selected.is_empty()).then_some(selected)
 }
 
-pub(super) fn gui_editor_replacement_selected_text(
+pub(in crate::gui::app::state) fn gui_editor_replacement_selected_text(
     document: &TextDocument,
     selection: GuiEditorReplacementSelection,
 ) -> Option<String> {

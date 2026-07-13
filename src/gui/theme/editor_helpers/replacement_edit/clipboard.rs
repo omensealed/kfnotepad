@@ -1,5 +1,7 @@
+use super::*;
+
 #[cfg(test)]
-pub(super) fn gui_editor_replacement_copy_selection(
+pub(in crate::gui::app::state) fn gui_editor_replacement_copy_selection(
     document: &TextDocument,
     selection: Option<GuiEditorReplacementSelection>,
 ) -> Option<String> {
@@ -8,7 +10,7 @@ pub(super) fn gui_editor_replacement_copy_selection(
 }
 
 #[cfg(test)]
-pub(super) fn gui_editor_replacement_cut_selection(
+pub(in crate::gui::app::state) fn gui_editor_replacement_cut_selection(
     document: &mut TextDocument,
     cursor: &mut DocumentCursor,
     viewport: &mut GuiEditorViewportState,
@@ -20,7 +22,7 @@ pub(super) fn gui_editor_replacement_cut_selection(
     Some(selected)
 }
 
-pub(super) fn gui_editor_replacement_paste_text(
+pub(in crate::gui::app::state) fn gui_editor_replacement_paste_text(
     document: &mut TextDocument,
     cursor: &mut DocumentCursor,
     viewport: &mut GuiEditorViewportState,
