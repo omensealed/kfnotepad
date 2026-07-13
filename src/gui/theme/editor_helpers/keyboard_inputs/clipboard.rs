@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_clipboard_shortcut_command(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_clipboard_shortcut_command(
     event: &keyboard::Event,
 ) -> Option<GuiMenuCommand> {
     let keyboard::Event::KeyPressed {

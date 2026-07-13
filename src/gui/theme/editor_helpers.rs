@@ -9,8 +9,10 @@ include!("editor_helpers/replacement_edit.rs");
 include!("editor_helpers/mouse_layout.rs");
 #[path = "editor_helpers/text_ranges.rs"]
 mod text_ranges;
-include!("editor_helpers/keyboard_inputs.rs");
+#[path = "editor_helpers/keyboard_inputs.rs"]
+mod keyboard_inputs;
 
 pub(in crate::gui::app::state) use editor_viewport::*;
+pub(in crate::gui::app::state) use keyboard_inputs::*;
 pub(in crate::gui::app::state) use syntax_colors::*;
 pub(in crate::gui::app::state) use text_ranges::*;

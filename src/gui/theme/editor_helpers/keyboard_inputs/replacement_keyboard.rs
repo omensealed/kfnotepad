@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_replacement_inputs_from_keyboard_event(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_replacement_inputs_from_keyboard_event(
     event: &keyboard::Event,
 ) -> Vec<GuiEditorReplacementInput> {
     let keyboard::Event::KeyPressed {

@@ -1,5 +1,8 @@
 #[cfg(test)]
-pub(super) fn gui_editor_replacement_inputs_from_ime_event(
+use super::*;
+
+#[cfg(test)]
+pub(in crate::gui::app::state) fn gui_editor_replacement_inputs_from_ime_event(
     event: &input_method::Event,
 ) -> Vec<GuiEditorReplacementInput> {
     match event {
