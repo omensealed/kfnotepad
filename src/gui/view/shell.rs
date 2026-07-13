@@ -1,4 +1,8 @@
-pub(super) fn view(state: &KfnotepadGui) -> Element<'_, Message> {
+//! Responsive root window composition for the complete GUI surface.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn view(state: &KfnotepadGui) -> Element<'_, Message> {
     responsive(move |viewport_size| view_sized(state, viewport_size)).into()
 }
 
