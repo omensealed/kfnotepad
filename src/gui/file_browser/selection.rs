@@ -1,5 +1,11 @@
+//! Browser action-target selection.
+
+use super::*;
+
 impl KfnotepadGui {
-pub(super) fn selected_browser_action_entry(&self) -> Option<FileSidebarEntry> {
+    pub(in crate::gui::app::state) fn selected_browser_action_entry(
+        &self,
+    ) -> Option<FileSidebarEntry> {
         if let Some(path) = self.browser_selected_path.as_deref() {
             if path.is_dir() {
                 return Some(FileSidebarEntry {
@@ -26,6 +32,6 @@ pub(super) fn selected_browser_action_entry(&self) -> Option<FileSidebarEntry> {
         self.browser
             .as_ref()
             .and_then(|browser| browser.selected_entry())
-        .cloned()
-}
+            .cloned()
+    }
 }

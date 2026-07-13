@@ -1,5 +1,9 @@
+//! Parent navigation and browser refresh operations.
+
+use super::*;
+
 impl KfnotepadGui {
-pub(super) fn navigate_browser_parent(&mut self) -> Task<Message> {
+    pub(in crate::gui::app::state) fn navigate_browser_parent(&mut self) -> Task<Message> {
         let current_dir = self.current_browser_dir();
         let Some(parent) = current_dir.parent() else {
             self.status_message = "already at filesystem root".to_string();
@@ -8,7 +12,7 @@ pub(super) fn navigate_browser_parent(&mut self) -> Task<Message> {
         self.set_browser_root(parent.to_path_buf())
     }
 
-    pub(super) fn refresh_file_browser(&mut self) -> Task<Message> {
+    pub(in crate::gui::app::state) fn refresh_file_browser(&mut self) -> Task<Message> {
         let Some(directory) = self
             .browser
             .as_ref()

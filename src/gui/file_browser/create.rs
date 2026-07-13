@@ -1,5 +1,12 @@
+//! File and directory creation rooted in the active browser selection.
+
+use super::*;
+
 impl KfnotepadGui {
-pub(super) fn create_browser_file_named(&mut self, raw_name: &str) -> Option<Task<Message>> {
+    pub(in crate::gui::app::state) fn create_browser_file_named(
+        &mut self,
+        raw_name: &str,
+    ) -> Option<Task<Message>> {
         let directory = self.selected_browser_create_directory();
         let path = match resolve_browser_child_path(&directory, raw_name) {
             Ok(path) => path,
@@ -26,7 +33,7 @@ pub(super) fn create_browser_file_named(&mut self, raw_name: &str) -> Option<Tas
         }
     }
 
-    pub(super) fn create_browser_directory_named(
+    pub(in crate::gui::app::state) fn create_browser_directory_named(
         &mut self,
         raw_name: &str,
     ) -> Option<Task<Message>> {
@@ -54,12 +61,12 @@ pub(super) fn create_browser_file_named(&mut self, raw_name: &str) -> Option<Tas
         }
     }
 
-    pub(super) fn selected_browser_create_directory(&self) -> PathBuf {
+    pub(in crate::gui::app::state) fn selected_browser_create_directory(&self) -> PathBuf {
         self.selected_browser_action_entry()
             .and_then(|entry| match entry.kind {
                 FileSidebarEntryKind::Directory => Some(entry.path),
                 FileSidebarEntryKind::Parent | FileSidebarEntryKind::File => None,
             })
-        .unwrap_or_else(|| self.current_browser_dir())
-}
+            .unwrap_or_else(|| self.current_browser_dir())
+    }
 }

@@ -1,5 +1,12 @@
+//! Local browser tree expansion, selection, activation, and caching.
+
+use super::*;
+
 impl KfnotepadGui {
-    pub(super) fn toggle_local_browser_tree_path(&mut self, path: PathBuf) -> Task<Message> {
+    pub(in crate::gui::app::state) fn toggle_local_browser_tree_path(
+        &mut self,
+        path: PathBuf,
+    ) -> Task<Message> {
         if self.browser_expanded_paths.contains(&path) {
             self.browser_expanded_paths.remove(&path);
         } else {
@@ -8,7 +15,7 @@ impl KfnotepadGui {
         self.request_cached_file_tree_rows()
     }
 
-    pub(super) fn select_local_browser_tree_path(
+    pub(in crate::gui::app::state) fn select_local_browser_tree_path(
         &mut self,
         path: PathBuf,
         is_dir: bool,
@@ -26,7 +33,7 @@ impl KfnotepadGui {
         Task::none()
     }
 
-    pub(super) fn activate_local_browser_tree_path(
+    pub(in crate::gui::app::state) fn activate_local_browser_tree_path(
         &mut self,
         path: PathBuf,
         is_dir: bool,
@@ -51,7 +58,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn select_browser_path(&mut self, path: &Path) {
+    pub(in crate::gui::app::state) fn select_browser_path(&mut self, path: &Path) {
         self.browser_selected_path = Some(path.to_path_buf());
         self.update_cached_file_tree_selection(path);
         let Some(browser) = self.browser.as_mut() else {
@@ -69,7 +76,7 @@ impl KfnotepadGui {
         self.pending_browser_delete = None;
     }
 
-    pub(super) fn request_cached_file_tree_rows(&mut self) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_cached_file_tree_rows(&mut self) -> Task<Message> {
         let Some(root) = self
             .browser
             .as_ref()
@@ -104,7 +111,7 @@ impl KfnotepadGui {
         )
     }
 
-    pub(super) fn apply_cached_file_tree_rows(
+    pub(in crate::gui::app::state) fn apply_cached_file_tree_rows(
         &mut self,
         generation: u64,
         result: Result<Vec<GuiFileTreeRowModel>, String>,

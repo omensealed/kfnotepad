@@ -1,6 +1,10 @@
+//! Test-only direct browser selection and activation helpers.
+
+use super::*;
+
 impl KfnotepadGui {
-#[cfg(test)]
-pub(super) fn activate_browser_entry(&mut self, index: usize) {
+    #[cfg(test)]
+    pub(in crate::gui::app::state) fn activate_browser_entry(&mut self, index: usize) {
         if !self.browser_visible || self.left_panel.mode != GuiLeftPanelMode::Files {
             return;
         }
@@ -20,7 +24,7 @@ pub(super) fn activate_browser_entry(&mut self, index: usize) {
     }
 
     #[cfg(test)]
-    pub(super) fn select_browser_entry(&mut self, index: usize) {
+    pub(in crate::gui::app::state) fn select_browser_entry(&mut self, index: usize) {
         if !self.browser_visible || self.left_panel.mode != GuiLeftPanelMode::Files {
             return;
         }
@@ -37,7 +41,7 @@ pub(super) fn activate_browser_entry(&mut self, index: usize) {
     }
 
     #[cfg(test)]
-pub(super) fn open_selected_browser_entry(&mut self) {
+    pub(in crate::gui::app::state) fn open_selected_browser_entry(&mut self) {
         let Some(browser) = self.browser.as_mut() else {
             self.status_message = "file browser unavailable".to_string();
             return;
@@ -51,7 +55,7 @@ pub(super) fn open_selected_browser_entry(&mut self) {
             }
             Err(error) => {
                 self.status_message = format!("file browser error: {error}");
+            }
+        }
     }
 }
-}
-    }

@@ -1,5 +1,9 @@
+//! Guarded browser deletion dispatch.
+
+use super::*;
+
 impl KfnotepadGui {
-pub(super) fn delete_selected_browser_entry(&mut self) -> Task<Message> {
+    pub(in crate::gui::app::state) fn delete_selected_browser_entry(&mut self) -> Task<Message> {
         if !self.browser_visible || self.left_panel.mode != GuiLeftPanelMode::Files {
             return Task::none();
         }
@@ -66,7 +70,7 @@ pub(super) fn delete_selected_browser_entry(&mut self) -> Task<Message> {
             Err(error) => {
                 self.status_message = format!("delete failed: {error}");
                 Task::none()
+            }
+        }
     }
 }
-}
-    }

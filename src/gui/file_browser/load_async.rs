@@ -1,5 +1,9 @@
+//! Asynchronous browser loading and stale-result rejection.
+
+use super::*;
+
 impl KfnotepadGui {
-    pub(super) fn request_browser_load(
+    pub(in crate::gui::app::state) fn request_browser_load(
         &mut self,
         directory: PathBuf,
         reset_root: bool,
@@ -20,12 +24,8 @@ impl KfnotepadGui {
 
         #[cfg(test)]
         {
-            let result = load_gui_browser_and_rows(
-                directory,
-                expanded_paths,
-                selected_path,
-                reset_root,
-            );
+            let result =
+                load_gui_browser_and_rows(directory, expanded_paths, selected_path, reset_root);
             self.apply_browser_load(generation, result);
             Task::none()
         }
@@ -33,12 +33,7 @@ impl KfnotepadGui {
         Task::perform(
             async move {
                 tokio::task::spawn_blocking(move || {
-                    load_gui_browser_and_rows(
-                        directory,
-                        expanded_paths,
-                        selected_path,
-                        reset_root,
-                    )
+                    load_gui_browser_and_rows(directory, expanded_paths, selected_path, reset_root)
                 })
                 .await
                 .map_err(|error| format!("file browser worker failed: {error}"))?
@@ -47,7 +42,7 @@ impl KfnotepadGui {
         )
     }
 
-    pub(super) fn apply_browser_load(
+    pub(in crate::gui::app::state) fn apply_browser_load(
         &mut self,
         generation: u64,
         result: Result<GuiBrowserLoadResult, String>,
