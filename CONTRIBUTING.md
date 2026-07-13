@@ -15,7 +15,7 @@ For feature-gated work, `./scripts/check.sh` now also runs:
 Run `cargo bench --locked --no-default-features --bench core_text` when changing text-buffer, search, or undo
 behavior. Benchmark data must remain synthetic and should be recorded with host and compiler details.
 
-CI now runs this check matrix across `ubuntu-latest`, `macos-14`, and `windows-latest`.
+CI runs this check matrix across `ubuntu-24.04`, `macos-15`, and `windows-2025`.
 
 Do not include secrets, production data, generated databases, build outputs, or unrelated formatting changes.
 Document the rationale before changing architecture, persistent formats, public interfaces, or production dependencies.

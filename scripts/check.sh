@@ -29,4 +29,8 @@ if grep -REn 'uses:[[:space:]]+[^[:space:]]+@(v[0-9]+|main|master)([[:space:]]|$
     printf '%s\n' 'GitHub Actions must use immutable commit SHAs.' >&2
     exit 1
 fi
+if grep -REn '(^|[[:space:]])(ubuntu|windows|macos)-latest([[:space:]]|$)' .github/workflows; then
+    printf '%s\n' 'GitHub Actions must use explicit hosted runner images.' >&2
+    exit 1
+fi
 printf '%s\n' 'All configured checks passed.'

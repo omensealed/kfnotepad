@@ -20,9 +20,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
-          - macos-14
-          - windows-latest
+          - ubuntu-24.04
+          - macos-15
+          - windows-2025
     timeout-minutes: 20
     defaults:
       run:
@@ -54,7 +54,7 @@ jobs:
         run: cargo build --locked --release --no-default-features --features "gui syntax" --bin kfnotepad-gui
 
   shell:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     defaults:
       run:
@@ -68,7 +68,7 @@ jobs:
         run: shellcheck scripts/*.sh
 
   security:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     defaults:
       run:
