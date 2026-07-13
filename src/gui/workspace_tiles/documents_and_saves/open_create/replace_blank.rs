@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn replace_initial_blank_tile(
+    pub(in crate::gui::app::state) fn replace_initial_blank_tile(
         &mut self,
         document: TextDocument,
         opened_status: String,
@@ -34,7 +34,7 @@ impl KfnotepadGui {
         true
     }
 
-    pub(super) fn active_tile_is_replaceable_blank(&self) -> bool {
+    pub(in crate::gui::app::state) fn active_tile_is_replaceable_blank(&self) -> bool {
         if self.workspace.tiles.len() != 1 || self.panes.len() != 1 {
             return false;
         }

@@ -1,9 +1,9 @@
 impl KfnotepadGui {
-    pub(super) fn toggle_active_minimize(&mut self) {
+    pub(in crate::gui::app::state) fn toggle_active_minimize(&mut self) {
         self.toggle_pane_minimized(self.active_pane);
     }
 
-    pub(super) fn toggle_pane_minimized(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn toggle_pane_minimized(&mut self, pane: pane_grid::Pane) {
         self.sync_pane_to_document(pane);
         let Some(tile_id) = self.panes.get(pane).map(|pane_state| pane_state.tile_id) else {
             self.status_message = "minimize failed: no such pane".to_string();
@@ -45,7 +45,7 @@ impl KfnotepadGui {
         self.persist_layout();
     }
 
-    pub(super) fn restore_minimized_tile(&mut self, tile_id: GuiTileId) {
+    pub(in crate::gui::app::state) fn restore_minimized_tile(&mut self, tile_id: GuiTileId) {
         let Some(index) = self
             .minimized_panes
             .iter()
@@ -82,7 +82,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn minimized_tray_items(&self) -> Vec<GuiMinimizedTrayItem> {
+    pub(in crate::gui::app::state) fn minimized_tray_items(&self) -> Vec<GuiMinimizedTrayItem> {
         self.minimized_panes
             .iter()
             .filter_map(|pane_state| {

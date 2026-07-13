@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn replacement_editor_scrollbar_moved(
+    pub(in crate::gui::app::state) fn replacement_editor_scrollbar_moved(
         &mut self,
         pane: pane_grid::Pane,
         y: f32,
@@ -18,7 +18,7 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn replacement_editor_scrollbar_pressed(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn replacement_editor_scrollbar_pressed(&mut self, pane: pane_grid::Pane) {
         let Some((pointer_pane, y, model)) = self.replacement_scrollbar_pointer else {
             return;
         };
@@ -44,7 +44,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn replacement_editor_scrollbar_released(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn replacement_editor_scrollbar_released(&mut self, pane: pane_grid::Pane) {
         if self
             .replacement_scrollbar_drag
             .is_some_and(|drag| drag.pane == pane)
@@ -53,7 +53,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn set_replacement_editor_scrollbar_first_line(
+    pub(in crate::gui::app::state) fn set_replacement_editor_scrollbar_first_line(
         &mut self,
         pane: pane_grid::Pane,
         first_line: usize,

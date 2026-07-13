@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn apply_replacement_editor_ime_event(&mut self, event: input_method::Event) {
+    pub(in crate::gui::app::state) fn apply_replacement_editor_ime_event(&mut self, event: input_method::Event) {
         let Some(tile_id) = self
             .panes
             .get(self.active_pane)

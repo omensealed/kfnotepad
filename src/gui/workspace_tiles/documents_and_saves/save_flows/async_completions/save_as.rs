@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn apply_save_active_tile_as_completion(
+    pub(in crate::gui::app::state) fn apply_save_active_tile_as_completion(
         &mut self,
         tile_id: GuiTileId,
         requested_path: PathBuf,

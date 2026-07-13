@@ -1,9 +1,9 @@
 impl KfnotepadGui {
-    pub(super) fn toggle_active_maximize(&mut self) {
+    pub(in crate::gui::app::state) fn toggle_active_maximize(&mut self) {
         self.toggle_pane_maximized(self.active_pane);
     }
 
-    pub(super) fn toggle_pane_maximized(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn toggle_pane_maximized(&mut self, pane: pane_grid::Pane) {
         let was_maximized = self.panes.maximized() == Some(pane);
         if !self.focus_pane(pane) {
             self.status_message = "maximize failed: no such pane".to_string();
@@ -21,7 +21,7 @@ impl KfnotepadGui {
         self.pending_app_quit = false;
     }
 
-    pub(super) fn equalize_tile_layout(&mut self) {
+    pub(in crate::gui::app::state) fn equalize_tile_layout(&mut self) {
         self.sync_all_panes_to_documents();
         let visible_tile_ids = self
             .workspace

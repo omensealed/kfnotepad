@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn open_document_in_new_pane(
+    pub(in crate::gui::app::state) fn open_document_in_new_pane(
         &mut self,
         document: TextDocument,
         opened_status: String,
@@ -43,7 +43,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn open_help_document(&mut self) {
+    pub(in crate::gui::app::state) fn open_help_document(&mut self) {
         self.show_startup_help_panel = false;
         let path = self.current_browser_dir().join(GUI_HELP_DOCUMENT_PATH);
         let document = TextDocument {
@@ -53,7 +53,7 @@ impl KfnotepadGui {
         self.open_document_in_new_pane(document, format!("opened help {}", path.display()));
     }
 
-    pub(super) fn open_tile_id_for_path(&self, path: &Path) -> Option<GuiTileId> {
+    pub(in crate::gui::app::state) fn open_tile_id_for_path(&self, path: &Path) -> Option<GuiTileId> {
         self.workspace
             .tiles
             .iter()
@@ -61,7 +61,7 @@ impl KfnotepadGui {
             .map(|tile| tile.id)
     }
 
-    pub(super) fn focus_or_restore_existing_tile(&mut self, tile_id: GuiTileId, path: &Path) {
+    pub(in crate::gui::app::state) fn focus_or_restore_existing_tile(&mut self, tile_id: GuiTileId, path: &Path) {
         if let Some(pane) = pane_for_tile_id(&self.panes, tile_id) {
             self.focus_pane(pane);
             self.status_message = format!("already open: {}", path.display());
@@ -82,7 +82,7 @@ impl KfnotepadGui {
         self.status_message = format!("already open: {}", path.display());
     }
 
-    pub(super) fn open_path_in_new_pane(&mut self, path: PathBuf) -> bool {
+    pub(in crate::gui::app::state) fn open_path_in_new_pane(&mut self, path: PathBuf) -> bool {
         match open_text_file(&path) {
             Ok(document) => {
                 let opened_path = document.path.clone();

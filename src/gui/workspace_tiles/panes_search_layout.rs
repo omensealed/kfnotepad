@@ -1,3 +1,7 @@
+//! Pane lifecycle, search/navigation, closing, and layout operations.
+
+use super::*;
+
 include!("panes_search_layout/lifecycle.rs");
 include!("panes_search_layout/search_navigation.rs");
 include!("panes_search_layout/closing.rs");

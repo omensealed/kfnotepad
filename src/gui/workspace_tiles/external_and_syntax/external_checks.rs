@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn refresh_all_file_snapshots(&mut self) {
+    pub(in crate::gui::app::state) fn refresh_all_file_snapshots(&mut self) {
         self.file_snapshots.clear();
         for tile in &self.workspace.tiles {
             if let Ok(Some(snapshot)) = gui_file_snapshot(&tile.document.path) {
@@ -8,7 +8,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn refresh_file_snapshot_for_tile(&mut self, tile_id: GuiTileId) {
+    pub(in crate::gui::app::state) fn refresh_file_snapshot_for_tile(&mut self, tile_id: GuiTileId) {
         let Some(path) = self
             .workspace
             .tile(tile_id)
@@ -28,7 +28,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn external_file_check_candidates(
+    pub(in crate::gui::app::state) fn external_file_check_candidates(
         &self,
         force_deep_check: bool,
     ) -> Vec<GuiExternalFileCheckCandidate> {
@@ -45,7 +45,7 @@ impl KfnotepadGui {
             .collect()
     }
 
-    pub(super) fn request_external_file_check(&mut self) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_external_file_check(&mut self) -> Task<Message> {
         if self.external_file_check_in_flight {
             return Task::none();
         }
@@ -80,7 +80,7 @@ impl KfnotepadGui {
         )
     }
 
-    pub(super) fn sync_external_file_watcher(&mut self) {
+    pub(in crate::gui::app::state) fn sync_external_file_watcher(&mut self) {
         let paths = self
             .workspace
             .tiles
@@ -113,7 +113,7 @@ impl KfnotepadGui {
         drained.changed_paths
     }
 
-    pub(super) fn complete_external_file_check(
+    pub(in crate::gui::app::state) fn complete_external_file_check(
         &mut self,
         results: Vec<GuiExternalFileCheckResult>,
     ) {
@@ -123,7 +123,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn apply_external_file_check_result(&mut self, result: GuiExternalFileCheckResult) {
+    pub(in crate::gui::app::state) fn apply_external_file_check_result(&mut self, result: GuiExternalFileCheckResult) {
         match result {
             GuiExternalFileCheckResult::SnapshotInitialized { tile_id, snapshot } => {
                 self.file_snapshots.insert(tile_id, snapshot);
@@ -166,7 +166,7 @@ impl KfnotepadGui {
     }
 
     #[cfg(test)]
-    pub(super) fn poll_external_file_changes(&mut self) {
+    pub(in crate::gui::app::state) fn poll_external_file_changes(&mut self) {
         let candidates = self.external_file_check_candidates(true);
         let results = check_external_file_changes(candidates);
         for result in results {

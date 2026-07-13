@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn close_pane(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn close_pane(&mut self, pane: pane_grid::Pane) {
         self.sync_pane_to_document(pane);
         let Some(tile_id) = self.panes.get(pane).map(|pane_state| pane_state.tile_id) else {
             self.status_message = "close failed: no such pane".to_string();

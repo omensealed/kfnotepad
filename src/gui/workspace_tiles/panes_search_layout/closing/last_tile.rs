@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn close_last_tile(
+    pub(in crate::gui::app::state) fn close_last_tile(
         &mut self,
         pane: pane_grid::Pane,
         tile_id: GuiTileId,

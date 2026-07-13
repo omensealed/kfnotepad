@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn copy_active_selection(&mut self) -> Task<Message> {
+    pub(in crate::gui::app::state) fn copy_active_selection(&mut self) -> Task<Message> {
         let Some(selection) = self.active_editor_selection() else {
             self.status_message = "nothing selected".to_string();
             return Task::none();
@@ -8,7 +8,7 @@ impl KfnotepadGui {
         clipboard::write(selection)
     }
 
-    pub(super) fn cut_active_selection(&mut self) -> Task<Message> {
+    pub(in crate::gui::app::state) fn cut_active_selection(&mut self) -> Task<Message> {
         let Some(selection) = self.active_editor_selection() else {
             self.status_message = "nothing selected".to_string();
             return Task::none();
@@ -17,7 +17,7 @@ impl KfnotepadGui {
         clipboard::write(selection)
     }
 
-    pub(super) fn paste_into_active_editor(&mut self, contents: Option<String>) {
+    pub(in crate::gui::app::state) fn paste_into_active_editor(&mut self, contents: Option<String>) {
         let Some(contents) = contents.filter(|contents| !contents.is_empty()) else {
             self.status_message = "clipboard is empty".to_string();
             return;
@@ -41,19 +41,19 @@ impl KfnotepadGui {
         self.perform_active_editor_command(GuiEditorCommand::Paste(contents), "pasted clipboard");
     }
 
-    pub(super) fn select_all_active_editor(&mut self) {
+    pub(in crate::gui::app::state) fn select_all_active_editor(&mut self) {
         self.perform_active_editor_command(GuiEditorCommand::SelectAll, "selected all");
     }
 
-    pub(super) fn undo_active_edit(&mut self) {
+    pub(in crate::gui::app::state) fn undo_active_edit(&mut self) {
         self.apply_undo_redo_to_active_tile(true);
     }
 
-    pub(super) fn redo_active_edit(&mut self) {
+    pub(in crate::gui::app::state) fn redo_active_edit(&mut self) {
         self.apply_undo_redo_to_active_tile(false);
     }
 
-    pub(super) fn apply_undo_redo_to_active_tile(&mut self, undo: bool) {
+    pub(in crate::gui::app::state) fn apply_undo_redo_to_active_tile(&mut self, undo: bool) {
         let Some(tile_id) = self
             .panes
             .get(self.active_pane)

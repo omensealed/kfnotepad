@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn open_managed_note_by_title(&mut self, title: &str) -> bool {
+    pub(in crate::gui::app::state) fn open_managed_note_by_title(&mut self, title: &str) -> bool {
         let Some(notes_dir) = self.notes_dir.clone() else {
             self.status_message =
                 "managed notes unavailable: cannot resolve data directory".to_string();
@@ -18,7 +18,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn list_managed_notes_panel(&mut self) {
+    pub(in crate::gui::app::state) fn list_managed_notes_panel(&mut self) {
         let Some(notes_dir) = self.notes_dir.as_deref() else {
             self.notes_panel = None;
             self.pending_managed_note_delete = None;
@@ -42,7 +42,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn open_managed_note_from_panel(&mut self, index: usize) {
+    pub(in crate::gui::app::state) fn open_managed_note_from_panel(&mut self, index: usize) {
         let Some(note) = self
             .notes_panel
             .as_ref()
@@ -58,7 +58,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn delete_managed_note_from_panel(&mut self, index: usize) {
+    pub(in crate::gui::app::state) fn delete_managed_note_from_panel(&mut self, index: usize) {
         let Some(note) = self
             .notes_panel
             .as_ref()

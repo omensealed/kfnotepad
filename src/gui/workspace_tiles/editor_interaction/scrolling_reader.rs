@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn scroll_active_editor_viewport(&mut self, delta: i32) {
+    pub(in crate::gui::app::state) fn scroll_active_editor_viewport(&mut self, delta: i32) {
         self.perform_active_editor_command(
             GuiEditorCommand::ScrollViewportLines(delta),
             if delta < 0 {
@@ -10,7 +10,7 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn scroll_active_editor_viewport_preserving_cursor(
+    pub(in crate::gui::app::state) fn scroll_active_editor_viewport_preserving_cursor(
         &mut self,
         delta: i32,
         status: &str,
@@ -34,7 +34,7 @@ impl KfnotepadGui {
         self.status_message = status.to_string();
     }
 
-    pub(super) fn reader_scroll_tick(&mut self) {
+    pub(in crate::gui::app::state) fn reader_scroll_tick(&mut self) {
         if !self.settings.gui_reader_mode_enabled {
             return;
         }
@@ -78,7 +78,7 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn scroll_replacement_editor_pane_viewport(
+    pub(in crate::gui::app::state) fn scroll_replacement_editor_pane_viewport(
         &mut self,
         pane: pane_grid::Pane,
         delta: i32,

@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn replacement_editor_cursor_for_point(
+    pub(in crate::gui::app::state) fn replacement_editor_cursor_for_point(
         &self,
         pane: pane_grid::Pane,
         point: GuiEditorReplacementMousePoint,

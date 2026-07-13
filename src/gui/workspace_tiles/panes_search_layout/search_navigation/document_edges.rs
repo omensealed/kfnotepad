@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn go_active_document_start(&mut self) {
+    pub(in crate::gui::app::state) fn go_active_document_start(&mut self) {
         self.sync_active_editor_to_document();
         let Some(tile_id) = self
             .panes
@@ -18,7 +18,7 @@ impl KfnotepadGui {
         self.status_message = "moved to document start".to_string();
     }
 
-    pub(super) fn go_active_document_end(&mut self) {
+    pub(in crate::gui::app::state) fn go_active_document_end(&mut self) {
         self.sync_active_editor_to_document();
         let Some(tile_id) = self
             .panes

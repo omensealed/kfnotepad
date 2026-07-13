@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn go_active_line(&mut self) {
+    pub(in crate::gui::app::state) fn go_active_line(&mut self) {
         self.sync_active_editor_to_document();
         let Some(tile_id) = self
             .panes

@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn request_save_active_tile_async(&mut self) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_save_active_tile_async(&mut self) -> Task<Message> {
         let Some(tile_id) = self
             .panes
             .get(self.active_pane)
@@ -16,7 +16,7 @@ impl KfnotepadGui {
         self.request_save_tile_async(tile_id)
     }
 
-    pub(super) fn request_save_tile_async(&mut self, tile_id: GuiTileId) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_save_tile_async(&mut self, tile_id: GuiTileId) -> Task<Message> {
         let Some(pane) = self
             .panes
             .iter()
@@ -68,7 +68,7 @@ impl KfnotepadGui {
     }
 
     #[cfg(not(test))]
-    pub(super) fn request_save_active_tile_as(&mut self, path: PathBuf) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_save_active_tile_as(&mut self, path: PathBuf) -> Task<Message> {
         let Some(tile_id) = self
             .panes
             .get(self.active_pane)

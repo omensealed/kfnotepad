@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn create_new_tile(&mut self) {
+    pub(in crate::gui::app::state) fn create_new_tile(&mut self) {
         let path = self.next_untitled_path();
         let document = TextDocument {
             path: path.clone(),
@@ -38,7 +38,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn next_untitled_path(&self) -> PathBuf {
+    pub(in crate::gui::app::state) fn next_untitled_path(&self) -> PathBuf {
         let current_dir = self
             .browser
             .as_ref()
@@ -47,7 +47,7 @@ impl KfnotepadGui {
         self.next_untitled_path_in_dir_excluding(current_dir, None)
     }
 
-    pub(super) fn next_untitled_path_in_dir_excluding(
+    pub(in crate::gui::app::state) fn next_untitled_path_in_dir_excluding(
         &self,
         directory: PathBuf,
         excluded_tile_id: Option<GuiTileId>,

@@ -1,9 +1,9 @@
 impl KfnotepadGui {
-    pub(super) fn close_active_pane(&mut self) {
+    pub(in crate::gui::app::state) fn close_active_pane(&mut self) {
         self.close_pane(self.active_pane);
     }
 
-    pub(super) fn visible_tile_count(&self) -> usize {
+    pub(in crate::gui::app::state) fn visible_tile_count(&self) -> usize {
         self.workspace
             .tiles
             .iter()
@@ -11,14 +11,14 @@ impl KfnotepadGui {
             .count()
     }
 
-    pub(super) fn sync_all_panes_to_documents(&mut self) {
+    pub(in crate::gui::app::state) fn sync_all_panes_to_documents(&mut self) {
         let panes: Vec<_> = self.panes.iter().map(|(pane, _pane_state)| *pane).collect();
         for pane in panes {
             self.sync_pane_to_document(pane);
         }
     }
 
-    pub(super) fn has_dirty_tile(&mut self) -> bool {
+    pub(in crate::gui::app::state) fn has_dirty_tile(&mut self) -> bool {
         self.sync_all_panes_to_documents();
         self.workspace
             .tiles
@@ -26,7 +26,7 @@ impl KfnotepadGui {
             .any(|tile| tile.document.buffer.is_dirty())
     }
 
-    pub(super) fn request_app_close(&mut self, window_id: window::Id) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_app_close(&mut self, window_id: window::Id) -> Task<Message> {
         if self.has_dirty_tile() {
             if self.pending_app_quit {
                 return window::close(window_id);
@@ -41,7 +41,7 @@ impl KfnotepadGui {
         window::close(window_id)
     }
 
-    pub(super) fn move_active_editor_to_document_cursor(&mut self) {
+    pub(in crate::gui::app::state) fn move_active_editor_to_document_cursor(&mut self) {
         let Some(tile_id) = self
             .panes
             .get(self.active_pane)

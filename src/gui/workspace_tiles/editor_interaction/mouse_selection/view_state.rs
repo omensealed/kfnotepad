@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn update_replacement_editor_view_state(
+    pub(in crate::gui::app::state) fn update_replacement_editor_view_state(
         &mut self,
         pane: pane_grid::Pane,
         cursor: DocumentCursor,

@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn focus_pane(&mut self, pane: pane_grid::Pane) -> bool {
+    pub(in crate::gui::app::state) fn focus_pane(&mut self, pane: pane_grid::Pane) -> bool {
         let Some(tile_id) = self.panes.get(pane).map(|pane_state| pane_state.tile_id) else {
             return false;
         };
@@ -11,11 +11,11 @@ impl KfnotepadGui {
         self.workspace.focus_tile(tile_id)
     }
 
-    pub(super) fn sync_pane_to_document(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn sync_pane_to_document(&mut self, pane: pane_grid::Pane) {
         let _ = self.sync_pane_to_document_text(pane);
     }
 
-    pub(super) fn sync_pane_to_document_text(
+    pub(in crate::gui::app::state) fn sync_pane_to_document_text(
         &mut self,
         pane: pane_grid::Pane,
     ) -> Option<(GuiTileId, String)> {
@@ -29,7 +29,7 @@ impl KfnotepadGui {
         Some((tile_id, text))
     }
 
-    pub(super) fn sync_pane_cursor_to_document(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn sync_pane_cursor_to_document(&mut self, pane: pane_grid::Pane) {
         let Some(pane_state) = self.panes.get(pane) else {
             return;
         };
@@ -39,11 +39,11 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn sync_active_editor_to_document(&mut self) {
+    pub(in crate::gui::app::state) fn sync_active_editor_to_document(&mut self) {
         self.sync_pane_to_document(self.active_pane);
     }
 
-    pub(super) fn perform_active_editor_command(
+    pub(in crate::gui::app::state) fn perform_active_editor_command(
         &mut self,
         command: GuiEditorCommand,
         status: &str,
@@ -78,7 +78,7 @@ impl KfnotepadGui {
         self.status_message = status.to_string();
     }
 
-    pub(super) fn active_editor_selection(&self) -> Option<String> {
+    pub(in crate::gui::app::state) fn active_editor_selection(&self) -> Option<String> {
         self.panes
             .get(self.active_pane)
             .and_then(|pane_state| pane_state.editor.selection())

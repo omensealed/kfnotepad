@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn replacement_editor_pointer_moved(
+    pub(in crate::gui::app::state) fn replacement_editor_pointer_moved(
         &mut self,
         pane: pane_grid::Pane,
         point: GuiEditorReplacementMousePoint,
@@ -10,7 +10,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn replacement_editor_body_pointer_moved(
+    pub(in crate::gui::app::state) fn replacement_editor_body_pointer_moved(
         &mut self,
         pane: pane_grid::Pane,
         point: GuiEditorReplacementMousePoint,
@@ -23,7 +23,7 @@ impl KfnotepadGui {
         }
     }
 
-    pub(super) fn replacement_editor_pointer_pressed(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn replacement_editor_pointer_pressed(&mut self, pane: pane_grid::Pane) {
         let Some((point_pane, point)) = self.replacement_pointer_point else {
             return;
         };
@@ -39,18 +39,18 @@ impl KfnotepadGui {
         self.apply_replacement_editor_mouse_click_to_pane(pane, point);
     }
 
-    pub(super) fn replacement_editor_pointer_released(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn replacement_editor_pointer_released(&mut self, pane: pane_grid::Pane) {
         if self.replacement_drag.is_some_and(|drag| drag.pane == pane) {
             self.clear_replacement_drag();
         }
     }
 
-    pub(super) fn replacement_editor_global_pointer_released(&mut self) {
+    pub(in crate::gui::app::state) fn replacement_editor_global_pointer_released(&mut self) {
         self.clear_replacement_drag();
         self.replacement_scrollbar_drag = None;
     }
 
-    pub(super) fn clear_replacement_drag(&mut self) {
+    pub(in crate::gui::app::state) fn clear_replacement_drag(&mut self) {
         self.replacement_drag = None;
         self.replacement_drag_edge = None;
     }

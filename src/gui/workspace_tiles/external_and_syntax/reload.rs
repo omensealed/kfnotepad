@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn replace_tile_document_from_external_change(
+    pub(in crate::gui::app::state) fn replace_tile_document_from_external_change(
         &mut self,
         tile_id: GuiTileId,
         mut document: TextDocument,

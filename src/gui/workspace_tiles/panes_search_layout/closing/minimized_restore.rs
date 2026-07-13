@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn restore_first_minimized_into_pane(
+    pub(in crate::gui::app::state) fn restore_first_minimized_into_pane(
         &mut self,
         pane: pane_grid::Pane,
     ) -> Option<GuiTileId> {

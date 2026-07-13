@@ -1,9 +1,9 @@
 impl KfnotepadGui {
-    pub(super) fn move_active_pane(&mut self, direction: pane_grid::Direction) {
+    pub(in crate::gui::app::state) fn move_active_pane(&mut self, direction: pane_grid::Direction) {
         self.move_pane(self.active_pane, direction);
     }
 
-    pub(super) fn move_pane(&mut self, pane: pane_grid::Pane, direction: pane_grid::Direction) {
+    pub(in crate::gui::app::state) fn move_pane(&mut self, pane: pane_grid::Pane, direction: pane_grid::Direction) {
         if !self.focus_pane(pane) {
             self.status_message = "move failed: no such pane".to_string();
             return;
@@ -20,7 +20,7 @@ impl KfnotepadGui {
         self.persist_layout();
     }
 
-    pub(super) fn drag_pane(&mut self, event: pane_grid::DragEvent) {
+    pub(in crate::gui::app::state) fn drag_pane(&mut self, event: pane_grid::DragEvent) {
         if let pane_grid::DragEvent::Dropped { pane, target } = event {
             self.panes.drop(pane, target);
             self.focus_pane(pane);

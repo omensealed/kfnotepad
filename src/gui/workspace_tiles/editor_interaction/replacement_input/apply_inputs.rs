@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn apply_replacement_editor_inputs_to_active_tile(
+    pub(in crate::gui::app::state) fn apply_replacement_editor_inputs_to_active_tile(
         &mut self,
         inputs: Vec<GuiEditorReplacementInput>,
     ) {

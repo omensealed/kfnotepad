@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn search_active(&mut self, backwards: bool) {
+    pub(in crate::gui::app::state) fn search_active(&mut self, backwards: bool) {
         self.sync_active_editor_to_document();
         let query = self.search_query.trim().to_string();
         self.remember_search_query(&query);

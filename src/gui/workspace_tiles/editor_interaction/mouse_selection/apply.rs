@@ -1,5 +1,5 @@
 impl KfnotepadGui {
-    pub(super) fn apply_replacement_editor_mouse_click_to_pane(
+    pub(in crate::gui::app::state) fn apply_replacement_editor_mouse_click_to_pane(
         &mut self,
         pane: pane_grid::Pane,
         point: GuiEditorReplacementMousePoint,
@@ -41,7 +41,7 @@ impl KfnotepadGui {
         );
     }
 
-    pub(super) fn apply_replacement_editor_mouse_drag_to_pane(
+    pub(in crate::gui::app::state) fn apply_replacement_editor_mouse_drag_to_pane(
         &mut self,
         pane: pane_grid::Pane,
         focus: GuiEditorReplacementMousePoint,

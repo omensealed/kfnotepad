@@ -1,4 +1,8 @@
-fn gui_search_match_columns(
+//! Search match width helpers shared by workspace navigation operations.
+
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_search_match_columns(
     document: &TextDocument,
     cursor: DocumentCursor,
     query: &str,
