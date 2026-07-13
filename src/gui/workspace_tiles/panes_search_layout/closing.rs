@@ -1,3 +1,7 @@
+//! Pane closing, last-tile reset, and minimized-tile promotion.
+
+use super::*;
+
 #[path = "closing/close_pane.rs"]
 mod close_pane;
 #[path = "closing/last_tile.rs"]

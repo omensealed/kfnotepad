@@ -1,3 +1,7 @@
+//! Pane layout, minimization, restoration, movement, and drag/drop behavior.
+
+use super::*;
+
 #[path = "layout_minimize_move/maximize_equalize.rs"]
 mod maximize_equalize;
 #[path = "layout_minimize_move/minimize_restore.rs"]

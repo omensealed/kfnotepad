@@ -1,3 +1,7 @@
+//! Pane lifecycle, dirty-state checks, app close, and cursor synchronization.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn close_active_pane(&mut self) {
         self.close_pane(self.active_pane);
@@ -26,7 +30,10 @@ impl KfnotepadGui {
             .any(|tile| tile.document.buffer.is_dirty())
     }
 
-    pub(in crate::gui::app::state) fn request_app_close(&mut self, window_id: window::Id) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_app_close(
+        &mut self,
+        window_id: window::Id,
+    ) -> Task<Message> {
         if self.has_dirty_tile() {
             if self.pending_app_quit {
                 return window::close(window_id);

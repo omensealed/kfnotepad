@@ -1,3 +1,7 @@
+//! Active-document search, history, Go To Line, and edge navigation.
+
+use super::*;
+
 #[path = "search_navigation/document_edges.rs"]
 mod document_edges;
 #[path = "search_navigation/go_to_line.rs"]
