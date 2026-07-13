@@ -1,4 +1,6 @@
-pub(super) fn gui_menu_items(group: GuiMenuGroup) -> Vec<GuiMenuItem> {
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_menu_items(group: GuiMenuGroup) -> Vec<GuiMenuItem> {
     match group {
         GuiMenuGroup::File => file_menu_items(),
         GuiMenuGroup::Edit => edit_menu_items(),

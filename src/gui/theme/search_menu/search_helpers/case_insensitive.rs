@@ -1,4 +1,6 @@
-pub(super) fn gui_find_next_case_insensitive(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_find_next_case_insensitive(
     document: &TextDocument,
     query: &str,
     start: DocumentCursor,
@@ -20,7 +22,7 @@ pub(super) fn gui_find_next_case_insensitive(
     None
 }
 
-pub(super) fn gui_find_previous_case_insensitive(
+pub(in crate::gui::app::state) fn gui_find_previous_case_insensitive(
     document: &TextDocument,
     query: &str,
     start: DocumentCursor,
@@ -48,7 +50,7 @@ pub(super) fn gui_find_previous_case_insensitive(
     None
 }
 
-pub(super) fn gui_find_in_line_case_insensitive(
+pub(in crate::gui::app::state) fn gui_find_in_line_case_insensitive(
     line: &str,
     query: &str,
     start_column: usize,
@@ -61,7 +63,7 @@ pub(super) fn gui_find_in_line_case_insensitive(
     })
 }
 
-pub(super) fn gui_find_last_in_line_case_insensitive(
+pub(in crate::gui::app::state) fn gui_find_last_in_line_case_insensitive(
     line: &str,
     query: &str,
     before_column: usize,

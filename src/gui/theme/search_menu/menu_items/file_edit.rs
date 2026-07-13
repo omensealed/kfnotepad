@@ -1,4 +1,6 @@
-pub(super) fn file_menu_items() -> Vec<GuiMenuItem> {
+use super::*;
+
+pub(in crate::gui::app::state) fn file_menu_items() -> Vec<GuiMenuItem> {
     vec![
         GuiMenuItem {
             label: LABEL_NEW_TILE,
@@ -35,7 +37,7 @@ pub(super) fn file_menu_items() -> Vec<GuiMenuItem> {
     ]
 }
 
-pub(super) fn edit_menu_items() -> Vec<GuiMenuItem> {
+pub(in crate::gui::app::state) fn edit_menu_items() -> Vec<GuiMenuItem> {
     vec![
         GuiMenuItem {
             label: LABEL_UNDO,

@@ -1,4 +1,8 @@
-pub(super) fn document_cursor_from_editor(cursor: text_editor::Cursor) -> DocumentCursor {
+use super::*;
+
+pub(in crate::gui::app::state) fn document_cursor_from_editor(
+    cursor: text_editor::Cursor,
+) -> DocumentCursor {
     let position = match cursor.selection {
         Some(selection)
             if (selection.line, selection.column)
@@ -15,7 +19,9 @@ pub(super) fn document_cursor_from_editor(cursor: text_editor::Cursor) -> Docume
     }
 }
 
-pub(super) fn editor_cursor_from_document(cursor: DocumentCursor) -> text_editor::Cursor {
+pub(in crate::gui::app::state) fn editor_cursor_from_document(
+    cursor: DocumentCursor,
+) -> text_editor::Cursor {
     text_editor::Cursor {
         position: text_editor::Position {
             line: cursor.row,

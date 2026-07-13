@@ -1,4 +1,6 @@
-pub(super) fn gui_path_prompt_label(prompt: GuiPathPrompt) -> &'static str {
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_path_prompt_label(prompt: GuiPathPrompt) -> &'static str {
     match prompt {
         GuiPathPrompt::Open => "Open path",
         GuiPathPrompt::SaveAs => "Save as path",
@@ -9,15 +11,15 @@ pub(super) fn gui_path_prompt_label(prompt: GuiPathPrompt) -> &'static str {
 }
 
 #[cfg(test)]
-pub(super) fn gui_icon_label(icon: &str, label: &str) -> String {
+pub(in crate::gui::app::state) fn gui_icon_label(icon: &str, label: &str) -> String {
     format!("{icon} {label}")
 }
 
-pub(super) fn gui_icon_only_label(icon: &str) -> String {
+pub(in crate::gui::app::state) fn gui_icon_only_label(icon: &str) -> String {
     icon.to_string()
 }
 
-pub(super) fn gui_file_name_label(path: &Path) -> String {
+pub(in crate::gui::app::state) fn gui_file_name_label(path: &Path) -> String {
     path.file_name()
         .and_then(|name| name.to_str())
         .filter(|name| !name.is_empty())
@@ -25,7 +27,7 @@ pub(super) fn gui_file_name_label(path: &Path) -> String {
         .unwrap_or_else(|| path.display().to_string())
 }
 
-pub(super) fn gui_paths_refer_to_same_file(left: &Path, right: &Path) -> bool {
+pub(in crate::gui::app::state) fn gui_paths_refer_to_same_file(left: &Path, right: &Path) -> bool {
     if left == right {
         return true;
     }
@@ -36,7 +38,7 @@ pub(super) fn gui_paths_refer_to_same_file(left: &Path, right: &Path) -> bool {
     }
 }
 
-pub(super) fn gui_sidebar_path_label(path: &Path) -> String {
+pub(in crate::gui::app::state) fn gui_sidebar_path_label(path: &Path) -> String {
     let label = path.display().to_string();
     if label.chars().count() <= GUI_PANEL_PATH_MAX_CHARS {
         return label;
@@ -67,7 +69,9 @@ pub(super) fn gui_sidebar_path_label(path: &Path) -> String {
     )
 }
 
-pub(super) fn gui_header_layout_mode(viewport_width: f32) -> GuiHeaderLayoutMode {
+pub(in crate::gui::app::state) fn gui_header_layout_mode(
+    viewport_width: f32,
+) -> GuiHeaderLayoutMode {
     if viewport_width < GUI_HEADER_SPLIT_WIDTH {
         GuiHeaderLayoutMode::SplitActions
     } else {
@@ -75,7 +79,9 @@ pub(super) fn gui_header_layout_mode(viewport_width: f32) -> GuiHeaderLayoutMode
     }
 }
 
-pub(super) fn gui_search_layout_mode(viewport_width: f32) -> GuiSearchLayoutMode {
+pub(in crate::gui::app::state) fn gui_search_layout_mode(
+    viewport_width: f32,
+) -> GuiSearchLayoutMode {
     if viewport_width < GUI_SEARCH_SPLIT_WIDTH {
         GuiSearchLayoutMode::SplitRows
     } else {
@@ -83,7 +89,11 @@ pub(super) fn gui_search_layout_mode(viewport_width: f32) -> GuiSearchLayoutMode
     }
 }
 
-pub(super) fn gui_tile_title_label(path: &Path, active: bool, save_status: &str) -> String {
+pub(in crate::gui::app::state) fn gui_tile_title_label(
+    path: &Path,
+    active: bool,
+    save_status: &str,
+) -> String {
     let file_name = gui_file_name_label(path);
     let label = if save_status == "saved" {
         file_name
@@ -98,11 +108,14 @@ pub(super) fn gui_tile_title_label(path: &Path, active: bool, save_status: &str)
     }
 }
 
-pub(super) fn gui_tile_title_controls_attached(_active: bool) -> bool {
+pub(in crate::gui::app::state) fn gui_tile_title_controls_attached(_active: bool) -> bool {
     true
 }
 
-pub(super) fn gui_tile_border_color(palette: iced::theme::Palette, active: bool) -> Color {
+pub(in crate::gui::app::state) fn gui_tile_border_color(
+    palette: iced::theme::Palette,
+    active: bool,
+) -> Color {
     if active {
         palette.primary
     } else {

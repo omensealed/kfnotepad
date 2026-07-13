@@ -1,4 +1,6 @@
-pub(super) fn gui_menu_groups() -> [GuiMenuGroup; 7] {
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_menu_groups() -> [GuiMenuGroup; 7] {
     [
         GuiMenuGroup::File,
         GuiMenuGroup::Edit,
@@ -10,7 +12,7 @@ pub(super) fn gui_menu_groups() -> [GuiMenuGroup; 7] {
     ]
 }
 
-pub(super) fn gui_menu_group_label(group: GuiMenuGroup) -> &'static str {
+pub(in crate::gui::app::state) fn gui_menu_group_label(group: GuiMenuGroup) -> &'static str {
     match group {
         GuiMenuGroup::File => "File",
         GuiMenuGroup::Edit => "Edit",

@@ -1,4 +1,6 @@
-pub(super) fn notes_menu_items() -> Vec<GuiMenuItem> {
+use super::*;
+
+pub(in crate::gui::app::state) fn notes_menu_items() -> Vec<GuiMenuItem> {
     vec![
         GuiMenuItem {
             label: LABEL_OPEN_NOTE,
@@ -11,7 +13,7 @@ pub(super) fn notes_menu_items() -> Vec<GuiMenuItem> {
     ]
 }
 
-pub(super) fn tile_menu_items() -> Vec<GuiMenuItem> {
+pub(in crate::gui::app::state) fn tile_menu_items() -> Vec<GuiMenuItem> {
     vec![
         GuiMenuItem {
             label: LABEL_MINIMIZE,
@@ -44,7 +46,7 @@ pub(super) fn tile_menu_items() -> Vec<GuiMenuItem> {
     ]
 }
 
-pub(super) fn help_menu_items() -> Vec<GuiMenuItem> {
+pub(in crate::gui::app::state) fn help_menu_items() -> Vec<GuiMenuItem> {
     vec![GuiMenuItem {
         label: LABEL_OPEN_HELP,
         command: GuiMenuCommand::OpenHelp,

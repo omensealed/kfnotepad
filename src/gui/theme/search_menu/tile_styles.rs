@@ -1,4 +1,6 @@
-pub(super) fn gui_tile_body_style(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_tile_body_style(
     palette: iced::theme::Palette,
     _active: bool,
 ) -> container::Style {
@@ -14,7 +16,7 @@ pub(super) fn gui_tile_body_style(
     }
 }
 
-pub(super) fn gui_tile_title_style(
+pub(in crate::gui::app::state) fn gui_tile_title_style(
     palette: iced::theme::Palette,
     active: bool,
 ) -> container::Style {
@@ -46,7 +48,9 @@ pub(super) fn gui_tile_title_style(
     }
 }
 
-pub(super) fn gui_pane_grid_style(palette: iced::theme::Palette) -> pane_grid::Style {
+pub(in crate::gui::app::state) fn gui_pane_grid_style(
+    palette: iced::theme::Palette,
+) -> pane_grid::Style {
     pane_grid::Style {
         hovered_region: pane_grid::Highlight {
             background: Background::Color(Color::TRANSPARENT),
@@ -67,12 +71,12 @@ pub(super) fn gui_pane_grid_style(palette: iced::theme::Palette) -> pane_grid::S
     }
 }
 
-pub(super) fn gui_menu_group_chrome_label(group: GuiMenuGroup) -> String {
+pub(in crate::gui::app::state) fn gui_menu_group_chrome_label(group: GuiMenuGroup) -> String {
     gui_menu_group_label(group).to_string()
 }
 
 #[cfg(test)]
-pub(super) fn gui_menu_group_index(group: GuiMenuGroup) -> usize {
+pub(in crate::gui::app::state) fn gui_menu_group_index(group: GuiMenuGroup) -> usize {
     gui_menu_groups()
         .iter()
         .position(|candidate| *candidate == group)
@@ -80,7 +84,9 @@ pub(super) fn gui_menu_group_index(group: GuiMenuGroup) -> usize {
 }
 
 #[cfg(test)]
-pub(super) fn gui_menu_dropdown_labels(group: GuiMenuGroup) -> Vec<&'static str> {
+pub(in crate::gui::app::state) fn gui_menu_dropdown_labels(
+    group: GuiMenuGroup,
+) -> Vec<&'static str> {
     gui_menu_items(group)
         .into_iter()
         .map(|item| item.label)
@@ -88,11 +94,11 @@ pub(super) fn gui_menu_dropdown_labels(group: GuiMenuGroup) -> Vec<&'static str>
 }
 
 #[cfg(test)]
-pub(super) fn gui_menu_uses_iced_aw_menu_tree() -> bool {
+pub(in crate::gui::app::state) fn gui_menu_uses_iced_aw_menu_tree() -> bool {
     true
 }
 
 #[cfg(test)]
-pub(super) fn gui_menu_submenu_policy() -> &'static str {
+pub(in crate::gui::app::state) fn gui_menu_submenu_policy() -> &'static str {
     "Keep current root command groups flat until a group gains enough depth to justify nested hover submenus."
 }

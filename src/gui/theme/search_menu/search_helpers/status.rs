@@ -1,4 +1,9 @@
-pub(super) fn search_result_status(result: SearchRepeatResult, backwards: bool) -> String {
+use super::*;
+
+pub(in crate::gui::app::state) fn search_result_status(
+    result: SearchRepeatResult,
+    backwards: bool,
+) -> String {
     match result {
         SearchRepeatResult::NoPreviousSearch => "search query required".to_string(),
         SearchRepeatResult::Found { query } if backwards => format!("found previous: {query}"),
@@ -7,7 +12,7 @@ pub(super) fn search_result_status(result: SearchRepeatResult, backwards: bool) 
     }
 }
 
-pub(super) fn go_to_line_status(result: GoToLineResult) -> String {
+pub(in crate::gui::app::state) fn go_to_line_status(result: GoToLineResult) -> String {
     match result {
         GoToLineResult::Empty => "Line number is empty".to_string(),
         GoToLineResult::Invalid => "Line number is invalid".to_string(),

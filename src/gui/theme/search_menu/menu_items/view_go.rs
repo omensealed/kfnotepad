@@ -1,4 +1,6 @@
-pub(super) fn view_menu_items() -> Vec<GuiMenuItem> {
+use super::*;
+
+pub(in crate::gui::app::state) fn view_menu_items() -> Vec<GuiMenuItem> {
     vec![
         GuiMenuItem {
             label: LABEL_FILES,
@@ -19,7 +21,7 @@ pub(super) fn view_menu_items() -> Vec<GuiMenuItem> {
     ]
 }
 
-pub(super) fn go_menu_items() -> Vec<GuiMenuItem> {
+pub(in crate::gui::app::state) fn go_menu_items() -> Vec<GuiMenuItem> {
     vec![
         GuiMenuItem {
             label: LABEL_GO_TO_LINE,

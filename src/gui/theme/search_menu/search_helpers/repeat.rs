@@ -1,4 +1,6 @@
-pub(super) fn gui_repeat_search(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_repeat_search(
     document: &TextDocument,
     cursor: &mut DocumentCursor,
     query: &str,
@@ -37,7 +39,7 @@ pub(super) fn gui_repeat_search(
     }
 }
 
-pub(super) fn gui_next_search_start(
+pub(in crate::gui::app::state) fn gui_next_search_start(
     document: &TextDocument,
     cursor: DocumentCursor,
 ) -> DocumentCursor {
