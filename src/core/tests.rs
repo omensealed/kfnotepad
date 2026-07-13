@@ -49,6 +49,7 @@ fn assert_no_temp_files(directory: &Path) {
 }
 
 mod cli_summary;
+mod history_model;
 mod search;
 mod settings_layout_projects;
 mod sidebar_gui_models;

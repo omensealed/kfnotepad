@@ -99,6 +99,11 @@ Compound edits continue to use one pre-edit snapshot. A structural test verifies
 1 MiB ASCII document retains less than 1 KiB of history, and the ASCII overwrite path avoids unnecessary grapheme
 segmentation.
 
+Delta history also has a deterministic model test that runs 1,080 mixed edits across fixed seeds. It compares every
+forward state with an independent tokenized line model, then verifies the complete undo and redo sequence. The mix
+includes ASCII, CJK, emoji, combining graphemes, multiline insertion, line splitting/joining, deletion, backspace,
+and overwrite while remaining below the configured history-entry limit.
+
 ## External-change polling improvement
 
 The first polling correction kept the one-second responsiveness contract but compared symlink-safe file metadata
