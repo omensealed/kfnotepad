@@ -132,12 +132,18 @@ impl TextBuffer {
         let next_bytes = self.byte_len().saturating_add(value.len_utf8());
         self.ensure_byte_len(next_bytes)?;
 
-        self.record_undo_for_typed_insert(row, column);
+        let use_delta_history = matches!(self.compound_edit, CompoundEditState::Inactive);
+        if !use_delta_history {
+            self.record_undo();
+        }
         let line = self
             .lines
             .get_mut(row)
             .ok_or(BufferError::RowOutOfBounds { row, rows })?;
         line.insert(byte_index, value);
+        if use_delta_history {
+            self.record_typed_insert_undo(row, column, value);
+        }
         self.mark_changed();
         Ok(())
     }

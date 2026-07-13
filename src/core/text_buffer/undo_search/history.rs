@@ -1,12 +1,13 @@
-//! Undo grouping, compound-edit boundaries, and snapshot recording.
+//! Undo grouping, compound-edit boundaries, and history entry recording.
 
 use super::*;
 
 impl TextBuffer {
-    pub(in crate::core::text_buffer) fn record_undo_for_typed_insert(
+    pub(in crate::core::text_buffer) fn record_typed_insert_undo(
         &mut self,
         row: usize,
         column: usize,
+        value: char,
     ) {
         let now = Instant::now();
         let can_merge = self.insert_undo_group.is_some_and(|group| {
@@ -15,21 +16,76 @@ impl TextBuffer {
                 && now.duration_since(group.last_edit) <= TYPING_UNDO_COALESCE_WINDOW
         });
 
+        let start = Cursor { row, column };
+        let end = Cursor {
+            row,
+            column: column.saturating_add(1),
+        };
+        let mut merged = false;
         if can_merge {
-            self.insert_undo_group = Some(InsertUndoGroup {
-                row,
-                next_column: column.saturating_add(1),
-                last_edit: now,
-            });
-            return;
+            if let Some(entry) = pop_history_entry(&mut self.undo_history, &mut self.undo_bytes) {
+                match entry {
+                    HistoryEntry::InsertText {
+                        start: entry_start,
+                        end: entry_end,
+                        mut text,
+                        ..
+                    } if entry_end == start => {
+                        text.push(value);
+                        let byte_size = text
+                            .capacity()
+                            .saturating_add(std::mem::size_of::<HistoryEntry>());
+                        push_history_entry(
+                            &mut self.undo_history,
+                            &mut self.undo_bytes,
+                            HistoryEntry::InsertText {
+                                start: entry_start,
+                                end,
+                                text,
+                                byte_size,
+                            },
+                            MAX_UNDO_HISTORY,
+                            MAX_UNDO_BYTES,
+                        );
+                        merged = true;
+                    }
+                    entry => push_history_entry(
+                        &mut self.undo_history,
+                        &mut self.undo_bytes,
+                        entry,
+                        MAX_UNDO_HISTORY,
+                        MAX_UNDO_BYTES,
+                    ),
+                }
+            }
         }
 
-        self.record_undo();
+        if !merged {
+            let text = value.to_string();
+            let byte_size = text
+                .capacity()
+                .saturating_add(std::mem::size_of::<HistoryEntry>());
+            push_history_entry(
+                &mut self.undo_history,
+                &mut self.undo_bytes,
+                HistoryEntry::InsertText {
+                    start,
+                    end,
+                    text,
+                    byte_size,
+                },
+                MAX_UNDO_HISTORY,
+                MAX_UNDO_BYTES,
+            );
+        }
+
         self.insert_undo_group = Some(InsertUndoGroup {
             row,
             next_column: column.saturating_add(1),
             last_edit: now,
         });
+        self.redo_history.clear();
+        self.redo_bytes = 0;
     }
 
     pub(crate) fn break_undo_group(&mut self) {
@@ -114,8 +170,9 @@ impl TextBuffer {
         end: Cursor,
         text: &str,
     ) {
+        let text = text.to_owned();
         let byte_size = text
-            .len()
+            .capacity()
             .saturating_add(std::mem::size_of::<HistoryEntry>());
         push_history_entry(
             &mut self.undo_history,
@@ -123,7 +180,7 @@ impl TextBuffer {
             HistoryEntry::InsertText {
                 start,
                 end,
-                text: text.to_owned(),
+                text,
                 byte_size,
             },
             MAX_UNDO_HISTORY,

@@ -10,9 +10,34 @@ fn consecutive_typed_inserts_coalesce_as_one_undo_step() {
 
     assert_eq!(buffer.to_text(), "abc");
     assert_eq!(buffer.undo_history.len(), 1);
+    assert!(matches!(
+        buffer.undo_history.back(),
+        Some(HistoryEntry::InsertText { text, .. }) if text == "abc"
+    ));
 
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), "");
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "abc");
+}
+
+#[test]
+fn consecutive_unicode_typed_inserts_coalesce_and_redo_exactly() {
+    let mut buffer = TextBuffer::from_text("");
+
+    buffer.insert_char(0, 0, '\u{754c}').expect("insert CJK");
+    buffer.insert_char(0, 1, '\u{1f642}').expect("insert emoji");
+    buffer
+        .insert_char(0, 2, '\u{301}')
+        .expect("insert combining mark");
+
+    assert_eq!(buffer.to_text(), "\u{754c}\u{1f642}\u{301}");
+    assert_eq!(buffer.undo_history.len(), 1);
+    assert!(buffer.undo_bytes < 256);
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "");
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "\u{754c}\u{1f642}\u{301}");
 }
 
 #[test]
@@ -104,9 +129,13 @@ fn compound_edit_records_one_snapshot_for_multiple_edit_kinds() {
             .buffer
             .insert_text(Cursor { row: 1, column: 0 }, "x")
             .expect("insert bulk text");
+        document
+            .buffer
+            .insert_char(1, 1, 'y')
+            .expect("insert typed character");
     });
 
-    assert_eq!(document.buffer.to_text(), "hello\nx");
+    assert_eq!(document.buffer.to_text(), "hello\nxy");
     assert_eq!(document.buffer.undo_history.len(), 1);
     assert!(document.buffer.undo_last_edit());
     assert_eq!(document.buffer.to_text(), "hello world");
@@ -354,12 +383,8 @@ fn large_file_undo_history_uses_byte_budget_and_remains_responsive() {
         undo_steps += 1;
     }
 
-    assert!(undo_steps > 0);
-    let max_entries_by_budget = (MAX_UNDO_BYTES / (initial_text.len() + 1)) + 3;
-    assert!(undo_steps <= max_entries_by_budget);
-    assert!(!buffer.to_text().is_empty());
-    assert!(buffer.to_text().len() >= initial_text.len());
-    assert!(buffer.to_text().len() < after_edit_len);
+    assert_eq!(undo_steps, MAX_UNDO_HISTORY - 1);
+    assert_eq!(buffer.to_text().len(), initial_text.len() + 44);
 }
 
 #[test]

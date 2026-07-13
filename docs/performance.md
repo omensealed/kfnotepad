@@ -77,6 +77,12 @@ the full grapheme-boundary normalization path. Focused tests cover multiline tex
 redo invalidation, compound-edit fallback, and history-byte accounting. The result is a local comparison, not a
 portable performance guarantee.
 
+Contiguous typed characters now coalesce into the same insert-delta representation. The short 1,000-character
+benchmark moved from 525.70 us to 492.8 us median; its empty starting document did not carry a meaningful snapshot
+cost, so this is not treated as a material throughput result. The resource benefit appears on large documents: each
+typing group now retains its inserted text and allocation capacity instead of cloning the document, allowing the
+entry-count limit to remain useful without exhausting the byte budget first.
+
 ## External-change polling improvement
 
 The first polling correction kept the one-second responsiveness contract but compared symlink-safe file metadata
