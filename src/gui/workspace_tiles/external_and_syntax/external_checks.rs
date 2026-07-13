@@ -1,3 +1,7 @@
+//! Snapshot polling, watcher synchronization, and external-change result handling.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn refresh_all_file_snapshots(&mut self) {
         self.file_snapshots.clear();
@@ -8,7 +12,10 @@ impl KfnotepadGui {
         }
     }
 
-    pub(in crate::gui::app::state) fn refresh_file_snapshot_for_tile(&mut self, tile_id: GuiTileId) {
+    pub(in crate::gui::app::state) fn refresh_file_snapshot_for_tile(
+        &mut self,
+        tile_id: GuiTileId,
+    ) {
         let Some(path) = self
             .workspace
             .tile(tile_id)
@@ -123,7 +130,10 @@ impl KfnotepadGui {
         }
     }
 
-    pub(in crate::gui::app::state) fn apply_external_file_check_result(&mut self, result: GuiExternalFileCheckResult) {
+    pub(in crate::gui::app::state) fn apply_external_file_check_result(
+        &mut self,
+        result: GuiExternalFileCheckResult,
+    ) {
         match result {
             GuiExternalFileCheckResult::SnapshotInitialized { tile_id, snapshot } => {
                 self.file_snapshots.insert(tile_id, snapshot);

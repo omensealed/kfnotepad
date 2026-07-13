@@ -1,3 +1,7 @@
+//! Clean external document replacement across visible and minimized panes.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn replace_tile_document_from_external_change(
         &mut self,

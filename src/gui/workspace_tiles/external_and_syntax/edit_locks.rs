@@ -1,3 +1,7 @@
+//! External-change edit lock queries and explicit unlock behavior.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn is_external_edit_locked(&self, tile_id: GuiTileId) -> bool {
         self.external_edit_locks.contains(&tile_id)

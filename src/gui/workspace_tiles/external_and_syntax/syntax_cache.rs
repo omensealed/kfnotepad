@@ -1,3 +1,7 @@
+//! Visible-pane syntax cache invalidation and incremental extension.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn refresh_visible_syntax_caches(&mut self) {
         let tile_ids = self
@@ -18,7 +22,10 @@ impl KfnotepadGui {
         self.syntax_caches.clear();
     }
 
-    pub(in crate::gui::app::state) fn syntax_cache_target_end_for_tile(&self, tile_id: GuiTileId) -> Option<usize> {
+    pub(in crate::gui::app::state) fn syntax_cache_target_end_for_tile(
+        &self,
+        tile_id: GuiTileId,
+    ) -> Option<usize> {
         let pane = pane_for_tile_id(&self.panes, tile_id)?;
         let pane_state = self.panes.get(pane)?;
         let tile = self.workspace.tile(tile_id)?;
@@ -34,7 +41,10 @@ impl KfnotepadGui {
         )
     }
 
-    pub(in crate::gui::app::state) fn ensure_visible_syntax_cache_for_tile(&mut self, tile_id: GuiTileId) {
+    pub(in crate::gui::app::state) fn ensure_visible_syntax_cache_for_tile(
+        &mut self,
+        tile_id: GuiTileId,
+    ) {
         let Some(target_end) = self.syntax_cache_target_end_for_tile(tile_id) else {
             self.syntax_caches.remove(&tile_id);
             return;

@@ -2,7 +2,11 @@
 
 use super::*;
 
-include!("external_and_syntax/external_checks.rs");
-include!("external_and_syntax/syntax_cache.rs");
-include!("external_and_syntax/edit_locks.rs");
-include!("external_and_syntax/reload.rs");
+#[path = "external_and_syntax/edit_locks.rs"]
+mod edit_locks;
+#[path = "external_and_syntax/external_checks.rs"]
+mod external_checks;
+#[path = "external_and_syntax/reload.rs"]
+mod reload;
+#[path = "external_and_syntax/syntax_cache.rs"]
+mod syntax_cache;
