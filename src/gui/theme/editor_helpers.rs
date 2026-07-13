@@ -2,11 +2,15 @@
 
 #[path = "editor_helpers/viewport.rs"]
 mod editor_viewport;
-include!("editor_helpers/syntax_colors.rs");
+#[path = "editor_helpers/syntax_colors.rs"]
+mod syntax_colors;
 include!("editor_helpers/render_model.rs");
 include!("editor_helpers/replacement_edit.rs");
 include!("editor_helpers/mouse_layout.rs");
-include!("editor_helpers/text_ranges.rs");
+#[path = "editor_helpers/text_ranges.rs"]
+mod text_ranges;
 include!("editor_helpers/keyboard_inputs.rs");
 
 pub(in crate::gui::app::state) use editor_viewport::*;
+pub(in crate::gui::app::state) use syntax_colors::*;
+pub(in crate::gui::app::state) use text_ranges::*;

@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_replacement_delete_range(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_replacement_delete_range(
     buffer: &mut TextBuffer,
     start: DocumentCursor,
     end: DocumentCursor,
@@ -16,7 +18,7 @@ pub(super) fn gui_editor_replacement_delete_range(
     buffer.delete_replacement_range(start, end)
 }
 
-pub(super) fn gui_editor_replacement_grapheme_range(
+pub(in crate::gui::app::state) fn gui_editor_replacement_grapheme_range(
     buffer: &TextBuffer,
     start: DocumentCursor,
     end: DocumentCursor,
@@ -50,15 +52,19 @@ pub(super) fn gui_editor_replacement_grapheme_range(
     ))
 }
 
-pub(super) fn char_prefix(value: &str, end_column: usize) -> String {
+pub(in crate::gui::app::state) fn char_prefix(value: &str, end_column: usize) -> String {
     value.chars().take(end_column).collect()
 }
 
-pub(super) fn char_suffix(value: &str, start_column: usize) -> String {
+pub(in crate::gui::app::state) fn char_suffix(value: &str, start_column: usize) -> String {
     value.chars().skip(start_column).collect()
 }
 
-pub(super) fn char_slice(value: &str, start_column: usize, end_column: usize) -> String {
+pub(in crate::gui::app::state) fn char_slice(
+    value: &str,
+    start_column: usize,
+    end_column: usize,
+) -> String {
     value
         .chars()
         .skip(start_column)
