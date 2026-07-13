@@ -1,4 +1,9 @@
-pub(super) fn delete_browser_path(path: &Path, kind: FileSidebarEntryKind) -> io::Result<()> {
+use super::*;
+
+pub(in crate::gui::app::state) fn delete_browser_path(
+    path: &Path,
+    kind: FileSidebarEntryKind,
+) -> io::Result<()> {
     let metadata = fs::symlink_metadata(path)?;
     if metadata.file_type().is_symlink() {
         return Err(io::Error::new(

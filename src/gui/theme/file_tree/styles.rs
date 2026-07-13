@@ -1,4 +1,6 @@
-pub(super) fn gui_file_tree_row_text_color(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_file_tree_row_text_color(
     palette: iced::theme::Palette,
     selected: bool,
     error: bool,
@@ -12,7 +14,7 @@ pub(super) fn gui_file_tree_row_text_color(
     }
 }
 
-pub(super) fn gui_file_tree_row_style(
+pub(in crate::gui::app::state) fn gui_file_tree_row_style(
     palette: iced::theme::Palette,
     selected: bool,
 ) -> container::Style {
@@ -31,7 +33,7 @@ pub(super) fn gui_file_tree_row_style(
     }
 }
 
-pub(super) fn gui_file_tree_button_style(
+pub(in crate::gui::app::state) fn gui_file_tree_button_style(
     palette: iced::theme::Palette,
     selected: bool,
     status: iced::widget::button::Status,

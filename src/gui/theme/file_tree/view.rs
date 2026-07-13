@@ -1,12 +1,14 @@
-pub(super) fn gui_file_tree_text_size(settings: EditorSettings) -> u32 {
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_file_tree_text_size(settings: EditorSettings) -> u32 {
     gui_ui_text_size(settings)
 }
 
-pub(super) fn gui_file_tree_icon_size(settings: EditorSettings) -> u32 {
+pub(in crate::gui::app::state) fn gui_file_tree_icon_size(settings: EditorSettings) -> u32 {
     gui_ui_icon_text_size(settings)
 }
 
-pub(super) fn gui_file_tree_view<'a>(
+pub(in crate::gui::app::state) fn gui_file_tree_view<'a>(
     cached_rows: &[GuiFileTreeRowModel],
     settings: EditorSettings,
 ) -> Element<'a, Message> {

@@ -1,4 +1,6 @@
-pub(super) fn resolve_browser_child_path(
+use super::*;
+
+pub(in crate::gui::app::state) fn resolve_browser_child_path(
     base_directory: &Path,
     raw_name: &str,
 ) -> Result<PathBuf, String> {
