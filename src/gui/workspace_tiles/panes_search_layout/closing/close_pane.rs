@@ -1,3 +1,7 @@
+//! Pane close orchestration and dirty-buffer confirmation.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn close_pane(&mut self, pane: pane_grid::Pane) {
         self.sync_pane_to_document(pane);

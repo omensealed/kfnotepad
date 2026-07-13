@@ -1,3 +1,7 @@
+//! Last-tile close behavior that resets the pane to a blank document.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn close_last_tile(
         &mut self,

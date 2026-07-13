@@ -1,3 +1,7 @@
+//! Minimized-tile restoration into an existing pane slot.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn restore_first_minimized_into_pane(
         &mut self,
