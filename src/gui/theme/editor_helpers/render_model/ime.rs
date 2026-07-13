@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_viewport_line_with_ime_preedit(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_viewport_line_with_ime_preedit(
     mut line: GuiEditorViewportLine,
     preedit: Option<&GuiImePreedit>,
 ) -> GuiEditorViewportLine {
@@ -32,7 +34,9 @@ pub(super) fn gui_editor_viewport_line_with_ime_preedit(
     line
 }
 
-pub(super) fn gui_ime_preedit_selection_columns(preedit: &GuiImePreedit) -> Option<(usize, usize)> {
+pub(in crate::gui::app::state) fn gui_ime_preedit_selection_columns(
+    preedit: &GuiImePreedit,
+) -> Option<(usize, usize)> {
     use unicode_segmentation::UnicodeSegmentation;
 
     let selection = preedit.selection.as_ref()?;
@@ -51,7 +55,10 @@ pub(super) fn gui_ime_preedit_selection_columns(preedit: &GuiImePreedit) -> Opti
     Some((start, end))
 }
 
-pub(super) fn gui_byte_index_to_char_column(text: &str, byte_index: usize) -> usize {
+pub(in crate::gui::app::state) fn gui_byte_index_to_char_column(
+    text: &str,
+    byte_index: usize,
+) -> usize {
     let clamped = byte_index.min(text.len());
     text.char_indices()
         .take_while(|(index, _)| *index < clamped)

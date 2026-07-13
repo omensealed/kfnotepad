@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_viewport_line_slice(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_viewport_line_slice(
     line: &GuiEditorViewportLine,
     start: usize,
     end: usize,
@@ -88,7 +90,7 @@ fn gui_editor_nearest_grapheme_column(text: &str, column: usize) -> usize {
     line_columns
 }
 
-pub(super) fn gui_editor_slice_syntax_segments(
+pub(in crate::gui::app::state) fn gui_editor_slice_syntax_segments(
     line: &GuiEditorViewportLine,
     start: usize,
     end: usize,

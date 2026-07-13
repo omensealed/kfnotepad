@@ -1,4 +1,8 @@
-pub(super) fn gui_editor_line_syntax_colors(line: &GuiEditorViewportLine) -> Vec<Option<Color>> {
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_line_syntax_colors(
+    line: &GuiEditorViewportLine,
+) -> Vec<Option<Color>> {
     let mut colors = Vec::new();
     if let Some(segments) = &line.syntax_segments {
         for segment in segments {
@@ -9,7 +13,7 @@ pub(super) fn gui_editor_line_syntax_colors(line: &GuiEditorViewportLine) -> Vec
     colors
 }
 
-pub(super) fn gui_editor_push_read_only_segment(
+pub(in crate::gui::app::state) fn gui_editor_push_read_only_segment(
     segments: &mut Vec<GuiEditorReadOnlyLineSegment>,
     text: &mut String,
     selected: bool,

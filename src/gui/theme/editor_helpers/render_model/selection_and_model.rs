@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_viewport_selection_span(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_viewport_selection_span(
     line: &str,
     row: usize,
     selection: Option<GuiEditorReplacementSelection>,
@@ -31,7 +33,7 @@ pub(super) fn gui_editor_viewport_selection_span(
 }
 
 #[cfg(test)]
-pub(super) fn gui_editor_read_only_render_model(
+pub(in crate::gui::app::state) fn gui_editor_read_only_render_model(
     slice: &GuiEditorViewportSlice,
 ) -> GuiEditorReadOnlyRenderModel {
     let cursor = slice

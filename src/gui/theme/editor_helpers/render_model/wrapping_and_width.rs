@@ -1,6 +1,7 @@
+use super::*;
 use unicode_segmentation::UnicodeSegmentation;
 
-pub(super) fn gui_editor_read_only_visual_rows(
+pub(in crate::gui::app::state) fn gui_editor_read_only_visual_rows(
     lines: &[GuiEditorViewportLine],
     first_line: usize,
     wrapping: Wrapping,
@@ -30,7 +31,10 @@ pub(super) fn gui_editor_read_only_visual_rows(
     rows
 }
 
-pub(super) fn gui_editor_word_wrap_ranges(text: &str, max_columns: usize) -> Vec<(usize, usize)> {
+pub(in crate::gui::app::state) fn gui_editor_word_wrap_ranges(
+    text: &str,
+    max_columns: usize,
+) -> Vec<(usize, usize)> {
     let max_columns = max_columns.max(1);
     let graphemes = gui_editor_grapheme_wrap_units(text);
     let len = graphemes.len();
@@ -62,14 +66,14 @@ pub(super) fn gui_editor_word_wrap_ranges(text: &str, max_columns: usize) -> Vec
 }
 
 #[derive(Clone, Copy)]
-pub(super) struct GuiEditorGraphemeWrapUnit {
+pub(in crate::gui::app::state) struct GuiEditorGraphemeWrapUnit {
     start_column: usize,
     end_column: usize,
     display_width: usize,
     is_whitespace: bool,
 }
 
-pub(super) fn gui_editor_display_width_hard_end(
+pub(in crate::gui::app::state) fn gui_editor_display_width_hard_end(
     graphemes: &[GuiEditorGraphemeWrapUnit],
     start: usize,
     max_columns: usize,
@@ -88,7 +92,7 @@ pub(super) fn gui_editor_display_width_hard_end(
     end.max(start.saturating_add(1)).min(graphemes.len())
 }
 
-pub(super) fn gui_editor_char_display_width(character: char) -> usize {
+pub(in crate::gui::app::state) fn gui_editor_char_display_width(character: char) -> usize {
     if character == '\t' {
         GUI_TAB_WIDTH
     } else {
@@ -96,7 +100,7 @@ pub(super) fn gui_editor_char_display_width(character: char) -> usize {
     }
 }
 
-pub(super) fn gui_editor_char_column_from_pixel_x(
+pub(in crate::gui::app::state) fn gui_editor_char_column_from_pixel_x(
     text: &str,
     x: f32,
     character_width: f32,

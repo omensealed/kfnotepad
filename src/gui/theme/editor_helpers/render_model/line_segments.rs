@@ -1,4 +1,6 @@
-pub(super) fn gui_editor_read_only_line_segments(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_editor_read_only_line_segments(
     line: &GuiEditorViewportLine,
 ) -> Vec<GuiEditorReadOnlyLineSegment> {
     use unicode_segmentation::UnicodeSegmentation;
