@@ -1,3 +1,7 @@
+//! Test-oriented synchronous Save As flow.
+
+use super::*;
+
 impl KfnotepadGui {
     #[cfg(test)]
     pub(in crate::gui::app::state) fn save_active_tile_as(&mut self, path: PathBuf) -> bool {

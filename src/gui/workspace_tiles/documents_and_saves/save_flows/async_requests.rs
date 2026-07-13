@@ -1,3 +1,7 @@
+//! Asynchronous save request preparation and worker dispatch.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn request_save_active_tile_async(&mut self) -> Task<Message> {
         let Some(tile_id) = self
@@ -16,7 +20,10 @@ impl KfnotepadGui {
         self.request_save_tile_async(tile_id)
     }
 
-    pub(in crate::gui::app::state) fn request_save_tile_async(&mut self, tile_id: GuiTileId) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_save_tile_async(
+        &mut self,
+        tile_id: GuiTileId,
+    ) -> Task<Message> {
         let Some(pane) = self
             .panes
             .iter()
@@ -31,10 +38,8 @@ impl KfnotepadGui {
         };
         debug_assert_eq!(synced_tile_id, tile_id);
 
-        let Some((path, source_revision, expected_snapshot)) = self
-            .workspace
-            .tile(tile_id)
-            .map(|tile| {
+        let Some((path, source_revision, expected_snapshot)) =
+            self.workspace.tile(tile_id).map(|tile| {
                 (
                     tile.document.path.clone(),
                     tile.document.buffer.edit_revision(),
@@ -68,7 +73,10 @@ impl KfnotepadGui {
     }
 
     #[cfg(not(test))]
-    pub(in crate::gui::app::state) fn request_save_active_tile_as(&mut self, path: PathBuf) -> Task<Message> {
+    pub(in crate::gui::app::state) fn request_save_active_tile_as(
+        &mut self,
+        path: PathBuf,
+    ) -> Task<Message> {
         let Some(tile_id) = self
             .panes
             .get(self.active_pane)
@@ -97,10 +105,8 @@ impl KfnotepadGui {
             }
         }
 
-        let Some((original_path, source_revision, current_snapshot)) = self
-            .workspace
-            .tile(tile_id)
-            .map(|tile| {
+        let Some((original_path, source_revision, current_snapshot)) =
+            self.workspace.tile(tile_id).map(|tile| {
                 (
                     tile.document.path.clone(),
                     tile.document.buffer.edit_revision(),
