@@ -9,6 +9,7 @@ use kfnotepad::{Cursor, TextBuffer, MAX_TEXT_FILE_BYTES};
 const PASTE_BYTES: usize = 100 * 1024;
 const TYPED_CHARS: usize = 1_000;
 const UNDO_OPERATIONS: usize = 200;
+const OVERWRITE_CHARS: usize = 100 * 1024;
 
 static NEAR_LIMIT_TEXT: LazyLock<String> = LazyLock::new(|| {
     synthetic_text(
@@ -20,6 +21,7 @@ static ONE_MIB_TEXT: LazyLock<String> =
     LazyLock::new(|| synthetic_text(1024 * 1024, "middle-marker"));
 static ONE_MIB_LINE: LazyLock<String> = LazyLock::new(|| "a".repeat(1024 * 1024));
 static LARGE_PASTE: LazyLock<String> = LazyLock::new(|| "paste payload ".repeat(8_534));
+static LARGE_OVERWRITE: LazyLock<String> = LazyLock::new(|| "z".repeat(OVERWRITE_CHARS));
 
 fn main() {
     divan::main();
@@ -144,5 +146,20 @@ fn undo_200_operations(bencher: Bencher<'_, '_>) {
             for _ in 0..UNDO_OPERATIONS {
                 assert!(buffer.undo_last_edit());
             }
+        });
+}
+
+#[divan::bench]
+fn overwrite_paste_100_kib(bencher: Bencher<'_, '_>) {
+    bencher
+        .counter(BytesCount::new(OVERWRITE_CHARS))
+        .with_inputs(|| TextBuffer::from_text(ONE_MIB_LINE.as_str()))
+        .bench_refs(|buffer| {
+            buffer
+                .overwrite_text(
+                    Cursor { row: 0, column: 0 },
+                    divan::black_box(LARGE_OVERWRITE.as_str()),
+                )
+                .expect("synthetic overwrite remains in range")
         });
 }

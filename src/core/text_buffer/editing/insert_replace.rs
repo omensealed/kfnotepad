@@ -3,6 +3,64 @@
 use super::*;
 
 impl TextBuffer {
+    pub fn overwrite_text(&mut self, cursor: Cursor, text: &str) -> Result<Cursor, BufferError> {
+        self.validate_cursor(cursor)?;
+        if text.is_empty() {
+            return Ok(cursor);
+        }
+
+        if text.is_ascii() && !text.contains('\n') && self.lines[cursor.row].is_ascii() {
+            let line_columns = self.lines[cursor.row].len();
+            let replaced_columns = text.len().min(line_columns.saturating_sub(cursor.column));
+            let end = Cursor {
+                row: cursor.row,
+                column: cursor.column.saturating_add(replaced_columns),
+            };
+            let next_bytes = self
+                .byte_len()
+                .saturating_sub(replaced_columns)
+                .saturating_add(text.len());
+            self.ensure_byte_len(next_bytes)?;
+            let before = self.text_in_range_without_normalization(cursor, end)?;
+            let next = Cursor {
+                row: cursor.row,
+                column: cursor.column.saturating_add(text.len()),
+            };
+
+            self.break_undo_group();
+            self.replace_range_without_history(cursor, end, text)?;
+            self.record_replace_text_undo(cursor, end, next, before, text.to_owned());
+            self.mark_changed();
+            return Ok(next);
+        }
+
+        self.begin_compound_edit();
+        let result = self.overwrite_text_by_character(cursor, text);
+        self.end_compound_edit();
+        result
+    }
+
+    fn overwrite_text_by_character(
+        &mut self,
+        mut cursor: Cursor,
+        text: &str,
+    ) -> Result<Cursor, BufferError> {
+        for value in text.chars() {
+            if value == '\n' {
+                self.insert_newline(cursor.row, cursor.column)?;
+                cursor.row = cursor.row.saturating_add(1);
+                cursor.column = 0;
+                continue;
+            }
+            self.replace_char(cursor.row, cursor.column, value)?;
+            let inserted_end = cursor.column.saturating_add(1);
+            cursor.column = self
+                .grapheme_range_end_boundary_column(cursor.row, inserted_end)
+                .unwrap_or(inserted_end);
+        }
+        Ok(cursor)
+    }
+
     pub fn insert_text(&mut self, cursor: Cursor, text: &str) -> Result<Cursor, BufferError> {
         self.validate_cursor(cursor)?;
         if text.is_empty() {

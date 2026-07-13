@@ -16,9 +16,10 @@ cargo bench --locked --no-default-features --bench core_text
 ```
 
 The `core_text` Divan harness uses synthetic content and measures near-limit construction, serialization, end/missing
-searches, 100 KiB paste and delete operations, 1,000 typed ASCII inserts, and 200 undo operations. Filter a benchmark by
-appending its name, for example `cargo bench --locked --no-default-features --bench core_text -- paste_100_kib`.
-Record complete output with the host and compiler details above; benchmark numbers are not portable between machines.
+searches, 100 KiB paste, delete, and overwrite-paste operations, 1,000 typed ASCII inserts, and 200 undo
+operations. Filter a benchmark by appending its name, for example
+`cargo bench --locked --no-default-features --bench core_text -- paste_100_kib`. Record complete output with the host
+and compiler details above; benchmark numbers are not portable between machines.
 
 Divan `0.1.21` is pinned as a development-only dependency under its MIT/Apache-2.0 dual license. It is not linked into
 either application binary. Its nine locked transitive packages provide its CLI, macros, terminal sizing, and matching;
@@ -109,6 +110,24 @@ Separate eviction tests exceed both history constraints. Real mixed insert, repl
 256-entry cap discards only the oldest prefix and that every retained edit still undoes and redoes in order. A
 mixed-entry queue test covers standalone and grouped deltas under a byte cap, checking exact accounting after every
 push and pop and confirming that eviction retains one contiguous newest suffix.
+
+## Overwrite paste improvement
+
+Captured 2026-07-13 on the same host and compiler with
+`cargo bench --locked --no-default-features --bench core_text -- overwrite_paste_100_kib --sample-count 10 --max-time 0.5`.
+Overwriting 100 KiB at the start of a 1 MiB ASCII line measured a 1.018 ms median (100.5 MB/s).
+
+The previous character-at-a-time path did not complete one benchmark iteration inside a 30-second measurement
+window. It deleted and inserted each character separately, shifting the remainder of the long `String` twice per
+character. The optimized path validates the complete operation, replaces the covered same-line ASCII range once,
+extends at end-of-line when needed, and records one exact replacement delta. TUI overwrite-mode paste uses this path
+for newline-free ASCII input when no prompt or overlay owns paste input. Unicode and multiline overwrite paste retain
+the established characterwise behavior inside one byte-budgeted compound group.
+
+A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
+undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt
+precedence, and coalesced history storage. These local results are a forward baseline, not a portable performance
+guarantee.
 
 ## External-change polling improvement
 

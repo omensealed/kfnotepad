@@ -107,6 +107,16 @@ impl TextBuffer {
         self.validate_cursor(start)?;
         self.validate_cursor(end)?;
         let byte_index = byte_index_for_char_column(&self.lines[start.row], start.column)?;
+        if start.row == end.row && !text.contains('\n') {
+            let end_byte = byte_index_for_char_column(&self.lines[end.row], end.column)?;
+            if end_byte.saturating_sub(byte_index) == text.len() {
+                self.lines[start.row].replace_range(byte_index..end_byte, text);
+                return Ok(Cursor {
+                    row: start.row,
+                    column: start.column.saturating_add(text.chars().count()),
+                });
+            }
+        }
         self.delete_range_without_history(start, end)?;
         Ok(self.insert_text_without_history(start, byte_index, text))
     }

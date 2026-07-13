@@ -135,8 +135,8 @@ impl EditGroup {
             if contiguous {
                 previous.before.push_str(&delta.before);
                 previous.after.push_str(&delta.after);
-                previous.before_end = cursor_after_text(previous.start, &previous.before);
-                previous.after_end = cursor_after_text(previous.start, &previous.after);
+                previous.before_end = cursor_after_text(previous.before_end, &delta.before);
+                previous.after_end = delta.after_end;
                 previous.trailing_newline_after = delta.trailing_newline_after;
                 return;
             }

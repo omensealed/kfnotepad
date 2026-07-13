@@ -268,6 +268,71 @@ fn compound_delta_history_scales_with_changed_text_in_large_document() {
 }
 
 #[test]
+fn contiguous_compound_overwrite_coalesces_without_metadata_growth() {
+    const OVERWRITES: usize = 1_000;
+    let base = "a".repeat(1024 * 1024);
+    let mut document = TextDocument {
+        path: PathBuf::from("compound-overwrite.txt"),
+        buffer: TextBuffer::from_text(&base),
+    };
+
+    document.with_compound_edit(|document| {
+        for column in 0..OVERWRITES {
+            document
+                .buffer
+                .replace_char(0, column, 'z')
+                .expect("overwrite contiguous character");
+        }
+    });
+
+    assert!(matches!(
+        document.buffer.undo_history.back(),
+        Some(HistoryEntry::Group(group)) if group.deltas.len() == 1
+    ));
+    assert!(document.buffer.undo_bytes < 4 * OVERWRITES);
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), base);
+    assert!(document.buffer.redo_last_undo());
+    assert!(document.buffer.lines[0][..OVERWRITES]
+        .bytes()
+        .all(|byte| byte == b'z'));
+}
+
+#[test]
+fn bulk_ascii_overwrite_replaces_and_extends_with_one_exact_delta() {
+    let mut buffer = TextBuffer::from_text("abcdef");
+
+    let cursor = buffer
+        .overwrite_text(Cursor { row: 0, column: 2 }, "WXYZ12")
+        .expect("overwrite and extend line");
+
+    assert_eq!(buffer.to_text(), "abWXYZ12");
+    assert_eq!(cursor, Cursor { row: 0, column: 8 });
+    assert_eq!(buffer.undo_history.len(), 1);
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "abcdef");
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "abWXYZ12");
+}
+
+#[test]
+fn unicode_multiline_overwrite_preserves_characterwise_semantics() {
+    let mut buffer = TextBuffer::from_text("a\u{1f642}z");
+
+    let cursor = buffer
+        .overwrite_text(Cursor { row: 0, column: 1 }, "\u{754c}\nq")
+        .expect("overwrite Unicode and newline text");
+
+    assert_eq!(buffer.to_text(), "a\u{754c}\nq");
+    assert_eq!(cursor, Cursor { row: 1, column: 1 });
+    assert_eq!(buffer.undo_history.len(), 1);
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "a\u{1f642}z");
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "a\u{754c}\nq");
+}
+
+#[test]
 fn noncontiguous_compound_deltas_replay_in_order() {
     let mut document = TextDocument {
         path: PathBuf::from("noncontiguous-compound.txt"),
