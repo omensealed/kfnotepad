@@ -1,4 +1,6 @@
-pub(super) fn gui_text_input_style(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_text_input_style(
     palette: iced::theme::Palette,
     _status: iced::widget::text_input::Status,
 ) -> iced::widget::text_input::Style {
@@ -25,7 +27,7 @@ pub(super) fn gui_text_input_style(
     }
 }
 
-pub(super) fn gui_checkbox_style(
+pub(in crate::gui::app::state) fn gui_checkbox_style(
     palette: iced::theme::Palette,
     status: iced::widget::checkbox::Status,
 ) -> iced::widget::checkbox::Style {

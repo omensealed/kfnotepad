@@ -1,4 +1,6 @@
-pub(super) fn gui_native_editor_style(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_native_editor_style(
     palette: iced::theme::Palette,
     _status: text_editor::Status,
     search_highlight_active: bool,

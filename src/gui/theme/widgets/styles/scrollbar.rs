@@ -1,4 +1,6 @@
-pub(super) fn gui_scrollbar_track_style(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_scrollbar_track_style(
     palette: iced::theme::Palette,
     enabled: bool,
 ) -> container::Style {
@@ -19,7 +21,7 @@ pub(super) fn gui_scrollbar_track_style(
     }
 }
 
-pub(super) fn gui_scrollbar_thumb_style(
+pub(in crate::gui::app::state) fn gui_scrollbar_thumb_style(
     palette: iced::theme::Palette,
     enabled: bool,
 ) -> container::Style {

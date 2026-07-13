@@ -1,4 +1,6 @@
-pub(super) fn gui_chrome_button_style(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_chrome_button_style(
     palette: iced::theme::Palette,
     status: iced::widget::button::Status,
 ) -> iced::widget::button::Style {

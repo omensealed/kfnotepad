@@ -1,4 +1,6 @@
-pub(super) fn gui_menu_panel_style(
+use super::*;
+
+pub(in crate::gui::app::state) fn gui_menu_panel_style(
     palette: iced::theme::Palette,
 ) -> iced_aw::style::menu_bar::Style {
     iced_aw::style::menu_bar::Style {
@@ -32,7 +34,7 @@ pub(super) fn gui_menu_panel_style(
     }
 }
 
-pub(super) fn gui_menu_item_button_style(
+pub(in crate::gui::app::state) fn gui_menu_item_button_style(
     palette: iced::theme::Palette,
     status: iced::widget::button::Status,
 ) -> iced::widget::button::Style {
@@ -66,7 +68,9 @@ pub(super) fn gui_menu_item_button_style(
     }
 }
 
-pub(super) fn gui_menu_root_style(palette: iced::theme::Palette) -> container::Style {
+pub(in crate::gui::app::state) fn gui_menu_root_style(
+    palette: iced::theme::Palette,
+) -> container::Style {
     container::Style {
         text_color: Some(palette.text),
         background: None,
