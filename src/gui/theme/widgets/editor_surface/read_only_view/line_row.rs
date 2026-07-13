@@ -1,4 +1,6 @@
-fn gui_editor_read_only_line_row(
+use super::*;
+
+pub(super) fn gui_editor_read_only_line_row(
     context: GuiReadOnlyLineRowContext,
     visual_row: GuiEditorReadOnlyVisualRow,
     rendered_row: usize,

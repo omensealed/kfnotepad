@@ -1,4 +1,6 @@
-fn gui_editor_read_only_body(
+use super::*;
+
+pub(super) fn gui_editor_read_only_body(
     editor_rows: iced::widget::Column<'static, Message>,
     context: GuiReadOnlyBodyContext,
 ) -> Element<'static, Message> {
