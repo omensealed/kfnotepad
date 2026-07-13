@@ -21,7 +21,12 @@ test -s docs/06-SECURITY.md
 test -s docs/13-OPERATIONS.md
 test -s docs/16-CLI-CONTRACT.md
 test -s docs/17-GUI-CONTRACT.md
+test -s .github/dependabot.yml
 test -s .github/workflows/ci.yml
 grep -q 'cargo clippy --locked --all-targets --all-features -- -D warnings' .github/workflows/ci.yml
 grep -q 'cargo test --locked --all-features' .github/workflows/ci.yml
+if grep -REn 'uses:[[:space:]]+[^[:space:]]+@(v[0-9]+|main|master)([[:space:]]|$)' .github/workflows; then
+    printf '%s\n' 'GitHub Actions must use immutable commit SHAs.' >&2
+    exit 1
+fi
 printf '%s\n' 'All configured checks passed.'
