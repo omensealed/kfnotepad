@@ -403,6 +403,62 @@ fn gui_editor_replacement_clipboard_paste_replaces_selection_and_handles_newline
 }
 
 #[test]
+fn gui_editor_replacement_overwrite_paste_uses_one_undo_group() {
+    let mut document = TextDocument {
+        path: PathBuf::from("overwrite-paste.txt"),
+        buffer: TextBuffer::from_text("abcdef"),
+    };
+    let mut cursor = DocumentCursor { row: 0, column: 1 };
+    let mut viewport = GuiEditorViewportState::new(3);
+    let mut selection = None;
+
+    assert!(gui_editor_replacement_paste_text_with_mode(
+        &mut document,
+        &mut cursor,
+        &mut viewport,
+        &mut selection,
+        true,
+        "XYZ",
+    ));
+
+    assert_eq!(document.buffer.to_text(), "aXYZef");
+    assert_eq!(cursor, DocumentCursor { row: 0, column: 4 });
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), "abcdef");
+    assert!(!document.buffer.undo_last_edit());
+}
+
+#[test]
+fn gui_editor_replacement_overwrite_paste_preserves_selection_semantics() {
+    let mut document = TextDocument {
+        path: PathBuf::from("overwrite-selection-paste.txt"),
+        buffer: TextBuffer::from_text("abcdef"),
+    };
+    let mut cursor = DocumentCursor { row: 0, column: 3 };
+    let mut viewport = GuiEditorViewportState::new(3);
+    let mut selection = Some(GuiEditorReplacementSelection {
+        anchor: DocumentCursor { row: 0, column: 1 },
+        focus: DocumentCursor { row: 0, column: 3 },
+    });
+
+    assert!(gui_editor_replacement_paste_text_with_mode(
+        &mut document,
+        &mut cursor,
+        &mut viewport,
+        &mut selection,
+        true,
+        "XY",
+    ));
+
+    assert_eq!(document.buffer.to_text(), "aXYef");
+    assert_eq!(cursor, DocumentCursor { row: 0, column: 3 });
+    assert_eq!(selection, None);
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), "abcdef");
+    assert!(!document.buffer.undo_last_edit());
+}
+
+#[test]
 fn gui_editor_replacement_paste_expands_partial_grapheme_selection() {
     let mut document = TextDocument {
         path: PathBuf::from("paste-grapheme.txt"),

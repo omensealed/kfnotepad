@@ -375,4 +375,18 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
     let _ = update(&mut state, Message::ClipboardPasted(None));
     assert_eq!(state.status_message, "clipboard is empty");
     assert_eq!(state.active_editor().text(), "omega");
+
+    state.replacement_overwrite_mode = true;
+    state
+        .panes
+        .get_mut(state.active_pane)
+        .expect("active pane")
+        .editor
+        .move_to(DocumentCursor { row: 0, column: 1 });
+    state.sync_pane_cursor_to_document(state.active_pane);
+    let _ = update(&mut state, Message::ClipboardPasted(Some("XY".to_string())));
+    assert_eq!(state.status_message, "pasted clipboard");
+    assert_eq!(state.active_editor().text(), "oXYga");
+    state.undo_active_edit();
+    assert_eq!(state.active_editor().text(), "omega");
 }

@@ -29,6 +29,25 @@ impl KfnotepadGui {
             self.status_message = "clipboard is empty".to_string();
             return;
         };
+        let Some(tile_id) = self
+            .panes
+            .get(self.active_pane)
+            .map(|pane_state| pane_state.tile_id)
+        else {
+            return;
+        };
+        if self.is_external_edit_locked(tile_id) {
+            self.status_message = "external edit lock active; unlock to edit".to_string();
+            return;
+        }
+        if GUI_USE_READ_ONLY_EDITOR_RENDERER {
+            if self.apply_replacement_editor_paste_to_active_tile(&contents) {
+                self.status_message = "pasted clipboard".to_string();
+            } else {
+                self.status_message = "paste could not be applied".to_string();
+            }
+            return;
+        }
         let selected_bytes = self
             .active_editor_selection()
             .map_or(0, |selection| selection.len());

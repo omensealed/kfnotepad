@@ -124,6 +124,11 @@ extends at end-of-line when needed, and records one exact replacement delta. TUI
 for newline-free ASCII input when no prompt or overlay owns paste input. Unicode and multiline overwrite paste retain
 the established characterwise behavior inside one byte-budgeted compound group.
 
+The GUI replacement editor uses the same bulk document operation for overwrite-mode editor and clipboard paste. It
+rebuilds the Iced editor mirror once after the shared edit because Iced's public editor API has no bulk arbitrary-range
+replacement operation; insert-mode editor paste retains its existing per-input delta synchronization and performs no
+full mirror rebuild. Both modes keep one shared undo step, including paste over an active selection.
+
 A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
 undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt
 precedence, and coalesced history storage. These local results are a forward baseline, not a portable performance

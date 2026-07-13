@@ -176,6 +176,41 @@ fn gui_edit_paste_uses_delta_edit_and_no_rebuild() {
 }
 
 #[test]
+fn gui_edit_overwrite_paste_uses_bulk_document_edit_and_one_mirror_rebuild() {
+    let temp = TempArea::new("gui-edit-overwrite-paste-bulk");
+    let path = temp.path("note.txt");
+    fs::write(&path, "alpha\n").expect("write file");
+    let mut state = KfnotepadGui::new(GuiLaunch {
+        requested_paths: vec![path],
+    });
+    let active_pane = state.active_pane;
+    state.replacement_overwrite_mode = true;
+    state
+        .panes
+        .get_mut(active_pane)
+        .expect("active pane")
+        .editor
+        .move_to(DocumentCursor { row: 0, column: 1 });
+
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
+    let _ = update(
+        &mut state,
+        Message::Edit(
+            active_pane,
+            text_editor::Action::Edit(text_editor::Edit::Paste("XY".to_string().into())),
+        ),
+    );
+
+    assert_eq!(state.active_editor().text(), "aXYha\n");
+    assert_eq!(kfnotepad::to_text_call_count(), 1);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
+
+    state.undo_active_edit();
+    assert_eq!(state.active_editor().text(), "alpha\n");
+}
+
+#[test]
 fn gui_edit_delete_uses_delta_edit_when_selection_is_empty() {
     let temp = TempArea::new("gui-edit-delete-rebuilds-text");
     let path = temp.path("note.txt");
