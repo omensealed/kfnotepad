@@ -2,5 +2,7 @@
 
 use super::*;
 
-include!("async_completions/save.rs");
-include!("async_completions/save_as.rs");
+#[path = "async_completions/save.rs"]
+mod save;
+#[path = "async_completions/save_as.rs"]
+mod save_as;

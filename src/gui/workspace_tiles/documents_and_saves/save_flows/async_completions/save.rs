@@ -1,3 +1,7 @@
+//! Completion handling for saves to an existing document path.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn apply_save_active_tile_completion(
         &mut self,

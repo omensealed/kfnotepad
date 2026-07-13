@@ -1,3 +1,7 @@
+//! Completion handling for saves that retarget a document path.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn apply_save_active_tile_as_completion(
         &mut self,
