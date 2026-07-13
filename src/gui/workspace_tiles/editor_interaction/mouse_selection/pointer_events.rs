@@ -27,7 +27,10 @@ impl KfnotepadGui {
         }
     }
 
-    pub(in crate::gui::app::state) fn replacement_editor_pointer_pressed(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn replacement_editor_pointer_pressed(
+        &mut self,
+        pane: pane_grid::Pane,
+    ) {
         let Some((point_pane, point)) = self.replacement_pointer_point else {
             return;
         };
@@ -43,7 +46,10 @@ impl KfnotepadGui {
         self.apply_replacement_editor_mouse_click_to_pane(pane, point);
     }
 
-    pub(in crate::gui::app::state) fn replacement_editor_pointer_released(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn replacement_editor_pointer_released(
+        &mut self,
+        pane: pane_grid::Pane,
+    ) {
         if self.replacement_drag.is_some_and(|drag| drag.pane == pane) {
             self.clear_replacement_drag();
         }

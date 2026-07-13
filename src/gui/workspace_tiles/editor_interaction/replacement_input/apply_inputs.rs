@@ -49,7 +49,8 @@ impl KfnotepadGui {
                 self.replacement_overwrite_mode,
                 *input,
             );
-            let input_mutates_text = gui_replacement_inputs_mutates_text(std::slice::from_ref(input));
+            let input_mutates_text =
+                gui_replacement_inputs_mutates_text(std::slice::from_ref(input));
             if !input_mutates_text || tile.document.buffer.edit_revision() != revision_before {
                 applied_editor_inputs.push(*input);
             }
