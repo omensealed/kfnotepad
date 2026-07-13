@@ -1,3 +1,5 @@
+use super::*;
+
 #[test]
 fn gui_browser_clicks_are_ignored_while_workspace_panel_is_active() {
     let temp = TempArea::new("gui-left-panel-ignore-browser");
@@ -326,7 +328,12 @@ fn gui_window_close_pending_confirmation_clears_after_save() {
     assert!(state.pending_app_quit);
     let tile_id = state.workspace.active_tile().id;
     let _ = update(&mut state, Message::SaveRequested);
-    let source_revision = state.workspace.active_tile().document.buffer.edit_revision();
+    let source_revision = state
+        .workspace
+        .active_tile()
+        .document
+        .buffer
+        .edit_revision();
     fs::write(&file, "saved before close\n").expect("simulate async save");
     let snapshot = gui_file_snapshot(&file)
         .expect("snapshot saved file")
@@ -366,7 +373,12 @@ fn gui_save_async_completion_keeps_dirty_when_text_changed_before_finish() {
         .editor = GuiEditorAdapter::from_text("queued save text\n");
 
     let _task = update(&mut state, Message::SaveRequested);
-    let source_revision = state.workspace.active_tile().document.buffer.edit_revision();
+    let source_revision = state
+        .workspace
+        .active_tile()
+        .document
+        .buffer
+        .edit_revision();
     fs::write(&path, "queued save text\n").expect("simulate async save");
     let snapshot = gui_file_snapshot(&path)
         .expect("snapshot queued save")
@@ -417,7 +429,12 @@ fn gui_repeated_save_requests_coalesce_to_one_follow_up_per_tile() {
     let tile_id = state.workspace.active_tile().id;
 
     let _first = update(&mut state, Message::SaveRequested);
-    let source_revision = state.workspace.active_tile().document.buffer.edit_revision();
+    let source_revision = state
+        .workspace
+        .active_tile()
+        .document
+        .buffer
+        .edit_revision();
     let _second = update(&mut state, Message::SaveRequested);
     let _third = update(&mut state, Message::SaveRequested);
 
@@ -443,7 +460,12 @@ fn gui_repeated_save_requests_coalesce_to_one_follow_up_per_tile() {
     assert!(state.save_in_flight.contains(&tile_id));
     assert!(!state.save_requested_after_in_flight.contains(&tile_id));
 
-    let follow_up_revision = state.workspace.active_tile().document.buffer.edit_revision();
+    let follow_up_revision = state
+        .workspace
+        .active_tile()
+        .document
+        .buffer
+        .edit_revision();
     let snapshot = gui_file_snapshot(&path)
         .expect("snapshot follow-up")
         .expect("follow-up file");

@@ -1,3 +1,5 @@
+use super::*;
+
 #[test]
 fn gui_managed_note_prompt_creates_and_opens_note_in_new_pane() {
     let temp = TempArea::new("gui-managed-note-prompt");
@@ -592,7 +594,12 @@ fn gui_browser_tree_directory_double_click_resets_root_without_opening_tile() {
         subdir.canonicalize().expect("canonical subdir")
     );
     assert_eq!(
-        state.browser_tree_rows.first().expect("tree root").path.clone(),
+        state
+            .browser_tree_rows
+            .first()
+            .expect("tree root")
+            .path
+            .clone(),
         subdir.canonicalize().expect("canonical tree subdir")
     );
     assert!(state
@@ -625,7 +632,12 @@ fn gui_browser_parent_request_resets_tree_root_to_parent_directory() {
         parent
     );
     assert_eq!(
-        state.browser_tree_rows.first().expect("tree root").path.clone(),
+        state
+            .browser_tree_rows
+            .first()
+            .expect("tree root")
+            .path
+            .clone(),
         parent
     );
 }

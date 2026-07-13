@@ -1,3 +1,5 @@
+use super::*;
+
 #[test]
 fn gui_launch_loads_requested_file_into_editor_state() {
     let temp = TempArea::new("gui-open");

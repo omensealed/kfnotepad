@@ -34,12 +34,18 @@ fn gui_test_syntax_cache_for_document(
     }
 }
 
-include!("tests/launch_and_file_io.rs");
-include!("tests/managed_external_browser.rs");
-include!("tests/workspaces.rs");
-include!("tests/panes_search_menu_layout.rs");
-include!("tests/actions_preferences_icons.rs");
-include!("tests/editor_renderer.rs");
+#[path = "tests/actions_preferences_icons.rs"]
+mod actions_preferences_icons;
+#[path = "tests/editor_renderer.rs"]
+mod editor_renderer;
+#[path = "tests/launch_and_file_io.rs"]
+mod launch_and_file_io;
+#[path = "tests/managed_external_browser.rs"]
+mod managed_external_browser;
+#[path = "tests/panes_search_menu_layout.rs"]
+mod panes_search_menu_layout;
+#[path = "tests/workspaces.rs"]
+mod workspaces;
 
 struct TempArea {
     root: PathBuf,

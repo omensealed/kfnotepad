@@ -1,3 +1,5 @@
+use super::*;
+
 #[test]
 fn gui_left_panel_switches_between_files_workspaces_and_preferences_without_project_io() {
     let temp = TempArea::new("gui-left-panel-mode");

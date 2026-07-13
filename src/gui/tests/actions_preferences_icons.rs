@@ -1,3 +1,5 @@
+use super::*;
+
 #[test]
 fn gui_core_actions_keep_descriptive_labels_and_access_paths() {
     let actions = gui_action_descriptors();
@@ -149,7 +151,12 @@ fn gui_menu_file_and_view_commands_route_existing_actions() {
     let save_tile_id = state.workspace.active_tile().id;
 
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Save));
-    let source_revision = state.workspace.active_tile().document.buffer.edit_revision();
+    let source_revision = state
+        .workspace
+        .active_tile()
+        .document
+        .buffer
+        .edit_revision();
     fs::write(&second, "saved by menu\n").expect("simulate async menu save");
     let snapshot = gui_file_snapshot(&second)
         .expect("snapshot menu save")
@@ -1211,7 +1218,10 @@ fn gui_case_sensitive_search_selects_full_grapheme_for_partial_match() {
     );
     assert_eq!(state.active_editor().selection().as_deref(), Some("🇺🇸"));
 
-    let _ = update(&mut state, Message::SearchQueryChanged("\u{301}".to_string()));
+    let _ = update(
+        &mut state,
+        Message::SearchQueryChanged("\u{301}".to_string()),
+    );
     let _ = update(&mut state, Message::SearchNext);
     assert_eq!(
         state.workspace.active_tile().state.cursor,

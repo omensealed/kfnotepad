@@ -1,3 +1,5 @@
+use super::*;
+
 #[test]
 fn gui_editor_rendering_helpers_reflect_line_number_and_wrap_preferences() {
     assert_eq!(gui_editor_wrapping(false), Wrapping::None);
