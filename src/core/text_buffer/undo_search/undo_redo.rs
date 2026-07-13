@@ -102,6 +102,49 @@ impl TextBuffer {
                     MAX_UNDO_BYTES,
                 );
             }
+            HistoryEntry::ReplaceText {
+                start,
+                before_end,
+                after_end,
+                before,
+                after,
+                byte_size,
+            } => {
+                if self
+                    .replace_range_without_history(start, after_end, &before)
+                    .is_err()
+                {
+                    push_history_entry(
+                        &mut self.undo_history,
+                        &mut self.undo_bytes,
+                        HistoryEntry::ReplaceText {
+                            start,
+                            before_end,
+                            after_end,
+                            before,
+                            after,
+                            byte_size,
+                        },
+                        MAX_UNDO_HISTORY,
+                        MAX_UNDO_BYTES,
+                    );
+                    return false;
+                }
+                push_history_entry(
+                    &mut self.redo_history,
+                    &mut self.redo_bytes,
+                    HistoryEntry::ReplaceText {
+                        start,
+                        before_end,
+                        after_end,
+                        before,
+                        after,
+                        byte_size,
+                    },
+                    MAX_UNDO_HISTORY,
+                    MAX_UNDO_BYTES,
+                );
+            }
         }
         self.mark_changed();
         true
@@ -204,6 +247,49 @@ impl TextBuffer {
                         text,
                         trailing_newline_before,
                         trailing_newline_after,
+                        byte_size,
+                    },
+                    MAX_UNDO_HISTORY,
+                    MAX_UNDO_BYTES,
+                );
+            }
+            HistoryEntry::ReplaceText {
+                start,
+                before_end,
+                after_end,
+                before,
+                after,
+                byte_size,
+            } => {
+                if self
+                    .replace_range_without_history(start, before_end, &after)
+                    .is_err()
+                {
+                    push_history_entry(
+                        &mut self.redo_history,
+                        &mut self.redo_bytes,
+                        HistoryEntry::ReplaceText {
+                            start,
+                            before_end,
+                            after_end,
+                            before,
+                            after,
+                            byte_size,
+                        },
+                        MAX_UNDO_HISTORY,
+                        MAX_UNDO_BYTES,
+                    );
+                    return false;
+                }
+                push_history_entry(
+                    &mut self.undo_history,
+                    &mut self.undo_bytes,
+                    HistoryEntry::ReplaceText {
+                        start,
+                        before_end,
+                        after_end,
+                        before,
+                        after,
                         byte_size,
                     },
                     MAX_UNDO_HISTORY,

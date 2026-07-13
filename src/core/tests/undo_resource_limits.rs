@@ -59,6 +59,66 @@ fn insert_newline_breaks_typing_undo_group() {
 }
 
 #[test]
+fn insert_newline_uses_exact_insert_delta_and_preserves_trailing_newline() {
+    let mut buffer = TextBuffer::from_text("abc\n");
+
+    buffer.insert_newline(0, 3).expect("insert newline");
+
+    assert_eq!(buffer.to_text(), "abc\n\n");
+    assert!(buffer.has_trailing_newline());
+    assert!(matches!(
+        buffer.undo_history.back(),
+        Some(HistoryEntry::InsertText { text, .. }) if text == "\n"
+    ));
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "abc\n");
+    assert!(buffer.has_trailing_newline());
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "abc\n\n");
+    assert!(buffer.has_trailing_newline());
+}
+
+#[test]
+fn replace_delta_restores_entire_unicode_grapheme() {
+    let mut buffer = TextBuffer::from_text("a\u{1f1fa}\u{1f1f8}z\n");
+
+    buffer.replace_char(0, 1, 'x').expect("replace flag");
+
+    assert_eq!(buffer.to_text(), "axz\n");
+    assert!(matches!(
+        buffer.undo_history.back(),
+        Some(HistoryEntry::ReplaceText { before, after, .. })
+            if before == "\u{1f1fa}\u{1f1f8}" && after == "x"
+    ));
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "a\u{1f1fa}\u{1f1f8}z\n");
+    assert!(buffer.has_trailing_newline());
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "axz\n");
+    assert!(buffer.has_trailing_newline());
+}
+
+#[test]
+fn replace_delta_history_scales_with_replacement_instead_of_document() {
+    let base = "a".repeat(1024 * 1024);
+    let mut buffer = TextBuffer::from_text(&base);
+
+    buffer.replace_char(0, 0, 'z').expect("replace character");
+
+    assert_eq!(buffer.undo_history.len(), 1);
+    assert!(buffer.undo_bytes < 1024);
+    assert!(matches!(
+        buffer.undo_history.back(),
+        Some(HistoryEntry::ReplaceText { before, after, .. })
+            if before == "a" && after == "z"
+    ));
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), base);
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.lines[0].as_bytes()[0], b'z');
+}
+
+#[test]
 fn cursor_jumps_break_typed_insert_undo_coalescing() {
     let mut buffer = TextBuffer::from_text("");
 

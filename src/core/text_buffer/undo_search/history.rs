@@ -218,4 +218,34 @@ impl TextBuffer {
         self.redo_history.clear();
         self.redo_bytes = 0;
     }
+
+    pub(in crate::core::text_buffer) fn record_replace_text_undo(
+        &mut self,
+        start: Cursor,
+        before_end: Cursor,
+        after_end: Cursor,
+        before: String,
+        after: String,
+    ) {
+        let byte_size = before
+            .capacity()
+            .saturating_add(after.capacity())
+            .saturating_add(std::mem::size_of::<HistoryEntry>());
+        push_history_entry(
+            &mut self.undo_history,
+            &mut self.undo_bytes,
+            HistoryEntry::ReplaceText {
+                start,
+                before_end,
+                after_end,
+                before,
+                after,
+                byte_size,
+            },
+            MAX_UNDO_HISTORY,
+            MAX_UNDO_BYTES,
+        );
+        self.redo_history.clear();
+        self.redo_bytes = 0;
+    }
 }

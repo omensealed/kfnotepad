@@ -108,6 +108,19 @@ impl TextBuffer {
         Ok(())
     }
 
+    pub(in crate::core::text_buffer) fn replace_range_without_history(
+        &mut self,
+        start: Cursor,
+        end: Cursor,
+        text: &str,
+    ) -> Result<Cursor, BufferError> {
+        self.validate_cursor(start)?;
+        self.validate_cursor(end)?;
+        let byte_index = byte_index_for_char_column(&self.lines[start.row], start.column)?;
+        self.delete_range_without_history(start, end)?;
+        Ok(self.insert_text_without_history(start, byte_index, text))
+    }
+
     fn range_start_boundary_cursor(&self, cursor: Cursor) -> Result<Cursor, BufferError> {
         let line = self
             .lines

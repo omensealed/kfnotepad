@@ -144,7 +144,11 @@ impl TextBuffer {
                 .lines
                 .get(row)
                 .ok_or(BufferError::RowOutOfBounds { row, rows })?;
-            grapheme_char_range_at_column(line, column)?.unwrap_or((column, column + 1))
+            if line.is_ascii() {
+                (column, column + 1)
+            } else {
+                grapheme_char_range_at_column(line, column)?.unwrap_or((column, column + 1))
+            }
         };
         let start = {
             let line = self
@@ -168,39 +172,38 @@ impl TextBuffer {
             .saturating_add(value.len_utf8());
         self.ensure_byte_len(next_bytes)?;
 
+        let start_cursor = Cursor {
+            row,
+            column: start_column,
+        };
+        let before_end = Cursor {
+            row,
+            column: end_column,
+        };
+        let after = value.to_string();
+        let after_end = Cursor {
+            row,
+            column: start_column.saturating_add(1),
+        };
+        let use_delta_history = matches!(self.compound_edit, CompoundEditState::Inactive);
+        let before = if use_delta_history {
+            Some(self.text_in_range_without_normalization(start_cursor, before_end)?)
+        } else {
+            None
+        };
         self.break_undo_group();
-        self.record_undo();
-        let line = self
-            .lines
-            .get_mut(row)
-            .ok_or(BufferError::RowOutOfBounds { row, rows })?;
-        line.replace_range(start..end, &value.to_string());
+        if !use_delta_history {
+            self.record_undo();
+        }
+        self.replace_range_without_history(start_cursor, before_end, &after)?;
+        if let Some(before) = before {
+            self.record_replace_text_undo(start_cursor, before_end, after_end, before, after);
+        }
         self.mark_changed();
         Ok(())
     }
 
     pub fn insert_newline(&mut self, row: usize, column: usize) -> Result<(), BufferError> {
-        let rows = self.lines.len();
-        let byte_index = {
-            let line = self
-                .lines
-                .get(row)
-                .ok_or(BufferError::RowOutOfBounds { row, rows })?;
-            byte_index_for_char_column(line, column)?
-        };
-
-        let next_bytes = self.byte_len().saturating_add(1);
-        self.ensure_byte_len(next_bytes)?;
-
-        self.break_undo_group();
-        self.record_undo();
-        let line = self
-            .lines
-            .get_mut(row)
-            .ok_or(BufferError::RowOutOfBounds { row, rows })?;
-        let remainder = line.split_off(byte_index);
-        self.lines.insert(row + 1, remainder);
-        self.mark_changed();
-        Ok(())
+        self.insert_text(Cursor { row, column }, "\n").map(|_| ())
     }
 }

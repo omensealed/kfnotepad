@@ -92,6 +92,13 @@ boundary in the line is already a grapheme boundary. On the same host, the 1 MiB
 measured a 1.068 ms median for deleting 100 KiB from a 1 MiB ASCII line. No pre-change release baseline exists for
 that added benchmark, so the result is a forward baseline rather than an improvement ratio.
 
+Standalone newline insertion now uses the same exact insert delta as bulk text, and character overwrite uses a
+replacement delta containing only the removed grapheme, inserted character, and their exact ranges. Undo and redo
+therefore preserve multi-code-point graphemes and trailing-newline state without retaining the surrounding document.
+Compound edits continue to use one pre-edit snapshot. A structural test verifies that overwriting one character in a
+1 MiB ASCII document retains less than 1 KiB of history, and the ASCII overwrite path avoids unnecessary grapheme
+segmentation.
+
 ## External-change polling improvement
 
 The first polling correction kept the one-second responsiveness contract but compared symlink-safe file metadata
