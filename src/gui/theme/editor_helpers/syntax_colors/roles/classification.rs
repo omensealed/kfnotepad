@@ -1,4 +1,8 @@
-fn gui_syntax_color_role(red: u8, green: u8, blue: u8) -> GuiSyntaxColorRole {
+//! RGB-to-semantic syntax role classification.
+
+use super::*;
+
+pub(super) fn gui_syntax_color_role(red: u8, green: u8, blue: u8) -> GuiSyntaxColorRole {
     let max = red.max(green).max(blue);
     let min = red.min(green).min(blue);
     let chroma = max.saturating_sub(min);

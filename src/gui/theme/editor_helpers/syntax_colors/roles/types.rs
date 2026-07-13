@@ -1,5 +1,7 @@
+//! Semantic roles used to normalize source syntax colors across themes.
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-enum GuiSyntaxColorRole {
+pub(super) enum GuiSyntaxColorRole {
     Text,
     Comment,
     Rose,

@@ -1,4 +1,11 @@
-fn gui_syntax_role_rgb(theme_id: EditorThemeId, role: GuiSyntaxColorRole) -> (u8, u8, u8) {
+//! Theme-specific RGB palettes for semantic syntax roles.
+
+use super::*;
+
+pub(super) fn gui_syntax_role_rgb(
+    theme_id: EditorThemeId,
+    role: GuiSyntaxColorRole,
+) -> (u8, u8, u8) {
     match theme_id {
         EditorThemeId::Nocturne => match role {
             GuiSyntaxColorRole::Text => (213, 224, 246),
