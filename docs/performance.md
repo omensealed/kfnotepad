@@ -66,10 +66,9 @@ Captured 2026-07-13 on the same host and compiler with
 The 100 KiB paste median fell from 314.60 ms to 123.3 us.
 
 Standalone bulk insertion now records a byte-budgeted delta containing the inserted text and exact range instead of
-cloning the document into undo history. Snapshot history remains the fallback for compound edits and other edit
-kinds. Undo removes the exact inserted range without expanding across adjacent grapheme clusters, and redo reapplies
-the stored text. For the benchmark's 1 MiB document and 100 KiB paste, history payload therefore scales with roughly
-100 KiB of inserted text instead of the pre-edit document.
+cloning the document into undo history. Undo removes the exact inserted range without expanding across adjacent
+grapheme clusters, and redo reapplies the stored text. For the benchmark's 1 MiB document and 100 KiB paste, history
+payload therefore scales with roughly 100 KiB of inserted text instead of the pre-edit document.
 
 The remaining elapsed-time improvement comes from avoiding a full-line Unicode grapheme scan when the inserted final
 segment and following byte are both ASCII (or the insertion ends the line). Unicode text and non-ASCII adjacency keep
@@ -84,9 +83,9 @@ typing group now retains its inserted text and allocation capacity instead of cl
 entry-count limit to remain useful without exhausting the byte budget first.
 
 Character, word, selection, and line-boundary deletion now share an exact delete delta. A delta retains removed text,
-its original range, and trailing-newline policy; undo reinserts it and redo removes the same raw range. Compound edits
-continue to use one pre-edit snapshot. An ASCII-line fast path skips Unicode segmentation because every character
-boundary in the line is already a grapheme boundary. On the same host, the 1 MiB structural debug test fell from about
+its original range, and trailing-newline policy; undo reinserts it and redo removes the same raw range. An ASCII-line
+fast path skips Unicode segmentation because every character boundary in the line is already a grapheme boundary. On
+the same host, the 1 MiB structural debug test fell from about
 65 seconds to 0.35 seconds of test execution. A release comparison captured with
 `cargo bench --locked --no-default-features --bench core_text -- delete_100_kib --sample-count 10 --max-time 0.5`
 measured a 1.068 ms median for deleting 100 KiB from a 1 MiB ASCII line. No pre-change release baseline exists for
@@ -95,19 +94,21 @@ that added benchmark, so the result is a forward baseline rather than an improve
 Standalone newline insertion now uses the same exact insert delta as bulk text, and character overwrite uses a
 replacement delta containing only the removed grapheme, inserted character, and their exact ranges. Undo and redo
 therefore preserve multi-code-point graphemes and trailing-newline state without retaining the surrounding document.
-Compound edits continue to use one pre-edit snapshot. A structural test verifies that overwriting one character in a
-1 MiB ASCII document retains less than 1 KiB of history, and the ASCII overwrite path avoids unnecessary grapheme
-segmentation.
+Compound edits store ordered delta groups and remain one user-visible undo step. Contiguous operations coalesce into
+one replacement delta, while noncontiguous operations undo in reverse and redo forward. Group payload and vector
+storage count toward the same 64 MiB history ceiling during assembly. A structural test verifies that a compound
+replacement in a 1 MiB ASCII document retains less than 1 KiB of history, and the ASCII overwrite path avoids
+unnecessary grapheme segmentation.
 
-Delta history also has a deterministic model test that runs 1,080 mixed edits across fixed seeds. It compares every
-forward state with an independent tokenized line model, then verifies the complete undo and redo sequence. The mix
-includes ASCII, CJK, emoji, combining graphemes, multiline insertion, line splitting/joining, deletion, backspace,
-and overwrite while remaining below the configured history-entry limit.
+Delta history also has deterministic model tests for standalone edits and nested compound transactions. They compare
+every forward state with an independent tokenized line model, then verify each complete undo and redo sequence. The
+mix includes ASCII, CJK, emoji, combining graphemes, multiline insertion, line splitting/joining, deletion,
+backspace, and overwrite while remaining below the configured history-entry limit.
 
 Separate eviction tests exceed both history constraints. Real mixed insert, replace, and delete edits verify that the
 256-entry cap discards only the oldest prefix and that every retained edit still undoes and redoes in order. A
-mixed-entry queue test covers snapshots and all delta variants under a byte cap, checking exact accounting after
-every push and pop and confirming that eviction retains one contiguous newest suffix.
+mixed-entry queue test covers standalone and grouped deltas under a byte cap, checking exact accounting after every
+push and pop and confirming that eviction retains one contiguous newest suffix.
 
 ## External-change polling improvement
 

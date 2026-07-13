@@ -218,3 +218,75 @@ fn mixed_delta_history_matches_model_through_complete_undo_and_redo() {
         assert!(!buffer.redo_last_undo());
     }
 }
+
+#[test]
+fn compound_delta_groups_match_model_through_complete_undo_and_redo() {
+    for seed in [3, 11, 29, 53, 101, 223] {
+        let mut rng = DeterministicRng(seed);
+        let mut model = LineModel::sample();
+        let mut buffer = TextBuffer::from_text(&model.text());
+        let mut states = vec![model.text()];
+
+        for transaction in 0..90 {
+            let operation_count = 2 + rng.index(5);
+            let nested = transaction % 2 == 0;
+            let mut operations = Vec::with_capacity(operation_count);
+
+            buffer.begin_compound_edit();
+            if nested {
+                buffer.begin_compound_edit();
+            }
+            for _ in 0..operation_count {
+                operations.push(apply_generated_edit(&mut buffer, &mut model, &mut rng));
+            }
+            if nested {
+                buffer.end_compound_edit();
+                assert_eq!(
+                    buffer.undo_history.len(),
+                    states.len() - 1,
+                    "nested boundary committed early for seed {seed}, transaction {transaction}"
+                );
+            }
+            buffer.end_compound_edit();
+
+            let expected = model.text();
+            assert_eq!(
+                buffer.to_text(),
+                expected,
+                "forward mismatch for seed {seed}, transaction {transaction}, operations {operations:?}"
+            );
+            assert!(matches!(
+                buffer.undo_history.back(),
+                Some(HistoryEntry::Group(_))
+            ));
+            states.push(expected);
+        }
+
+        assert_eq!(buffer.undo_history.len(), states.len() - 1);
+        for (transaction, expected) in states[..states.len() - 1].iter().enumerate().rev() {
+            assert!(
+                buffer.undo_last_edit(),
+                "missing compound undo for seed {seed}, transaction {transaction}"
+            );
+            assert_eq!(
+                buffer.to_text(),
+                *expected,
+                "compound undo mismatch for seed {seed}, transaction {transaction}"
+            );
+        }
+        assert!(!buffer.undo_last_edit());
+
+        for (transaction, expected) in states.iter().enumerate().skip(1) {
+            assert!(
+                buffer.redo_last_undo(),
+                "missing compound redo for seed {seed}, transaction {transaction}"
+            );
+            assert_eq!(
+                buffer.to_text(),
+                *expected,
+                "compound redo mismatch for seed {seed}, transaction {transaction}"
+            );
+        }
+        assert!(!buffer.redo_last_undo());
+    }
+}

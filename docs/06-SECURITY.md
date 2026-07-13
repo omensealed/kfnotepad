@@ -8,7 +8,7 @@
 - Payments: No
 - Additional notes: do not enter credentials
 
-Threat model status: current as of 2026-07-08 for the arbitrary-file terminal/editor GUI journey.
+Threat model status: current as of 2026-07-13 for the arbitrary-file terminal/editor GUI journey.
 
 ## Assets
 
@@ -41,7 +41,7 @@ Threat model status: current as of 2026-07-08 for the arbitrary-file terminal/ed
 ## Sensitive Data Inventory
 
 - User file contents may contain personal data or secrets.
-- Search queries, open tab buffers, and in-memory undo snapshots may contain user file content.
+- Search queries, open tab buffers, and in-memory undo entries may contain user file content.
 - GUI open tile buffers, search queries, and Iced editor content may contain user file content.
 - Error messages may include paths and OS errors, but must not include file contents.
 - `config.toml` stores only display preferences. `gui-layout.v1` stores only pane geometry, browser visibility,
@@ -97,7 +97,7 @@ Threat model status: current as of 2026-07-08 for the arbitrary-file terminal/ed
   reports status; it does not recreate, truncate, or overwrite paths that no longer load. If no files can be loaded,
   the editor opens a clean untitled document.
 - Undo history is bounded by byte budget and count to reduce memory growth while editing within the 8 MiB file limit.
-  The current limit is 64 MiB and uses full-delta snapshots plus snapshot coalescing around typed insert runs.
+  The current limit is 64 MiB and uses exact text deltas, typed-insert coalescing, and byte-budgeted compound groups.
 - End-to-end raw-mode cleanup is still manually verified; unit coverage proves the drop path calls restore but does
   not exercise a real pseudo-terminal.
 - No automatic backup/restore feature exists. Recovery depends on the original file remaining untouched for expected
