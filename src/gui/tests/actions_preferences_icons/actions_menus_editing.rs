@@ -347,9 +347,13 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
         "alpha\n"
     );
 
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Cut));
     assert_eq!(state.status_message, "cut selection");
     assert_eq!(state.active_editor().text(), "");
+    assert_eq!(kfnotepad::to_text_call_count(), 2);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
     assert_eq!(state.workspace.active_tile().document.buffer.to_text(), "");
     assert_eq!(
         state.workspace.active_tile().save_status(),
@@ -360,6 +364,11 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
         "alpha\n",
         "cut should not save implicitly"
     );
+
+    state.undo_active_edit();
+    assert_eq!(state.active_editor().text(), "alpha\n");
+    state.redo_active_edit();
+    assert_eq!(state.active_editor().text(), "");
 
     let _ = update(
         &mut state,
@@ -389,4 +398,31 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
     assert_eq!(state.active_editor().text(), "oXYga");
     state.undo_active_edit();
     assert_eq!(state.active_editor().text(), "omega");
+}
+
+#[test]
+fn gui_menu_partial_cut_uses_shared_selection_without_document_reconstruction() {
+    let temp = TempArea::new("gui-menu-partial-cut");
+    let file = temp.path("partial-cut.txt");
+    fs::write(&file, "alpha\n").expect("write file");
+    let mut state = KfnotepadGui::new(GuiLaunch {
+        requested_paths: vec![file],
+    });
+    let _ = update(
+        &mut state,
+        Message::ReplacementEditorInputs(vec![GuiEditorReplacementInput::SelectRange {
+            anchor: DocumentCursor { row: 0, column: 0 },
+            focus: DocumentCursor { row: 0, column: 2 },
+        }]),
+    );
+
+    kfnotepad::reset_to_text_call_count();
+    kfnotepad::reset_from_text_call_count();
+    let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Cut));
+
+    assert_eq!(state.active_editor().text(), "pha\n");
+    assert_eq!(kfnotepad::to_text_call_count(), 1);
+    assert_eq!(kfnotepad::from_text_call_count(), 0);
+    state.undo_active_edit();
+    assert_eq!(state.active_editor().text(), "alpha\n");
 }

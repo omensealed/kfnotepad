@@ -34,6 +34,8 @@ kfnotepad-gui FILE1 FILE2
   devices, non-UTF-8 data, and files larger than 8 MiB.
 - Editing cannot grow a document beyond 8 MiB. Typed input, newline insertion, overwrite growth, and paste are rejected
   before changing text or undo history. Oversized paste-over-selection leaves both text and selection unchanged.
+- Cutting or replacing a partial selection preserves an existing trailing newline. Selecting and deleting the entire
+  document removes that newline as part of the selected content; undo restores the exact prior newline state.
 - Save writes through the tested atomic-save adapter with symlink target rejection, existing permission preservation,
   directory and other non-regular save-target rejection, private new-file mode on Unix, and best-effort temp cleanup
   on failure.

@@ -35,6 +35,14 @@ fn gui_external_file_change_refreshes_clean_tile_and_locks_editing() {
         state.status_message,
         "external edit lock active; unlock to edit"
     );
+
+    let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::SelectAll));
+    let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Cut));
+    assert_eq!(state.active_editor().text(), "one\ntwo\n");
+    assert_eq!(
+        state.status_message,
+        "external edit lock active; unlock to edit"
+    );
 }
 
 #[test]

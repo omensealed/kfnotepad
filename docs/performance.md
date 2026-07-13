@@ -130,6 +130,8 @@ replacement operation; insert-mode editor paste retains its existing per-input d
 full mirror rebuild. Both modes keep one shared undo step, including paste over an active selection.
 Multi-character IME commits use that bulk path in overwrite mode after the keyboard bridge removes control characters;
 single-character commits and mixed input batches retain the ordinary replacement-input path.
+Replacement-editor Cut deletes the selection in the shared document directly, retaining exact undo history and
+rebuilding the Iced mirror once instead of extracting adapter text into a temporary document and synchronizing it back.
 
 A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
 undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt

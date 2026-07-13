@@ -195,9 +195,11 @@ fn gui_editor_replacement_selection_expands_to_grapheme_boundaries() {
         GuiEditorReplacementInput::DeleteBackward,
     );
 
-    assert_eq!(document.buffer.to_text(), "x");
+    assert_eq!(document.buffer.to_text(), "x\n");
     assert_eq!(cursor, DocumentCursor { row: 0, column: 0 });
     assert_eq!(selection, None);
+    assert!(document.buffer.undo_last_edit());
+    assert_eq!(document.buffer.to_text(), format!("{flag}x\n"));
 }
 
 #[test]

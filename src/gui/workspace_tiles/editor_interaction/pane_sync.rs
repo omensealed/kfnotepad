@@ -86,6 +86,13 @@ impl KfnotepadGui {
     }
 
     pub(in crate::gui::app::state) fn active_editor_selection(&self) -> Option<String> {
+        if GUI_USE_READ_ONLY_EDITOR_RENDERER {
+            let pane_state = self.panes.get(self.active_pane)?;
+            let selection = pane_state.editor.replacement_selection?;
+            let tile = self.workspace.tile(pane_state.tile_id)?;
+            return gui_editor_replacement_selected_text(&tile.document, selection)
+                .filter(|selection| !selection.is_empty());
+        }
         self.panes
             .get(self.active_pane)
             .and_then(|pane_state| pane_state.editor.selection())

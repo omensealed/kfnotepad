@@ -13,7 +13,14 @@ impl TextBuffer {
         start: Cursor,
         end: Cursor,
     ) -> Result<(), BufferError> {
-        self.delete_range_with_trailing_newline_policy(start, end, true)
+        let last_row = self.lines.len().saturating_sub(1);
+        let removes_entire_document = start == (Cursor { row: 0, column: 0 })
+            && end.row == last_row
+            && self
+                .lines
+                .get(last_row)
+                .is_some_and(|line| end.column == line.chars().count());
+        self.delete_range_with_trailing_newline_policy(start, end, removes_entire_document)
     }
 
     fn delete_range_with_trailing_newline_policy(

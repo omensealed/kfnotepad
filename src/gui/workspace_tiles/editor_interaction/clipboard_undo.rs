@@ -17,8 +17,77 @@ impl KfnotepadGui {
             self.status_message = "nothing selected".to_string();
             return Task::none();
         };
+        let Some(tile_id) = self
+            .panes
+            .get(self.active_pane)
+            .map(|pane_state| pane_state.tile_id)
+        else {
+            return Task::none();
+        };
+        if self.is_external_edit_locked(tile_id) {
+            self.status_message = "external edit lock active; unlock to edit".to_string();
+            return Task::none();
+        }
+        if GUI_USE_READ_ONLY_EDITOR_RENDERER {
+            if !self.delete_active_replacement_selection() {
+                self.status_message = "cut could not be applied".to_string();
+                return Task::none();
+            }
+            self.status_message = "cut selection".to_string();
+            return clipboard::write(selection);
+        }
         self.perform_active_editor_command(GuiEditorCommand::Delete, "cut selection");
         clipboard::write(selection)
+    }
+
+    fn delete_active_replacement_selection(&mut self) -> bool {
+        let Some(tile_id) = self
+            .panes
+            .get(self.active_pane)
+            .map(|pane_state| pane_state.tile_id)
+        else {
+            return false;
+        };
+        self.sync_pane_cursor_to_document(self.active_pane);
+        let mut viewport = self
+            .panes
+            .get(self.active_pane)
+            .map(|pane_state| pane_state.editor.viewport)
+            .unwrap_or_else(|| GuiEditorViewportState::new(GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES));
+        let mut selection = self
+            .panes
+            .get(self.active_pane)
+            .and_then(|pane_state| pane_state.editor.replacement_selection);
+
+        let Some(tile) = self.workspace.tile_mut(tile_id) else {
+            return false;
+        };
+        if !delete_gui_editor_replacement_selection(
+            &mut tile.document,
+            &mut tile.state.cursor,
+            &mut selection,
+        ) {
+            return false;
+        }
+        let cursor = tile.state.cursor;
+        viewport.keep_cursor_visible(cursor, tile.document.buffer.line_count());
+        let text = tile.document.buffer.to_text();
+
+        if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
+            pane_state.editor = GuiEditorAdapter::new(text_editor::Content::with_text(&text));
+            pane_state.editor.move_to(cursor);
+            pane_state.editor.viewport = viewport;
+            pane_state.editor.viewport_tracks_cursor = true;
+            pane_state.editor.replacement_selection = selection;
+        }
+        self.workspace.clear_tile_save_error(tile_id);
+        self.invalidate_syntax_cache(tile_id);
+        self.ensure_visible_syntax_cache_for_tile(tile_id);
+        self.search_highlight = None;
+        self.pending_close_tile = None;
+        self.pending_app_quit = false;
+        self.pending_project_open = None;
+        true
     }
 
     pub(in crate::gui::app::state) fn paste_into_active_editor(

@@ -566,14 +566,28 @@ fn replacement_delete_delta_restores_trailing_newline_policy() {
     buffer
         .delete_replacement_range(Cursor { row: 0, column: 1 }, Cursor { row: 0, column: 2 })
         .expect("delete replacement selection");
-    assert_eq!(buffer.to_text(), "ac");
+    assert_eq!(buffer.to_text(), "ac\n");
+    assert!(buffer.has_trailing_newline());
+
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "abc\n");
+    assert!(buffer.has_trailing_newline());
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "ac\n");
+    assert!(buffer.has_trailing_newline());
+
+    assert!(buffer.undo_last_edit());
+    buffer
+        .delete_replacement_range(Cursor { row: 0, column: 0 }, Cursor { row: 0, column: 3 })
+        .expect("delete complete replacement selection");
+    assert_eq!(buffer.to_text(), "");
     assert!(!buffer.has_trailing_newline());
 
     assert!(buffer.undo_last_edit());
     assert_eq!(buffer.to_text(), "abc\n");
     assert!(buffer.has_trailing_newline());
     assert!(buffer.redo_last_undo());
-    assert_eq!(buffer.to_text(), "ac");
+    assert_eq!(buffer.to_text(), "");
     assert!(!buffer.has_trailing_newline());
 }
 
