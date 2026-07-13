@@ -1,3 +1,7 @@
+//! Managed-note open, list, and guarded trash operations.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn open_managed_note_by_title(&mut self, title: &str) -> bool {
         let Some(notes_dir) = self.notes_dir.clone() else {
