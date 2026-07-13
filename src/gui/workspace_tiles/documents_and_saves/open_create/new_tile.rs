@@ -1,3 +1,7 @@
+//! New untitled tile creation and collision-free path selection.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn create_new_tile(&mut self) {
         let path = self.next_untitled_path();

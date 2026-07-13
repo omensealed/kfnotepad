@@ -1,3 +1,7 @@
+//! Initial blank-tile detection and in-place document replacement.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn replace_initial_blank_tile(
         &mut self,
