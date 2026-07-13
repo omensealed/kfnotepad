@@ -475,6 +475,7 @@ fn shared_theme_ids_cycle_and_parse_without_terminal_types() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
 fn shared_syntax_highlighter_detects_and_keeps_state_without_terminal_types() {
     let highlighter = SyntaxHighlighter::default();
     let rust_document = TextDocument {

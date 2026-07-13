@@ -70,9 +70,11 @@ The crate supports feature gates for leaner builds:
 
 - `tui` (default): terminal editor dependencies
 - `gui`: Iced GUI dependencies for the separate GUI binary
-- `syntax`: syntax highlighting dependency
+- `syntax`: shared Syntect highlighting implementation; the current TUI and GUI features enable it
 
 Default features are `["tui", "syntax"]`. GUI is intentionally excluded from defaults so terminal-only users can build without Iced/rfd.
+
+Core-only tools and benchmarks can exclude both front ends and syntax with `--no-default-features`.
 
 Default builds are terminal-capable. For an explicit minimal TUI-only build in constrained environments, run:
 

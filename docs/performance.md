@@ -12,7 +12,17 @@ cargo tree -e features --no-default-features --features "tui syntax"
 cargo tree -e features --no-default-features --features gui
 cargo tree -e features --all-features
 /usr/bin/time -v cargo build --locked --release --all-features --bins
+cargo bench --locked --no-default-features --bench core_text
 ```
+
+The `core_text` Divan harness uses synthetic content and measures near-limit construction, serialization, end/missing
+searches, a 100 KiB paste, 1,000 typed ASCII inserts, and 200 undo operations. Filter an individual benchmark by
+appending its name, for example `cargo bench --locked --no-default-features --bench core_text -- paste_100_kib`.
+Record complete output with the host and compiler details above; benchmark numbers are not portable between machines.
+
+Divan `0.1.21` is pinned as a development-only dependency under its MIT/Apache-2.0 dual license. It is not linked into
+either application binary. Its nine locked transitive packages provide its CLI, macros, terminal sizing, and matching;
+none enter normal dependency graphs. Its removal path is deleting the `core_text` benchmark target and dev dependency.
 
 GUI idle-I/O measurements should use four synthetic 8 MiB files for five minutes with reader mode disabled. Record
 full-file snapshot reads, metadata checks, process CPU time, and peak RSS. Save measurements should separately record
@@ -30,6 +40,24 @@ time alone; count the expensive operations under test.
 The initial static baseline confirms that each GUI external-change tick schedules one snapshot operation per open
 tile, and each snapshot reads and fingerprints the complete file. Timed and allocation baselines will be added beside
 the focused benchmark harness before changing the snapshot/save implementations.
+
+## Core text baseline
+
+Captured 2026-07-13 on Linux 7.1.3-2-cachyos, an Intel Xeon E5-2690 v4, and Rust 1.97.0. The short comparison run used
+`--sample-count 10 --max-time 0.5`; use the default longer run for optimization decisions.
+
+| Operation | Median |
+| --- | ---: |
+| Construct near-8 MiB text | 16.40 ms |
+| Serialize near-8 MiB text | 1.63 ms |
+| Search for marker at end | 20.58 ms |
+| Search for missing text | 21.08 ms |
+| Paste 100 KiB into 1 MiB text | 314.60 ms |
+| Type 1,000 ASCII characters | 525.70 us |
+| Undo 200 prepared operations | 10.24 us |
+
+The paste baseline includes the current snapshot-based undo cost and is the first optimization target. These values
+are local comparison data, not performance guarantees.
 
 ## External-change polling improvement
 

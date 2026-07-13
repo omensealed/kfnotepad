@@ -15,6 +15,7 @@ mod file_adapter;
 mod paths;
 mod search;
 mod settings;
+#[cfg(feature = "syntax")]
 mod syntax;
 mod text_buffer;
 mod text_document;
@@ -26,6 +27,7 @@ pub use paths::*;
 pub(crate) use search::next_search_start;
 pub use search::*;
 pub use settings::*;
+#[cfg(feature = "syntax")]
 pub use syntax::{
     SyntaxHighlightCacheState, SyntaxHighlightedLine, SyntaxHighlightedLines, SyntaxHighlighter,
 };
