@@ -1,5 +1,10 @@
+//! Initial file browser and workspace-project list construction.
+
+use super::super::*;
+use super::types::GuiBrowserBuild;
+
 #[cfg(test)]
-fn build_gui_browser(
+pub(super) fn build_gui_browser(
     current_dir: &std::path::Path,
     status_messages: &mut Vec<String>,
 ) -> GuiBrowserBuild {
@@ -30,7 +35,7 @@ fn build_gui_browser(
 }
 
 #[cfg(not(test))]
-fn build_gui_browser(
+pub(super) fn build_gui_browser(
     _current_dir: &std::path::Path,
     _status_messages: &mut Vec<String>,
 ) -> GuiBrowserBuild {
@@ -41,7 +46,7 @@ fn build_gui_browser(
     }
 }
 
-fn load_gui_workspace_project_entries(
+pub(super) fn load_gui_workspace_project_entries(
     workspace_projects_dir: Option<&std::path::Path>,
     status_messages: &mut Vec<String>,
 ) -> Vec<GuiWorkspaceProjectEntry> {

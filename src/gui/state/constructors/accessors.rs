@@ -1,6 +1,10 @@
+//! Frequently used active-editor and browser-directory accessors.
+
+use super::*;
+
 impl KfnotepadGui {
     #[cfg(test)]
-    fn active_editor(&self) -> &GuiEditorAdapter {
+    pub(in crate::gui::app::state) fn active_editor(&self) -> &GuiEditorAdapter {
         &self
             .panes
             .get(self.active_pane)
@@ -8,7 +12,7 @@ impl KfnotepadGui {
             .editor
     }
 
-    fn current_browser_dir(&self) -> PathBuf {
+    pub(in crate::gui::app::state) fn current_browser_dir(&self) -> PathBuf {
         self.browser
             .as_ref()
             .map(|browser| browser.sidebar.current_dir.clone())

@@ -1,4 +1,8 @@
-fn load_gui_settings(
+//! Editor settings load with status-preserving fallback.
+
+use super::super::*;
+
+pub(super) fn load_gui_settings(
     config_path: Option<&std::path::Path>,
     status_messages: &mut Vec<String>,
 ) -> EditorSettings {

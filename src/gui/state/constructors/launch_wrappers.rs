@@ -1,6 +1,10 @@
+//! Test-aware launch wrappers and platform path resolution.
+
+use super::*;
+
 impl KfnotepadGui {
     #[cfg(not(test))]
-    fn new_with_task(launch: GuiLaunch) -> (Self, Task<Message>) {
+    pub(in crate::gui::app::state) fn new_with_task(launch: GuiLaunch) -> (Self, Task<Message>) {
         let mut state = Self::new(launch);
         let directory = state.current_dir.clone();
         let task = state.request_browser_load(directory, true);
@@ -8,24 +12,27 @@ impl KfnotepadGui {
     }
 
     #[cfg(test)]
-    fn new_with_task(launch: GuiLaunch) -> (Self, Task<Message>) {
+    pub(in crate::gui::app::state) fn new_with_task(launch: GuiLaunch) -> (Self, Task<Message>) {
         (Self::new(launch), Task::none())
     }
 
     #[cfg(not(test))]
-    fn new(launch: GuiLaunch) -> Self {
+    pub(in crate::gui::app::state) fn new(launch: GuiLaunch) -> Self {
         let current_dir = env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
         Self::new_with_current_dir(launch, current_dir)
     }
 
     #[cfg(test)]
-    fn new(launch: GuiLaunch) -> Self {
+    pub(in crate::gui::app::state) fn new(launch: GuiLaunch) -> Self {
         let current_dir = env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
         Self::new_with_paths(launch, current_dir, None, None, None, None)
     }
 
     #[cfg(not(test))]
-    fn new_with_current_dir(launch: GuiLaunch, current_dir: PathBuf) -> Self {
+    pub(in crate::gui::app::state) fn new_with_current_dir(
+        launch: GuiLaunch,
+        current_dir: PathBuf,
+    ) -> Self {
         Self::new_with_paths(
             launch,
             current_dir,
@@ -37,7 +44,10 @@ impl KfnotepadGui {
     }
 
     #[cfg(test)]
-    fn new_with_current_dir(launch: GuiLaunch, current_dir: PathBuf) -> Self {
+    pub(in crate::gui::app::state) fn new_with_current_dir(
+        launch: GuiLaunch,
+        current_dir: PathBuf,
+    ) -> Self {
         Self::new_with_paths(launch, current_dir, None, None, None, None)
     }
 }

@@ -1,4 +1,9 @@
-fn load_gui_launch_documents(
+//! Explicit file and workspace-restore launch document loading.
+
+use super::super::*;
+use super::types::GuiLaunchDocuments;
+
+pub(super) fn load_gui_launch_documents(
     launch: GuiLaunch,
     current_dir: &std::path::Path,
     settings: EditorSettings,
@@ -10,13 +15,15 @@ fn load_gui_launch_documents(
     let mut launch_paths = launch.requested_paths;
     let mut project_layout = None;
     let mut project_active_ordinal = None;
-    let project_restore_path = workspace_project_path.map(|path| (path, false)).or_else(|| {
-        if !launch_paths.is_empty() || !settings.gui_restore_last_workspace {
-            return None;
-        }
-        let projects_dir = workspace_projects_dir?;
-        gui_workspace_project_path(projects_dir, "current workspace").map(|path| (path, true))
-    });
+    let project_restore_path = workspace_project_path
+        .map(|path| (path, false))
+        .or_else(|| {
+            if !launch_paths.is_empty() || !settings.gui_restore_last_workspace {
+                return None;
+            }
+            let projects_dir = workspace_projects_dir?;
+            gui_workspace_project_path(projects_dir, "current workspace").map(|path| (path, true))
+        });
     let show_startup_help_panel = launch_paths.is_empty() && project_restore_path.is_none();
 
     if let Some((path, is_auto_restore)) = project_restore_path {
@@ -28,8 +35,10 @@ fn load_gui_launch_documents(
                         restored.project.name
                     ));
                 } else {
-                    status_messages
-                        .push(format!("opened workspace project {}", restored.project.name));
+                    status_messages.push(format!(
+                        "opened workspace project {}",
+                        restored.project.name
+                    ));
                 }
                 if let Some(message) = restored.skipped_status_message() {
                     status_messages.push(message);

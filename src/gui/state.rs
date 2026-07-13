@@ -83,7 +83,8 @@ use view::view;
 #[path = "state/launch.rs"]
 mod launch;
 include!("state/types.rs");
-include!("state/constructors.rs");
+#[path = "state/constructors.rs"]
+mod constructors;
 
 pub use launch::run;
 use launch::GuiLaunch;

@@ -1,4 +1,9 @@
-fn build_workspace_and_pane_states(
+//! Workspace tile creation and persisted pane-grid restoration.
+
+use super::super::*;
+use super::types::GuiPaneBuild;
+
+pub(super) fn build_workspace_and_pane_states(
     mut documents: Vec<TextDocument>,
 ) -> (GuiWorkspace, Vec<GuiPane>) {
     let first_document = documents.remove(0);
@@ -15,7 +20,7 @@ fn build_workspace_and_pane_states(
     (workspace, pane_states)
 }
 
-fn build_gui_panes(
+pub(super) fn build_gui_panes(
     workspace: &mut GuiWorkspace,
     pane_states: Vec<GuiPane>,
     restored_layout: Option<GuiLayout>,

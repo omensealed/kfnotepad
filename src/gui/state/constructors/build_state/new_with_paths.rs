@@ -1,5 +1,13 @@
+//! Final GUI state assembly from resolved paths and launch inputs.
+
+use super::super::*;
+use super::{
+    build_gui_browser, build_gui_panes, build_workspace_and_pane_states, load_gui_launch_documents,
+    load_gui_settings, load_gui_workspace_project_entries, GuiBrowserBuild, GuiPaneBuild,
+};
+
 impl KfnotepadGui {
-    fn new_with_paths(
+    pub(in crate::gui::app::state) fn new_with_paths(
         launch: GuiLaunch,
         current_dir: PathBuf,
         config_path: Option<PathBuf>,
