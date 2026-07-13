@@ -1,3 +1,7 @@
+//! Mouse click and drag application to document cursor and selection state.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn apply_replacement_editor_mouse_click_to_pane(
         &mut self,

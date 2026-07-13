@@ -1,3 +1,7 @@
+//! Synchronized editor viewport, cursor, selection, and status updates.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn update_replacement_editor_view_state(
         &mut self,

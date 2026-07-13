@@ -1,3 +1,7 @@
+//! Pointer-position lookup into the active document cursor.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn replacement_editor_cursor_for_point(
         &self,

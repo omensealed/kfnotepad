@@ -1,3 +1,7 @@
+//! Pointer movement, press, release, and drag lifecycle routing.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn replacement_editor_pointer_moved(
         &mut self,
