@@ -1,3 +1,7 @@
+//! Replacement-editor pointer routing, cursor lookup, and mouse selection.
+
+use super::*;
+
 #[path = "mouse_selection/apply.rs"]
 mod apply;
 #[path = "mouse_selection/cursor_lookup.rs"]

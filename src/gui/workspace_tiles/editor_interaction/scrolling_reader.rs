@@ -1,3 +1,7 @@
+//! Viewport scrolling, reader-mode ticks, and pane-specific scrolling.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn scroll_active_editor_viewport(&mut self, delta: i32) {
         self.perform_active_editor_command(

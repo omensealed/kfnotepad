@@ -1,3 +1,7 @@
+//! Pane focus and synchronization between editor and shared document state.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn focus_pane(&mut self, pane: pane_grid::Pane) -> bool {
         let Some(tile_id) = self.panes.get(pane).map(|pane_state| pane_state.tile_id) else {
@@ -29,7 +33,10 @@ impl KfnotepadGui {
         Some((tile_id, text))
     }
 
-    pub(in crate::gui::app::state) fn sync_pane_cursor_to_document(&mut self, pane: pane_grid::Pane) {
+    pub(in crate::gui::app::state) fn sync_pane_cursor_to_document(
+        &mut self,
+        pane: pane_grid::Pane,
+    ) {
         let Some(pane_state) = self.panes.get(pane) else {
             return;
         };

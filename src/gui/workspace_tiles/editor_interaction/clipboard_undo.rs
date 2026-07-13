@@ -1,3 +1,7 @@
+//! Clipboard commands and shared document undo/redo synchronization.
+
+use super::*;
+
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn copy_active_selection(&mut self) -> Task<Message> {
         let Some(selection) = self.active_editor_selection() else {
@@ -17,7 +21,10 @@ impl KfnotepadGui {
         clipboard::write(selection)
     }
 
-    pub(in crate::gui::app::state) fn paste_into_active_editor(&mut self, contents: Option<String>) {
+    pub(in crate::gui::app::state) fn paste_into_active_editor(
+        &mut self,
+        contents: Option<String>,
+    ) {
         let Some(contents) = contents.filter(|contents| !contents.is_empty()) else {
             self.status_message = "clipboard is empty".to_string();
             return;

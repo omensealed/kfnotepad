@@ -1,3 +1,7 @@
+//! Replacement-editor input application, deltas, and IME handling.
+
+use super::*;
+
 #[path = "replacement_input/apply_inputs.rs"]
 mod apply_inputs;
 #[path = "replacement_input/editor_delta.rs"]
