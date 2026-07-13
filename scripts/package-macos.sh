@@ -62,7 +62,7 @@ codesign --force --deep --sign - "$app"
 
 cp -R "$app" "$dmg_root/"
 install -m 0755 "$target_dir/release/kfnotepad" "$dmg_root/kfnotepad"
-install -m 0644 README.md LICENSE "$dmg_root/"
+install -m 0644 README.md CHANGELOG.md LICENSE "$dmg_root/"
 ln -s /Applications "$dmg_root/Applications"
 
 rm -f "$dmg" "$dmg.sha256"

@@ -65,6 +65,7 @@ install_common_docs() {
   mkdir -p "$doc_dir/assets"
   install -m 0644 LICENSE "$doc_dir/LICENSE"
   install -m 0644 README.md "$doc_dir/README.md"
+  install -m 0644 CHANGELOG.md "$doc_dir/CHANGELOG.md"
   install -m 0644 assets/kfnotepad-logo.png "$doc_dir/assets/kfnotepad-logo.png"
   install -m 0644 docs/13-OPERATIONS.md "$doc_dir/13-OPERATIONS.md"
   install -m 0644 docs/16-CLI-CONTRACT.md "$doc_dir/16-CLI-CONTRACT.md"

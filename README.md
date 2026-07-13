@@ -100,6 +100,7 @@ the conservative snapshot adapter; metadata-first polling remains the fallback w
 ## Documentation
 
 See [`docs/README.md`](docs/README.md) for the public documentation map.
+Release highlights and upgrade notes are recorded in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Storage and paths
 

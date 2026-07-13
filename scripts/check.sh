@@ -13,6 +13,7 @@ printf '%s\n' '== Security checks =='
 ./scripts/security-check.sh
 printf '%s\n' '== Documentation invariants =='
 test -s README.md
+test -s CHANGELOG.md
 test -s CONTRIBUTING.md
 test -s SECURITY.md
 test -s docs/README.md

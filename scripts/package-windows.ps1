@@ -24,7 +24,7 @@ New-Item $dist -ItemType Directory -Force | Out-Null
 
 Copy-Item (Join-Path $target "release/kfnotepad.exe") $stage
 Copy-Item (Join-Path $target "release/kfnotepad-gui.exe") $stage
-Copy-Item "LICENSE", "README.md" $stage
+Copy-Item "LICENSE", "README.md", "CHANGELOG.md" $stage
 Copy-Item "docs/13-OPERATIONS.md", "docs/16-CLI-CONTRACT.md", "docs/17-GUI-CONTRACT.md" (Join-Path $stage "docs")
 
 $zip = Join-Path $dist "$name.zip"
