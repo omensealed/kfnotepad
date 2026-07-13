@@ -15,39 +15,26 @@ impl TextBuffer {
                     .ok_or(BufferError::RowOutOfBounds { row, rows })?;
                 grapheme_char_range_at_column(line, column)?.unwrap_or((column, column + 1))
             };
-            let start = {
-                let line = self
-                    .lines
-                    .get(row)
-                    .ok_or(BufferError::RowOutOfBounds { row, rows })?;
-                byte_index_for_char_column(line, start_column)?
-            };
-            let end = {
-                let line = self
-                    .lines
-                    .get(row)
-                    .ok_or(BufferError::RowOutOfBounds { row, rows })?;
-                byte_index_for_char_column(line, end_column)?
-            };
-
-            self.break_undo_group();
-            self.record_undo();
-            let line = self
-                .lines
-                .get_mut(row)
-                .ok_or(BufferError::RowOutOfBounds { row, rows })?;
-            line.replace_range(start..end, "");
-            self.mark_changed();
-            return Ok(());
+            return self.delete_range(
+                Cursor {
+                    row,
+                    column: start_column,
+                },
+                Cursor {
+                    row,
+                    column: end_column,
+                },
+            );
         }
 
         if column == line_columns && row + 1 < rows {
-            self.break_undo_group();
-            self.record_undo();
-            let next_line = self.lines.remove(row + 1);
-            self.lines[row].push_str(&next_line);
-            self.mark_changed();
-            return Ok(());
+            return self.delete_range(
+                Cursor { row, column },
+                Cursor {
+                    row: row + 1,
+                    column: 0,
+                },
+            );
         }
 
         if column == line_columns {
@@ -84,11 +71,16 @@ impl TextBuffer {
         if cursor.row > 0 {
             let previous_row = cursor.row - 1;
             let previous_columns = self.line_char_count(previous_row)?;
-            self.break_undo_group();
-            self.record_undo();
-            let current_line = self.lines.remove(cursor.row);
-            self.lines[previous_row].push_str(&current_line);
-            self.mark_changed();
+            self.delete_range(
+                Cursor {
+                    row: previous_row,
+                    column: previous_columns,
+                },
+                Cursor {
+                    row: cursor.row,
+                    column: 0,
+                },
+            )?;
             return Ok(Cursor {
                 row: previous_row,
                 column: previous_columns,

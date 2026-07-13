@@ -34,10 +34,7 @@ impl TextBuffer {
                     text,
                     byte_size,
                 };
-                if self
-                    .delete_inserted_text_without_history(start, end)
-                    .is_err()
-                {
+                if self.delete_range_without_history(start, end).is_err() {
                     push_history_entry(
                         &mut self.undo_history,
                         &mut self.undo_bytes,
@@ -51,6 +48,56 @@ impl TextBuffer {
                     &mut self.redo_history,
                     &mut self.redo_bytes,
                     entry,
+                    MAX_UNDO_HISTORY,
+                    MAX_UNDO_BYTES,
+                );
+            }
+            HistoryEntry::DeleteText {
+                start,
+                end,
+                text,
+                trailing_newline_before,
+                trailing_newline_after,
+                byte_size,
+            } => {
+                let Ok(byte_index) = self
+                    .lines
+                    .get(start.row)
+                    .ok_or(BufferError::RowOutOfBounds {
+                        row: start.row,
+                        rows: self.lines.len(),
+                    })
+                    .and_then(|line| byte_index_for_char_column(line, start.column))
+                else {
+                    push_history_entry(
+                        &mut self.undo_history,
+                        &mut self.undo_bytes,
+                        HistoryEntry::DeleteText {
+                            start,
+                            end,
+                            text,
+                            trailing_newline_before,
+                            trailing_newline_after,
+                            byte_size,
+                        },
+                        MAX_UNDO_HISTORY,
+                        MAX_UNDO_BYTES,
+                    );
+                    return false;
+                };
+                self.insert_text_without_history(start, byte_index, &text);
+                self.trailing_newline = trailing_newline_before;
+                push_history_entry(
+                    &mut self.redo_history,
+                    &mut self.redo_bytes,
+                    HistoryEntry::DeleteText {
+                        start,
+                        end,
+                        text,
+                        trailing_newline_before,
+                        trailing_newline_after,
+                        byte_size,
+                    },
                     MAX_UNDO_HISTORY,
                     MAX_UNDO_BYTES,
                 );
@@ -116,6 +163,47 @@ impl TextBuffer {
                         start,
                         end,
                         text,
+                        byte_size,
+                    },
+                    MAX_UNDO_HISTORY,
+                    MAX_UNDO_BYTES,
+                );
+            }
+            HistoryEntry::DeleteText {
+                start,
+                end,
+                text,
+                trailing_newline_before,
+                trailing_newline_after,
+                byte_size,
+            } => {
+                if self.delete_range_without_history(start, end).is_err() {
+                    push_history_entry(
+                        &mut self.redo_history,
+                        &mut self.redo_bytes,
+                        HistoryEntry::DeleteText {
+                            start,
+                            end,
+                            text,
+                            trailing_newline_before,
+                            trailing_newline_after,
+                            byte_size,
+                        },
+                        MAX_UNDO_HISTORY,
+                        MAX_UNDO_BYTES,
+                    );
+                    return false;
+                }
+                self.trailing_newline = trailing_newline_after;
+                push_history_entry(
+                    &mut self.undo_history,
+                    &mut self.undo_bytes,
+                    HistoryEntry::DeleteText {
+                        start,
+                        end,
+                        text,
+                        trailing_newline_before,
+                        trailing_newline_after,
                         byte_size,
                     },
                     MAX_UNDO_HISTORY,

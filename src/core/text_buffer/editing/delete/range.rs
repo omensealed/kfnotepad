@@ -32,53 +32,79 @@ impl TextBuffer {
         }
 
         self.break_undo_group();
-        self.record_undo();
+        let use_delta_history = matches!(self.compound_edit, CompoundEditState::Inactive);
+        if !use_delta_history {
+            self.record_undo();
+        }
+        let deleted_text = if use_delta_history {
+            Some(self.text_in_range_without_normalization(start, end)?)
+        } else {
+            None
+        };
+        let trailing_newline_before = self.trailing_newline;
+        let trailing_newline_after = trailing_newline_before && !remove_trailing_newline;
+
+        self.delete_range_without_history(start, end)?;
+        self.trailing_newline = trailing_newline_after;
+        if let Some(text) = deleted_text {
+            self.record_delete_text_undo(
+                start,
+                end,
+                text,
+                trailing_newline_before,
+                trailing_newline_after,
+            );
+        }
+        self.mark_changed();
+        Ok(())
+    }
+
+    pub(in crate::core::text_buffer) fn text_in_range_without_normalization(
+        &self,
+        start: Cursor,
+        end: Cursor,
+    ) -> Result<String, BufferError> {
+        self.validate_cursor(start)?;
+        self.validate_cursor(end)?;
+
+        let start_byte = byte_index_for_char_column(&self.lines[start.row], start.column)?;
+        let end_byte = byte_index_for_char_column(&self.lines[end.row], end.column)?;
+        if start.row == end.row {
+            return Ok(self.lines[start.row][start_byte..end_byte].to_owned());
+        }
+
+        let mut text = self.lines[start.row][start_byte..].to_owned();
+        for row in (start.row + 1)..end.row {
+            text.push('\n');
+            text.push_str(&self.lines[row]);
+        }
+        text.push('\n');
+        text.push_str(&self.lines[end.row][..end_byte]);
+        Ok(text)
+    }
+
+    pub(in crate::core::text_buffer) fn delete_range_without_history(
+        &mut self,
+        start: Cursor,
+        end: Cursor,
+    ) -> Result<(), BufferError> {
+        self.validate_cursor(start)?;
+        self.validate_cursor(end)?;
 
         if start.row == end.row {
-            let rows = self.lines.len();
-            let line = self
-                .lines
-                .get_mut(start.row)
-                .ok_or(BufferError::RowOutOfBounds {
-                    row: start.row,
-                    rows,
-                })?;
+            let line = &mut self.lines[start.row];
             let start_byte = byte_index_for_char_column(line, start.column)?;
             let end_byte = byte_index_for_char_column(line, end.column)?;
             line.replace_range(start_byte..end_byte, "");
-            if remove_trailing_newline {
-                self.trailing_newline = false;
-            }
-            self.mark_changed();
             return Ok(());
         }
 
-        let start_prefix = {
-            let line = self
-                .lines
-                .get(start.row)
-                .ok_or(BufferError::RowOutOfBounds {
-                    row: start.row,
-                    rows: self.lines.len(),
-                })?;
-            let start_byte = byte_index_for_char_column(line, start.column)?;
-            line[..start_byte].to_string()
-        };
-        let end_suffix = {
-            let line = self.lines.get(end.row).ok_or(BufferError::RowOutOfBounds {
-                row: end.row,
-                rows: self.lines.len(),
-            })?;
-            let end_byte = byte_index_for_char_column(line, end.column)?;
-            line[end_byte..].to_string()
-        };
-
-        self.lines[start.row] = format!("{start_prefix}{end_suffix}");
+        let start_byte = byte_index_for_char_column(&self.lines[start.row], start.column)?;
+        let end_byte = byte_index_for_char_column(&self.lines[end.row], end.column)?;
+        let end_suffix = self.lines[end.row][end_byte..].to_owned();
+        self.lines[start.row].truncate(start_byte);
+        self.lines[start.row].push_str(&end_suffix);
         self.lines.drain((start.row + 1)..=end.row);
-        if remove_trailing_newline {
-            self.trailing_newline = false;
-        }
-        self.mark_changed();
         Ok(())
     }
 
@@ -90,6 +116,9 @@ impl TextBuffer {
                 row: cursor.row,
                 rows: self.lines.len(),
             })?;
+        if line.is_ascii() {
+            return Ok(cursor);
+        }
         Ok(Cursor {
             row: cursor.row,
             column: grapheme_range_start_boundary_column(line, cursor.column),
@@ -104,6 +133,9 @@ impl TextBuffer {
                 row: cursor.row,
                 rows: self.lines.len(),
             })?;
+        if line.is_ascii() {
+            return Ok(cursor);
+        }
         Ok(Cursor {
             row: cursor.row,
             column: grapheme_range_end_boundary_column(line, cursor.column),

@@ -16,7 +16,7 @@ cargo bench --locked --no-default-features --bench core_text
 ```
 
 The `core_text` Divan harness uses synthetic content and measures near-limit construction, serialization, end/missing
-searches, a 100 KiB paste, 1,000 typed ASCII inserts, and 200 undo operations. Filter an individual benchmark by
+searches, 100 KiB paste and delete operations, 1,000 typed ASCII inserts, and 200 undo operations. Filter a benchmark by
 appending its name, for example `cargo bench --locked --no-default-features --bench core_text -- paste_100_kib`.
 Record complete output with the host and compiler details above; benchmark numbers are not portable between machines.
 
@@ -82,6 +82,15 @@ benchmark moved from 525.70 us to 492.8 us median; its empty starting document d
 cost, so this is not treated as a material throughput result. The resource benefit appears on large documents: each
 typing group now retains its inserted text and allocation capacity instead of cloning the document, allowing the
 entry-count limit to remain useful without exhausting the byte budget first.
+
+Character, word, selection, and line-boundary deletion now share an exact delete delta. A delta retains removed text,
+its original range, and trailing-newline policy; undo reinserts it and redo removes the same raw range. Compound edits
+continue to use one pre-edit snapshot. An ASCII-line fast path skips Unicode segmentation because every character
+boundary in the line is already a grapheme boundary. On the same host, the 1 MiB structural debug test fell from about
+65 seconds to 0.35 seconds of test execution. A release comparison captured with
+`cargo bench --locked --no-default-features --bench core_text -- delete_100_kib --sample-count 10 --max-time 0.5`
+measured a 1.068 ms median for deleting 100 KiB from a 1 MiB ASCII line. No pre-change release baseline exists for
+that added benchmark, so the result is a forward baseline rather than an improvement ratio.
 
 ## External-change polling improvement
 

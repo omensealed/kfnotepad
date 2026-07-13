@@ -47,13 +47,21 @@ pub(crate) enum HistoryEntry {
         text: String,
         byte_size: usize,
     },
+    DeleteText {
+        start: Cursor,
+        end: Cursor,
+        text: String,
+        trailing_newline_before: bool,
+        trailing_newline_after: bool,
+        byte_size: usize,
+    },
 }
 
 impl HistoryEntry {
     pub(crate) fn byte_size(&self) -> usize {
         match self {
             Self::Snapshot(snapshot) => snapshot.byte_size,
-            Self::InsertText { byte_size, .. } => *byte_size,
+            Self::InsertText { byte_size, .. } | Self::DeleteText { byte_size, .. } => *byte_size,
         }
     }
 }

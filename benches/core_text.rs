@@ -18,6 +18,7 @@ static NEAR_LIMIT_TEXT: LazyLock<String> = LazyLock::new(|| {
 });
 static ONE_MIB_TEXT: LazyLock<String> =
     LazyLock::new(|| synthetic_text(1024 * 1024, "middle-marker"));
+static ONE_MIB_LINE: LazyLock<String> = LazyLock::new(|| "a".repeat(1024 * 1024));
 static LARGE_PASTE: LazyLock<String> = LazyLock::new(|| "paste payload ".repeat(8_534));
 
 fn main() {
@@ -90,6 +91,24 @@ fn paste_100_kib(bencher: Bencher<'_, '_>) {
             buffer
                 .insert_text(Cursor { row: 0, column: 0 }, divan::black_box(paste))
                 .expect("synthetic paste remains under the text limit")
+        });
+}
+
+#[divan::bench]
+fn delete_100_kib(bencher: Bencher<'_, '_>) {
+    bencher
+        .counter(BytesCount::new(PASTE_BYTES))
+        .with_inputs(|| TextBuffer::from_text(ONE_MIB_LINE.as_str()))
+        .bench_refs(|buffer| {
+            buffer
+                .delete_range(
+                    Cursor { row: 0, column: 0 },
+                    Cursor {
+                        row: 0,
+                        column: PASTE_BYTES,
+                    },
+                )
+                .expect("synthetic delete range remains valid")
         });
 }
 

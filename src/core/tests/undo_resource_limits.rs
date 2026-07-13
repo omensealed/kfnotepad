@@ -137,6 +137,10 @@ fn compound_edit_records_one_snapshot_for_multiple_edit_kinds() {
 
     assert_eq!(document.buffer.to_text(), "hello\nxy");
     assert_eq!(document.buffer.undo_history.len(), 1);
+    assert!(matches!(
+        document.buffer.undo_history.back(),
+        Some(HistoryEntry::Snapshot(_))
+    ));
     assert!(document.buffer.undo_last_edit());
     assert_eq!(document.buffer.to_text(), "hello world");
     assert!(!document.buffer.undo_last_edit());
@@ -265,6 +269,89 @@ fn new_edit_clears_bulk_insert_delta_redo_history() {
 
     assert!(!buffer.redo_last_undo());
     assert_eq!(buffer.to_text(), "base!");
+}
+
+#[test]
+fn multiline_unicode_delete_delta_undoes_and_redoes_exactly() {
+    let mut buffer = TextBuffer::from_text("a\u{1f1fa}\u{1f1f8}\nmid\ne\u{301}z\n");
+
+    buffer
+        .delete_range(Cursor { row: 0, column: 1 }, Cursor { row: 2, column: 1 })
+        .expect("delete multiline Unicode range");
+
+    assert_eq!(buffer.to_text(), "az\n");
+    assert!(matches!(
+        buffer.undo_history.back(),
+        Some(HistoryEntry::DeleteText { text, .. })
+            if text == "\u{1f1fa}\u{1f1f8}\nmid\ne\u{301}"
+    ));
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "a\u{1f1fa}\u{1f1f8}\nmid\ne\u{301}z\n");
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "az\n");
+}
+
+#[test]
+fn newline_join_delete_delta_restores_line_boundary() {
+    let mut buffer = TextBuffer::from_text("abc\ndef");
+
+    buffer.delete_char(0, 3).expect("delete line boundary");
+    assert_eq!(buffer.to_text(), "abcdef");
+    assert!(matches!(
+        buffer.undo_history.back(),
+        Some(HistoryEntry::DeleteText { text, .. }) if text == "\n"
+    ));
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "abc\ndef");
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "abcdef");
+}
+
+#[cfg(feature = "gui")]
+#[test]
+fn replacement_delete_delta_restores_trailing_newline_policy() {
+    let mut buffer = TextBuffer::from_text("abc\n");
+
+    buffer
+        .delete_replacement_range(Cursor { row: 0, column: 1 }, Cursor { row: 0, column: 2 })
+        .expect("delete replacement selection");
+    assert_eq!(buffer.to_text(), "ac");
+    assert!(!buffer.has_trailing_newline());
+
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), "abc\n");
+    assert!(buffer.has_trailing_newline());
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.to_text(), "ac");
+    assert!(!buffer.has_trailing_newline());
+}
+
+#[test]
+fn delete_delta_history_scales_with_removed_text_instead_of_document() {
+    let base = "a".repeat(1024 * 1024);
+    let removed_bytes = 20 * 1024;
+    let mut buffer = TextBuffer::from_text(&base);
+
+    buffer
+        .delete_range(
+            Cursor {
+                row: 0,
+                column: base.len() - removed_bytes,
+            },
+            Cursor {
+                row: 0,
+                column: base.len(),
+            },
+        )
+        .expect("delete 20 KiB range");
+
+    assert_eq!(buffer.undo_history.len(), 1);
+    assert!(buffer.undo_bytes >= removed_bytes);
+    assert!(buffer.undo_bytes < base.len());
+    assert!(buffer.undo_last_edit());
+    assert_eq!(buffer.to_text(), base);
+    assert!(buffer.redo_last_undo());
+    assert_eq!(buffer.byte_len(), base.len() - removed_bytes);
 }
 
 #[test]

@@ -85,31 +85,6 @@ impl TextBuffer {
         }
     }
 
-    pub(in crate::core::text_buffer) fn delete_inserted_text_without_history(
-        &mut self,
-        start: Cursor,
-        end: Cursor,
-    ) -> Result<(), BufferError> {
-        self.validate_cursor(start)?;
-        self.validate_cursor(end)?;
-
-        if start.row == end.row {
-            let line = &mut self.lines[start.row];
-            let start_byte = byte_index_for_char_column(line, start.column)?;
-            let end_byte = byte_index_for_char_column(line, end.column)?;
-            line.replace_range(start_byte..end_byte, "");
-            return Ok(());
-        }
-
-        let start_byte = byte_index_for_char_column(&self.lines[start.row], start.column)?;
-        let end_byte = byte_index_for_char_column(&self.lines[end.row], end.column)?;
-        let end_suffix = self.lines[end.row][end_byte..].to_owned();
-        self.lines[start.row].truncate(start_byte);
-        self.lines[start.row].push_str(&end_suffix);
-        self.lines.drain((start.row + 1)..=end.row);
-        Ok(())
-    }
-
     pub fn insert_char(
         &mut self,
         row: usize,
