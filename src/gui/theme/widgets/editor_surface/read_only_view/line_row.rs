@@ -23,8 +23,7 @@ pub(super) fn gui_editor_read_only_line_row(
                 text_size: Some(Pixels(context.editor_size as f32)),
             }),
         });
-    let line_for_render =
-        gui_editor_viewport_line_with_ime_preedit(visual_row.line, ime_preedit);
+    let line_for_render = gui_editor_viewport_line_with_ime_preedit(visual_row.line, ime_preedit);
     let visual_row_text = line_for_render.text.clone();
     let line_spans = gui_editor_read_only_line_spans(
         &line_for_render,
