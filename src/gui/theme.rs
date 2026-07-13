@@ -4,11 +4,12 @@
 
 use super::*;
 
-#[path = "theme/palette.rs"]
-mod palette;
-include!("theme/editor_helpers.rs");
+#[path = "theme/editor_helpers.rs"]
+mod editor_helpers;
 #[path = "theme/file_tree.rs"]
 mod file_tree;
+#[path = "theme/palette.rs"]
+mod palette;
 #[path = "theme/search_menu.rs"]
 mod search_menu;
 #[cfg(test)]
@@ -17,6 +18,7 @@ mod test_descriptors;
 #[path = "theme/widgets.rs"]
 mod widgets;
 
+pub(super) use editor_helpers::*;
 pub(super) use file_tree::*;
 pub(super) use palette::*;
 pub(super) use search_menu::*;

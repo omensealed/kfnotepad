@@ -2,7 +2,11 @@
 
 use super::*;
 
-pub(in crate::gui::app::state::theme) fn gui_syntax_color_role(red: u8, green: u8, blue: u8) -> GuiSyntaxColorRole {
+pub(in crate::gui::app::state::theme) fn gui_syntax_color_role(
+    red: u8,
+    green: u8,
+    blue: u8,
+) -> GuiSyntaxColorRole {
     let max = red.max(green).max(blue);
     let min = red.min(green).min(blue);
     let chroma = max.saturating_sub(min);
@@ -56,5 +60,9 @@ fn gui_rgb_hue_degrees(red: u8, green: u8, blue: u8) -> f32 {
         60.0 * (((red - green) / delta) + 4.0)
     };
 
-    if hue < 0.0 { hue + 360.0 } else { hue }
+    if hue < 0.0 {
+        hue + 360.0
+    } else {
+        hue
+    }
 }

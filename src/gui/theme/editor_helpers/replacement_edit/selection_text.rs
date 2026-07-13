@@ -101,8 +101,7 @@ pub(in crate::gui::app::state) fn gui_editor_replacement_selected_text(
     if gui_editor_replacement_selection_covers_full_text(document, start, end) {
         return Some(document.buffer.to_text());
     }
-    let (start, end) =
-        gui_editor_replacement_grapheme_range(&document.buffer, start, end).ok()?;
+    let (start, end) = gui_editor_replacement_grapheme_range(&document.buffer, start, end).ok()?;
 
     let lines = document.buffer.lines();
     if start.row == end.row {

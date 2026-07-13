@@ -51,10 +51,7 @@ pub(in crate::gui::app::state) fn gui_editor_viewport_slice_from_lines(
 }
 
 #[cfg(test)]
-pub(in crate::gui::app::state) fn gui_document_lines(
-    text: &str,
-    line_count: usize,
-) -> Vec<String> {
+pub(in crate::gui::app::state) fn gui_document_lines(text: &str, line_count: usize) -> Vec<String> {
     let total = line_count.max(1);
     let mut lines = text
         .split('\n')
