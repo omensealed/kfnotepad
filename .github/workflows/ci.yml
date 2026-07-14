@@ -80,6 +80,8 @@ jobs:
         run: rustup toolchain install stable --profile minimal
       - name: Install security tools
         run: cargo install cargo-audit cargo-deny --locked
+      - name: Check temporary advisory exceptions
+        run: ./scripts/advisory-exceptions.sh
       - name: Audit dependencies
         run: cargo audit
       - name: Check dependency policy

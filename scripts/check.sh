@@ -23,9 +23,14 @@ test -s docs/16-CLI-CONTRACT.md
 test -s docs/17-GUI-CONTRACT.md
 test -s .github/dependabot.yml
 test -s .github/workflows/ci.yml
+test -s .github/workflows/dependency-policy.yml
 test -s .github/workflows/release.yml
+test -x scripts/advisory-exceptions.sh
 grep -q 'cargo clippy --locked --all-targets --all-features -- -D warnings' .github/workflows/ci.yml
 grep -q 'cargo test --locked --all-features' .github/workflows/ci.yml
+grep -q 'package-ecosystem: "cargo"' .github/dependabot.yml
+grep -q './scripts/advisory-exceptions.sh' .github/workflows/ci.yml
+grep -q './scripts/advisory-exceptions.sh' .github/workflows/dependency-policy.yml
 grep -q 'publish_release:' .github/workflows/release.yml
 grep -q "if: github.event_name == 'push' || inputs.publish_release" .github/workflows/release.yml
 if grep -REn 'uses:[[:space:]]+[^[:space:]]+@(v[0-9]+|main|master)([[:space:]]|$)' .github/workflows; then

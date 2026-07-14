@@ -7,6 +7,9 @@ if [[ "${CI:-}" == "true" || "${KFNOTEPAD_STRICT_SECURITY_CHECKS:-}" == "1" ]]; 
     require_security_tools=true
 fi
 
+printf '%s\n' '== Advisory exception expiry checks =='
+./scripts/advisory-exceptions.sh
+
 if command -v cargo-deny >/dev/null 2>&1; then
     printf '%s\n' '== Dependency and policy checks (cargo-deny) =='
     cargo deny check

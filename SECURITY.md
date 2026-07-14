@@ -9,4 +9,6 @@ See `docs/06-SECURITY.md` for the project's working threat model and release gat
 ## Release gating policy
 
 - Dependency and advisory checks are part of the local validation script (`scripts/check.sh`) via `scripts/security-check.sh`.
-- In CI, the same check step runs on every matrix job.
+- Temporary advisory exceptions are version-pinned by `scripts/advisory-exceptions.sh`. Weekly Cargo Dependabot updates
+  and the dependency-policy workflow surface compatible fixed releases and fail when a reviewed exception becomes stale.
+- CI runs the same policy in a dedicated fail-closed security job, alongside the cross-platform build/test matrix.
