@@ -142,3 +142,34 @@ fn gui_save_refuses_external_modification_since_open() {
         .status_message
         .contains("file changed on disk since open or last save"));
 }
+
+#[test]
+fn gui_save_refuses_oversized_external_target_and_keeps_dirty_buffer() {
+    let temp = TempArea::new("gui-save-oversized-conflict");
+    let path = temp.path("note.txt");
+    fs::write(&path, "original\n").expect("write original");
+    let mut state = KfnotepadGui::new(GuiLaunch {
+        requested_paths: vec![path.clone()],
+    });
+    state.replace_active_document_text("gui edit\n");
+    let oversized = fs::File::create(&path).expect("replace external file");
+    oversized
+        .set_len(MAX_TEXT_FILE_BYTES + 1)
+        .expect("grow external file");
+    drop(oversized);
+
+    state.save_active_tile();
+
+    assert_eq!(
+        fs::metadata(&path).expect("inspect external file").len(),
+        MAX_TEXT_FILE_BYTES + 1
+    );
+    assert!(state.workspace.active_tile().document.buffer.is_dirty());
+    assert!(matches!(
+        state.workspace.active_tile().save_status(),
+        GuiTileSaveStatus::SaveFailed { .. }
+    ));
+    assert!(state
+        .status_message
+        .contains("file on disk is too large to validate before save"));
+}

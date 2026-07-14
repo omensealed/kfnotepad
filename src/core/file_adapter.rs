@@ -1,7 +1,7 @@
 //! File parsing, persistence, and summary helpers.
 
-use std::fs::{self, OpenOptions};
-use std::io::{self, Write};
+use std::fs::{self, File, OpenOptions};
+use std::io::{self, Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -29,6 +29,7 @@ pub use cli_help::*;
 pub use managed_notes::*;
 use read_snapshot::{
     file_snapshot, read_text_file, read_text_file_with_snapshot, validate_save_target,
+    BoundedFileReadError,
 };
 pub use read_snapshot::{snapshot_text_file, snapshot_text_file_metadata};
 pub use save_impl::save_text_snapshot;

@@ -52,8 +52,10 @@ Threat model status: current as of 2026-07-13 for the arbitrary-file terminal/ed
 
 ## Abuse Cases And Current Controls
 
-- **Oversized file memory pressure:** open and save reject content over 8 MiB before reading/writing. Covered by
-  sparse-file open test and oversized-save test.
+- **Oversized file memory pressure:** initial open, reload, external-change snapshots, and save-conflict snapshots all
+  use one opened-file handle and read at most 8 MiB plus one sentinel byte. Oversized content is rejected before it
+  can replace an editor buffer or reach temporary-file creation. Covered by exact-boundary, sentinel-stream, sparse
+  snapshot, external-replacement, and oversized-save-conflict tests.
 - **Directory and non-regular file overwrite attempt:** open/save reject directory targets, symlinks, and other
   non-regular filesystem targets such as FIFOs, sockets, and devices. Covered by
   `rejects_directory_save_target_without_temp_file`, `rejects_fifo_without_reading_from_it`, and
@@ -89,9 +91,11 @@ Threat model status: current as of 2026-07-13 for the arbitrary-file terminal/ed
 
 ## Remaining Phase 2 Risks
 
-- Open and save perform metadata validation before the later read or rename operation. A same-path filesystem race
-  remains possible between validation and use; closing that gap may require Unix-specific no-follow/open-by-handle
-  behavior.
+- Protected content reads validate path type, open once, inspect handle metadata, and enforce the limit on the actual
+  read. This reduces path replacement and growth races, but the portable path check and `File::open` sequence does
+  not claim perfect race-free no-follow behavior against a malicious local filesystem adversary. Save-target
+  validation and the later atomic rename also remain separate operations; stronger guarantees may require
+  platform-specific directory-handle APIs.
 - Atomic rename semantics vary by filesystem; tests cover normal local temporary directories only.
 - Temp-file cleanup on all failure modes is best-effort and not exhaustively fault-injected.
 - Workspace snapshots store local file paths only. Restoring a stale snapshot skips missing or unavailable files and

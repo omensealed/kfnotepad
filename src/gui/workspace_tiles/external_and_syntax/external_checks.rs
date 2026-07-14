@@ -162,6 +162,15 @@ impl KfnotepadGui {
                 self.status_message =
                     format!("external update loaded: {}", gui_file_name_label(&path));
             }
+            GuiExternalFileCheckResult::Oversized { tile_id, path } => {
+                if self.workspace.tile(tile_id).is_some() {
+                    self.external_edit_locks.insert(tile_id);
+                    self.status_message = format!(
+                        "external update skipped for {}: file on disk now exceeds the 8 MiB limit; the open buffer was kept",
+                        gui_file_name_label(&path)
+                    );
+                }
+            }
             GuiExternalFileCheckResult::LoadFailed {
                 tile_id,
                 path,

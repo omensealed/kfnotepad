@@ -6,6 +6,12 @@ safety and privacy behavior.
 
 ## Unreleased
 
+### Correctness And Resource Use
+
+- Bounded initial-open, reload, external-change snapshot, and save-conflict reads to 8 MiB plus one sentinel byte
+  through a shared opened-file handle path. Oversized external replacements now leave GUI buffers intact, and
+  oversized save targets fail before temporary-file creation.
+
 ## 0.2.1 - 2026-07-14
 
 ### Engineering

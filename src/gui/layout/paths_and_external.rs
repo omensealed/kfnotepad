@@ -46,6 +46,13 @@ pub(in crate::gui::app::state) fn check_external_file_changes(
             Ok(Some(snapshot)) => snapshot,
             _ => continue,
         };
+        if metadata_snapshot.bytes > MAX_TEXT_FILE_BYTES {
+            results.push(GuiExternalFileCheckResult::Oversized {
+                tile_id: candidate.tile_id,
+                path: candidate.path,
+            });
+            continue;
+        }
         if !external_file_snapshot_requires_deep_check(
             &metadata_snapshot,
             candidate.previous_snapshot.as_ref(),
@@ -56,6 +63,13 @@ pub(in crate::gui::app::state) fn check_external_file_changes(
 
         let current_snapshot = match gui_file_snapshot(&candidate.path) {
             Ok(Some(snapshot)) => snapshot,
+            Err(error) if error.kind() == io::ErrorKind::FileTooLarge => {
+                results.push(GuiExternalFileCheckResult::Oversized {
+                    tile_id: candidate.tile_id,
+                    path: candidate.path,
+                });
+                continue;
+            }
             _ => continue,
         };
         let Some(previous_snapshot) = candidate.previous_snapshot else {

@@ -31,7 +31,8 @@ kfnotepad-gui FILE1 FILE2
 
 - GUI tiles use the same `TextDocument`, `open_text_file`, and `save_text_document` behavior as the TUI.
 - Open rejects missing paths, directories, symlinks, non-regular filesystem targets such as FIFOs, sockets, and
-  devices, non-UTF-8 data, and files larger than 8 MiB.
+  devices, non-UTF-8 data, and files larger than 8 MiB. Initial open and reload reads are bounded to 8 MiB plus one
+  sentinel byte even if a file grows after metadata inspection.
 - Editing cannot grow a document beyond 8 MiB. Typed input, newline insertion, overwrite growth, and paste are rejected
   before changing text or undo history. Oversized paste-over-selection leaves both text and selection unchanged.
 - Cutting or replacing a partial selection preserves an existing trailing newline. Selecting and deleting the entire
@@ -40,15 +41,18 @@ kfnotepad-gui FILE1 FILE2
   directory and other non-regular save-target rejection, private new-file mode on Unix, and best-effort temp cleanup
   on failure.
 - Save refuses to overwrite a document if its on-disk file changed or disappeared since open or the last successful
-  save. This save-time check is independent of the GUI's external-change watcher and reports a conflict
-  instead of silently replacing external edits.
+  save. This save-time check is independent of the GUI's external-change watcher and uses the same bounded snapshot
+  read. An oversized on-disk target remains untouched, no temporary file is created, and the tile stays dirty.
 - Saved text is normalized to LF line endings. CRLF input opens as text and writes back as LF after a save.
 - Save As refuses to retarget a tile to a path already open in another tile; the already-open tile is focused or
   restored and remains the only authoritative tile for that path.
 - Open GUI document tiles register their parent directories with one long-lived, debounced native watcher. Events for
   an open document trigger strong snapshot validation; clean tiles refresh in place through the same safe open path
   and enter an external-edit lock. Watcher failures visibly degrade to metadata-first polling. Directory watches are
-  non-recursive and update as tile paths change.
+  non-recursive and update as tile paths change. Strong snapshot reads are bounded by the same 8 MiB content limit:
+  if an external replacement is oversized, clean and dirty buffers are kept, the tile enters the external-edit lock,
+  and the status reports that the update was skipped. Returning the disk file to a supported size permits the normal
+  refresh path on the next detected check.
   Locked tiles still allow scrolling and later external refreshes, but text edits are refused until the Unlock
   titlebar control is clicked. Dirty local buffers are never overwritten by external refresh; the status message reports
   the conflict for explicit user resolution.

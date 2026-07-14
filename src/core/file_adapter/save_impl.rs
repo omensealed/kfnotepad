@@ -43,12 +43,34 @@ pub fn save_text_snapshot(
                 });
             }
             Ok(_) => {}
-            Err(error) if error.kind() == io::ErrorKind::NotFound => {
+            Err(BoundedFileReadError::TooLarge { bytes }) => {
+                return Err(SaveError::ExternalTargetTooLarge {
+                    path: path.to_path_buf(),
+                    bytes,
+                    limit: MAX_TEXT_FILE_BYTES,
+                });
+            }
+            Err(BoundedFileReadError::Access(error)) if error.kind() == io::ErrorKind::NotFound => {
                 return Err(SaveError::ExternalModification {
                     path: path.to_path_buf(),
                 });
             }
-            Err(source) => {
+            Err(BoundedFileReadError::Symlink) => {
+                return Err(SaveError::Symlink {
+                    path: path.to_path_buf(),
+                });
+            }
+            Err(BoundedFileReadError::Directory) => {
+                return Err(SaveError::Directory {
+                    path: path.to_path_buf(),
+                });
+            }
+            Err(BoundedFileReadError::NotRegular) => {
+                return Err(SaveError::NotRegular {
+                    path: path.to_path_buf(),
+                });
+            }
+            Err(BoundedFileReadError::Access(source)) => {
                 return Err(SaveError::Metadata {
                     path: path.to_path_buf(),
                     source,

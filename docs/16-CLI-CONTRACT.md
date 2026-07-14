@@ -43,14 +43,17 @@ kfnotepad --notes
 - Managed-note listing includes only direct regular visible `.md` files. It ignores directories, hidden files,
   non-note extensions, non-UTF-8 names, and symlinks. A missing managed-notes directory lists as empty.
 - Open rejects missing paths, directories, symlinks, non-regular filesystem targets such as FIFOs, sockets, and
-  devices, non-UTF-8 data, and files larger than 8 MiB.
+  devices, non-UTF-8 data, and files larger than 8 MiB. The actual opened-file read is bounded to 8 MiB plus one
+  sentinel byte, so growth after metadata inspection is still rejected safely.
 - Editing cannot grow a document beyond 8 MiB. Typed input, newline insertion, overwrite growth, and paste are rejected
   before changing text or undo history; the status line reports the limit.
 - Save writes through the tested adapter: temporary sibling file, flush, atomic rename, symlink save-target rejection,
   directory and other non-regular save-target rejection, existing permission preservation, `0o600` new-file mode on
   Unix, and best-effort temp cleanup on failure.
 - Save refuses to overwrite a document if its on-disk file changed or disappeared since open or the last successful
-  save. The first alpha behavior is a clear conflict message rather than merge UI.
+  save. Save-conflict snapshots use the same bounded read; an externally grown target above 8 MiB is left untouched,
+  no temporary file is created, and the in-memory document remains dirty. The first alpha behavior is a clear
+  conflict message rather than merge UI.
 - Saved text is normalized to LF line endings. CRLF input opens as text and writes back as LF after a save.
 - The editor does not create automatic backup files; restore successful overwrites from normal filesystem backups,
   snapshots, or version control.

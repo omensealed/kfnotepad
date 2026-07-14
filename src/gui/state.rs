@@ -42,7 +42,7 @@ use kfnotepad::{
     GuiWorkspaceProjectEntry, ManagedNoteDeleteResult, ManagedNoteEntry, SearchRepeatResult,
     SyntaxColor, SyntaxHighlightCacheState, SyntaxHighlighter, SyntaxStyle, TextBuffer,
     TextDocument, UndoRedoResult, MAX_GUI_FONT_SIZE, MAX_GUI_READER_LINES_PER_MINUTE,
-    MIN_GUI_FONT_SIZE, MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
+    MAX_TEXT_FILE_BYTES, MIN_GUI_FONT_SIZE, MIN_GUI_READER_LINES_PER_MINUTE, VERSION,
 };
 
 #[cfg(test)]

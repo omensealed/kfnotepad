@@ -243,7 +243,8 @@ verification.
 The write-safety and recovery policy is: same-directory temp file, flush, atomic rename, symlink path rejection,
 non-regular file rejection, existing permission preservation, `0o600` for new Unix files, 8 MiB file limit, no
 automatic backup files, and best-effort temp cleanup on failure. This path is exposed through save commands in both
-front ends and covered by adapter tests using disposable development data.
+front ends and covered by adapter tests using disposable development data. Initial open, reload, external snapshot,
+and save-conflict reads use an opened-file handle and read at most the 8 MiB limit plus one sentinel byte.
 
 Recovery expectations:
 

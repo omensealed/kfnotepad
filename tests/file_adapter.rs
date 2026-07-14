@@ -1,7 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
-use kfnotepad::{open_text_file, OpenError, MAX_TEXT_FILE_BYTES};
+use kfnotepad::{open_text_file, snapshot_text_file, OpenError, MAX_TEXT_FILE_BYTES};
 
 struct TempArea {
     root: PathBuf,
@@ -164,4 +164,55 @@ fn rejects_file_larger_than_open_limit_before_reading() {
             ..
         } if bytes == MAX_TEXT_FILE_BYTES + 1 && limit == MAX_TEXT_FILE_BYTES
     ));
+}
+
+#[test]
+fn opens_file_exactly_at_open_limit() {
+    let temp = TempArea::new("exact-limit");
+    let path = temp.path("exact.txt");
+    let file = fs::File::create(&path).expect("create exact-limit fixture");
+    file.set_len(MAX_TEXT_FILE_BYTES)
+        .expect("size exact-limit fixture");
+    drop(file);
+
+    let document = open_text_file(&path).expect("exact-limit file should open");
+
+    assert_eq!(document.buffer.to_text().len() as u64, MAX_TEXT_FILE_BYTES);
+    assert_eq!(
+        document
+            .buffer
+            .file_snapshot()
+            .map(|snapshot| snapshot.bytes),
+        Some(MAX_TEXT_FILE_BYTES)
+    );
+}
+
+#[test]
+fn strong_snapshot_rejects_file_above_open_limit() {
+    let temp = TempArea::new("snapshot-too-large");
+    let path = temp.path("large.txt");
+    let file = fs::File::create(&path).expect("create oversized fixture");
+    file.set_len(MAX_TEXT_FILE_BYTES + 1)
+        .expect("size oversized fixture");
+    drop(file);
+
+    let error = snapshot_text_file(&path).expect_err("oversized snapshot should fail");
+
+    assert_eq!(error.kind(), std::io::ErrorKind::FileTooLarge);
+    assert!(error.to_string().contains("exceeds"));
+}
+
+#[test]
+fn strong_snapshot_matches_snapshot_created_by_normal_open() {
+    let temp = TempArea::new("snapshot-normal");
+    let path = temp.path("note.txt");
+    fs::write(&path, "normal snapshot\n").expect("write fixture");
+
+    let document = open_text_file(&path).expect("open fixture");
+    let snapshot = snapshot_text_file(&path)
+        .expect("snapshot fixture")
+        .expect("regular file snapshot");
+
+    assert_eq!(document.buffer.file_snapshot(), Some(&snapshot));
+    assert_eq!(snapshot.bytes, "normal snapshot\n".len() as u64);
 }

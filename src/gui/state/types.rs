@@ -111,6 +111,10 @@ pub(super) enum GuiExternalFileCheckResult {
         snapshot: GuiFileSnapshot,
         document: Box<TextDocument>,
     },
+    Oversized {
+        tile_id: GuiTileId,
+        path: PathBuf,
+    },
     LoadFailed {
         tile_id: GuiTileId,
         path: PathBuf,

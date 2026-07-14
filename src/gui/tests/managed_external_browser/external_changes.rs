@@ -208,3 +208,70 @@ fn gui_external_file_change_does_not_overwrite_dirty_tile() {
         .status_message
         .contains("save or close local edits before refresh"));
 }
+
+#[test]
+fn gui_oversized_external_replacement_keeps_clean_buffer_and_recovers() {
+    let temp = TempArea::new("gui-external-oversized-clean");
+    let file = temp.path("watched.txt");
+    fs::write(&file, "original\n").expect("write file");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: vec![file.clone()],
+        },
+        temp.root.clone(),
+    );
+    let tile_id = state.workspace.active_tile().id;
+    let oversized = fs::File::create(&file).expect("replace external file");
+    oversized
+        .set_len(MAX_TEXT_FILE_BYTES + 1)
+        .expect("grow external file");
+    drop(oversized);
+
+    state.poll_external_file_changes();
+
+    assert_eq!(state.active_document_text(), "original\n");
+    assert!(!state.workspace.active_tile().document.buffer.is_dirty());
+    assert!(state.is_external_edit_locked(tile_id));
+    assert_eq!(
+        state.status_message,
+        "external update skipped for watched.txt: file on disk now exceeds the 8 MiB limit; the open buffer was kept"
+    );
+
+    fs::write(&file, "supported again\n").expect("restore supported file");
+    state.poll_external_file_changes();
+
+    assert_eq!(state.active_document_text(), "supported again\n");
+    assert!(!state.workspace.active_tile().document.buffer.is_dirty());
+    assert!(state.is_external_edit_locked(tile_id));
+    assert_eq!(state.status_message, "external update loaded: watched.txt");
+}
+
+#[test]
+fn gui_oversized_external_replacement_keeps_dirty_buffer_on_recheck() {
+    let temp = TempArea::new("gui-external-oversized-dirty");
+    let file = temp.path("watched.txt");
+    fs::write(&file, "original\n").expect("write file");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: vec![file.clone()],
+        },
+        temp.root.clone(),
+    );
+    let tile_id = state.workspace.active_tile().id;
+    state.replace_active_document_text("local dirty\n");
+    let oversized = fs::File::create(&file).expect("replace external file");
+    oversized
+        .set_len(MAX_TEXT_FILE_BYTES + 1)
+        .expect("grow external file");
+    drop(oversized);
+
+    state.poll_external_file_changes();
+    let first_status = state.status_message.clone();
+    state.poll_external_file_changes();
+
+    assert_eq!(state.active_document_text(), "local dirty\n");
+    assert!(state.workspace.active_tile().document.buffer.is_dirty());
+    assert!(state.is_external_edit_locked(tile_id));
+    assert_eq!(state.status_message, first_status);
+    assert!(state.status_message.contains("open buffer was kept"));
+}

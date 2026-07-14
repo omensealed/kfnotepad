@@ -193,6 +193,36 @@ fn save_document_rejects_missing_file_since_open() {
 }
 
 #[test]
+fn save_document_rejects_oversized_external_target_without_temp_file() {
+    let temp = TempArea::new("external-oversized");
+    let path = temp.path("note.txt");
+    fs::write(&path, "original\n").expect("write original");
+    let mut document = open_text_file(&path).expect("open text file");
+    document.buffer.insert_char(0, 0, '!').expect("edit buffer");
+    let file = fs::File::create(&path).expect("replace target");
+    file.set_len(MAX_TEXT_FILE_BYTES + 1)
+        .expect("grow target beyond limit");
+    drop(file);
+
+    let error = save_text_document(&mut document).expect_err("oversized target should conflict");
+
+    assert!(matches!(
+        error,
+        SaveError::ExternalTargetTooLarge {
+            bytes,
+            limit,
+            ..
+        } if bytes == MAX_TEXT_FILE_BYTES + 1 && limit == MAX_TEXT_FILE_BYTES
+    ));
+    assert_eq!(
+        fs::metadata(&path).expect("inspect target").len(),
+        MAX_TEXT_FILE_BYTES + 1
+    );
+    assert!(document.buffer.is_dirty());
+    assert_no_temp_files(&temp.root);
+}
+
+#[test]
 fn rejects_oversized_save_before_creating_temp_file() {
     let temp = TempArea::new("too-large");
     let path = temp.path("large.txt");

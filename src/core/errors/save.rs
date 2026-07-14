@@ -22,6 +22,11 @@ pub enum SaveError {
     ExternalModification {
         path: PathBuf,
     },
+    ExternalTargetTooLarge {
+        path: PathBuf,
+        bytes: u64,
+        limit: u64,
+    },
     TooLarge {
         path: PathBuf,
         bytes: u64,
@@ -77,6 +82,13 @@ impl fmt::Display for SaveError {
                 write!(
                     formatter,
                     "file changed on disk since open or last save: {}; reload or save as a new file",
+                    path.display()
+                )
+            }
+            SaveError::ExternalTargetTooLarge { path, bytes, limit } => {
+                write!(
+                    formatter,
+                    "file on disk is too large to validate before save: {} is at least {bytes} bytes and exceeds {limit} bytes; reload or save as a new file",
                     path.display()
                 )
             }
