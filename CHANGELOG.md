@@ -6,11 +6,18 @@ safety and privacy behavior.
 
 ## Unreleased
 
+## 0.2.2 - 2026-07-14
+
 ### Correctness And Resource Use
 
 - Bounded initial-open, reload, external-change snapshot, and save-conflict reads to 8 MiB plus one sentinel byte
   through a shared opened-file handle path. Oversized external replacements now leave GUI buffers intact, and
   oversized save targets fail before temporary-file creation.
+
+### Build And Release
+
+- Made CI and release jobs install the exact Rust version declared by `rust-toolchain.toml`, pinned reviewed
+  cargo-audit and cargo-deny releases centrally, and validated the deliberate advisory exceptions for both tools.
 
 ## 0.2.1 - 2026-07-14
 
