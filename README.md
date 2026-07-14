@@ -4,7 +4,7 @@
 
 # kfnotepad
 
-Local UTF-8 text-file editor with a modern terminal UI and a separate Iced GUI review path.
+Local UTF-8 text-file editor with a modern terminal UI and a separate Iced desktop GUI.
 
 ## Status
 
@@ -50,19 +50,20 @@ This writes a tarball, Linux `.deb`, AppImage, and SHA-256 files under ignored `
 `kfnotepad-gui`. Packaging and verification notes are in [`docs/13-OPERATIONS.md`](docs/13-OPERATIONS.md).
 
 Version tags matching `vX.Y.Z` run the native GitHub release workflow. Releases include Linux packages, standalone
-Windows TUI/GUI `.exe` files plus a combined ZIP, and an unsigned macOS `.dmg` containing `kfnotepad.app` and the
-terminal binary. Published artifacts are covered by a consolidated `SHA256SUMS` file. Manual workflow dispatches
-default to a non-publishing package dry-run.
+Windows TUI/GUI `.exe` files plus a combined ZIP, and an ad-hoc-signed, non-notarized macOS `.dmg` containing
+`kfnotepad.app` and the terminal binary. Published artifacts are covered by a consolidated `SHA256SUMS` file. Manual
+workflow dispatches default to a non-publishing package dry-run.
 
 ## Selected direction
 
 - Type: cli plus separate GUI binary
-- Stage: local TUI baseline complete; Iced GUI review path documented
+- Stage: cross-platform alpha with separate TUI and Iced GUI packages for tagged releases
 - Stack: rust, shell, iced
 - Database: none; normal files on disk
 - Support tiers:
   - Supported: Linux (primary; CI + local packaging documented).
-  - Windows/macOS: native builds and tests run in CI; unsigned alpha packages are produced by the release workflow.
+  - Windows/macOS: native builds and tests run in CI; Windows packages are unsigned, while macOS packages are
+    ad-hoc signed but not notarized.
 - License: AGPL-3.0-or-later
 
 ### Build features

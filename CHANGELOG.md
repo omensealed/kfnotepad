@@ -6,6 +6,8 @@ safety and privacy behavior.
 
 ## Unreleased
 
+## 0.2.1 - 2026-07-14
+
 ### Engineering
 
 - Added incremental GUI syntax-parser checkpoints so direct edits, paste, and cut preserve the valid highlighted

@@ -100,14 +100,16 @@ The script builds release binaries, stages `bin/kfnotepad`, `bin/kfnotepad-gui`,
 Linux package artifacts:
 
 ```text
-dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz
-dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz.sha256
-dist/kfnotepad_0.1.1_amd64.deb
-dist/kfnotepad_0.1.1_amd64.deb.sha256
-dist/kfnotepad-0.1.1-x86_64.AppImage
-dist/kfnotepad-0.1.1-x86_64.AppImage.sha256
+dist/kfnotepad-${version}-cachyos-linux-x86_64.tar.gz
+dist/kfnotepad-${version}-cachyos-linux-x86_64.tar.gz.sha256
+dist/kfnotepad_${version}_amd64.deb
+dist/kfnotepad_${version}_amd64.deb.sha256
+dist/kfnotepad-${version}-x86_64.AppImage
+dist/kfnotepad-${version}-x86_64.AppImage.sha256
 dist/SHA256SUMS
 ```
+
+Here `${version}` is the package version read from `Cargo.toml` by the packaging script.
 
 The `.deb` requires `dpkg-deb`. The AppImage requires `appimagetool`. For fully offline AppImage builds, set
 `KFNOTEPAD_APPIMAGE_RUNTIME=/path/to/runtime-x86_64`; otherwise `appimagetool` may try to download the runtime.
@@ -127,10 +129,11 @@ and work on newer Debian-derived systems, but may require newer runtime librarie
 Verify the artifact before install testing:
 
 ```bash
+version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)
 sha256sum -c dist/SHA256SUMS
-tar -tzf dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz
-dpkg-deb --info dist/kfnotepad_0.1.1_amd64.deb
-dpkg-deb --contents dist/kfnotepad_0.1.1_amd64.deb
+tar -tzf "dist/kfnotepad-${version}-cachyos-linux-x86_64.tar.gz"
+dpkg-deb --info "dist/kfnotepad_${version}_amd64.deb"
+dpkg-deb --contents "dist/kfnotepad_${version}_amd64.deb"
 ```
 
 `dist/` is ignored because these files are generated local artifacts.
@@ -138,16 +141,18 @@ dpkg-deb --contents dist/kfnotepad_0.1.1_amd64.deb
 The AppImage launches the GUI by default. For the terminal editor, pass `--cli`:
 
 ```bash
-dist/kfnotepad-0.1.1-x86_64.AppImage --help
-dist/kfnotepad-0.1.1-x86_64.AppImage --cli --help
+version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)
+"dist/kfnotepad-${version}-x86_64.AppImage" --help
+"dist/kfnotepad-${version}-x86_64.AppImage" --cli --help
 ```
 
 If FUSE is unavailable in the test environment, extract and run `AppRun` directly:
 
 ```bash
+version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)
 tmpdir=$(mktemp -d)
 cd "$tmpdir"
-/path/to/kfnotepad-0.1.1-x86_64.AppImage --appimage-extract
+"/path/to/kfnotepad-${version}-x86_64.AppImage" --appimage-extract
 squashfs-root/AppRun --help
 squashfs-root/AppRun --cli --help
 ```
@@ -159,9 +164,10 @@ The tarball is portable as a user-owned prefix install. Do not use `sudo` for th
 Fresh install:
 
 ```bash
-prefix="$HOME/.local/kfnotepad-0.1.1"
+version=$(sed -n 's/^version = "\([^"]*\)"/\1/p' Cargo.toml | head -1)
+prefix="$HOME/.local/kfnotepad-${version}"
 mkdir -p "$prefix"
-tar -xzf dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz -C "$prefix" --strip-components=1
+tar -xzf "dist/kfnotepad-${version}-cachyos-linux-x86_64.tar.gz" -C "$prefix" --strip-components=1
 "$prefix/bin/kfnotepad" --version
 "$prefix/bin/kfnotepad-gui" --version
 "$prefix/bin/kfnotepad-gui" --describe
@@ -173,7 +179,7 @@ previous binary as a rollback copy, then replacing the old prefix contents:
 ```bash
 cp "$prefix/bin/kfnotepad" "$prefix/bin/kfnotepad.previous"
 cp "$prefix/bin/kfnotepad-gui" "$prefix/bin/kfnotepad-gui.previous"
-tar -xzf dist/kfnotepad-0.1.1-cachyos-linux-x86_64.tar.gz -C "$prefix" --strip-components=1
+tar -xzf "dist/kfnotepad-${version}-cachyos-linux-x86_64.tar.gz" -C "$prefix" --strip-components=1
 "$prefix/bin/kfnotepad" --version
 "$prefix/bin/kfnotepad-gui" --version
 ```
@@ -201,7 +207,7 @@ upgrade, uninstall cleanup, and rollback were verified on 2026-06-24.
 
 ## Current alpha upload manifest
 
-Version tags matching the Cargo version (`v0.1.1`, for example) trigger `.github/workflows/release.yml`. The workflow
+Version tags matching the Cargo version (`v0.2.1`, for example) trigger `.github/workflows/release.yml`. The workflow
 builds on native GitHub-hosted runners and publishes:
 
 - Linux x86-64 tarball, `.deb`, and AppImage.

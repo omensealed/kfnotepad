@@ -326,10 +326,11 @@ kfnotepad-gui FILE1 FILE2
 
 ## Current gaps
 
-- The GUI path is a local development/review surface, not a published replacement for the TUI.
+- The GUI is published alongside the TUI as an alpha front end; it does not replace the terminal editor.
 - Native Open/Save as dialogs are implemented with path-prompt fallback, but exhaustive desktop-environment dialog
-  smoke coverage is still manual. No command palette, recent-file list, session restore, print/export, drag selection
-  beyond Iced text-editor behavior, or live assistive-technology audit has been completed.
+  smoke coverage is still manual. No command palette, recent-file list, print/export, or live assistive-technology
+  audit has been completed. Workspace restore and app-owned drag selection are implemented and covered by state tests,
+  but their complete platform/desktop-environment matrix remains manual.
 - A local screenshot/pixel smoke exists, but rich CI visual regression and exact layout assertions are not part of
   the default suite yet.
 
@@ -407,7 +408,8 @@ It verifies rendered output for that path, but not exact pixel layout correctnes
 ## Package and rollback expectations
 
 - `./scripts/package.sh` stages both `bin/kfnotepad` and `bin/kfnotepad-gui` in the local tarball.
-- The package still targets local CachyOS review. There is no configured Git remote or active public release channel.
+- Tagged releases publish Linux, Windows, and macOS alpha packages through the GitHub release workflow. Linux remains
+  the primary support tier; Windows packages are unsigned, while macOS packages are ad-hoc signed but not notarized.
 - Removing the GUI from a local install is deleting `bin/kfnotepad-gui`; the TUI binary and user notes continue to
   work.
 - Reset GUI layout by deleting `gui-layout.v1`.

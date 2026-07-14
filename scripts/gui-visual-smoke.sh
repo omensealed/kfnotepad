@@ -18,7 +18,7 @@ if ! command -v maim >/dev/null 2>&1 && ! command -v import >/dev/null 2>&1; the
   exit 2
 fi
 
-cargo build --quiet --locked --bin kfnotepad-gui
+cargo build --quiet --locked --no-default-features --features 'gui syntax' --bin kfnotepad-gui
 
 tmpdir=$(mktemp -d /tmp/kfnotepad-gui-visual.XXXXXX)
 pid=''
