@@ -162,6 +162,20 @@ retain cursor, selection, syntax segments, or theme styling; those are materiali
 so interaction and highlighting cannot become stale. Edits and viewport or width changes invalidate the entry through
 the key.
 
+## GUI syntax invalidation improvement
+
+The GUI syntax cache retains Syntect parser/highlighter checkpoints every 128 highlighted lines. Direct typing,
+newline and deletion commands, paste, and cut report their earliest potentially changed row. Invalidation keeps the
+valid highlighted prefix through the nearest preceding checkpoint and resumes parsing from that state. Editing within
+a deeply scrolled viewport therefore reparses at most one checkpoint interval plus the 512-line render budget instead
+of restarting from line zero. A deterministic operation counter in tests enforces that bound and compares the result
+with a fresh full parse.
+
+Syntax state can propagate after an edit, so lines after the edit are still rebuilt through the visible target. An
+edit far above the viewport can therefore require more work. Undo and redo also retain full invalidation because the
+current core undo result does not expose the changed delta range; preserving a prefix based only on the current cursor
+would be incorrect when undoing an edit elsewhere.
+
 A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
 undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt
 precedence, and coalesced history storage. These local results are a forward baseline, not a portable performance

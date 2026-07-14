@@ -44,6 +44,7 @@ pub(crate) const GUI_TILE_CONTROL_SPACING: u32 = 1;
 pub(crate) const GUI_EDITOR_PADDING: u16 = 2;
 pub(crate) const GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES: usize = 32;
 pub(crate) const GUI_EDITOR_RENDER_LINE_BUDGET: usize = 512;
+pub(crate) const GUI_SYNTAX_CHECKPOINT_INTERVAL: usize = 128;
 pub(crate) const GUI_LINE_NUMBER_GUTTER_HORIZONTAL_PADDING: f32 = 6.0;
 pub(crate) const GUI_EDITOR_LINE_HEIGHT: f32 = 1.3;
 pub(crate) const GUI_LINE_NUMBER_SEPARATOR_WIDTH: f32 = 1.0;

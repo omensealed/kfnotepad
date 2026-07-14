@@ -17,15 +17,18 @@ fn gui_test_syntax_cache_for_document(
 ) -> GuiSyntaxCache {
     let (highlighted, state) =
         highlighter.highlight_lines_incremental(document, 0, visible_rows, None);
+    let highlighted_line_operations = highlighted.len();
     GuiSyntaxCache {
         path: document.path.clone(),
         line_count: document.buffer.line_count().max(1),
-        highlighted_until: highlighted.len(),
+        highlighted_until: highlighted_line_operations,
         lines: highlighted
             .into_iter()
             .map(|line| line.map(|segments| gui_syntax_segments(segments, EditorThemeId::Nocturne)))
             .collect(),
         state,
+        checkpoints: Vec::new(),
+        highlighted_line_operations,
     }
 }
 

@@ -8,6 +8,14 @@ pub(crate) struct GuiSyntaxCache {
     pub(crate) highlighted_until: usize,
     pub(crate) lines: Vec<Option<Vec<GuiEditorSyntaxSegment>>>,
     pub(crate) state: Option<SyntaxHighlightCacheState>,
+    pub(crate) checkpoints: Vec<GuiSyntaxCheckpoint>,
+    #[cfg(test)]
+    pub(crate) highlighted_line_operations: usize,
+}
+
+pub(crate) struct GuiSyntaxCheckpoint {
+    pub(crate) line: usize,
+    pub(crate) state: SyntaxHighlightCacheState,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]

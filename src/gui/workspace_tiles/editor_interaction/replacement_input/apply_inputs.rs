@@ -32,6 +32,9 @@ impl KfnotepadGui {
         let Some(tile) = self.workspace.tile_mut(tile_id) else {
             return false;
         };
+        let first_changed_line = replacement_selection
+            .map(|selection| selection.normalized().0.row)
+            .unwrap_or(tile.state.cursor.row);
         let changed = gui_editor_replacement_paste_text_with_mode(
             &mut tile.document,
             &mut tile.state.cursor,
@@ -54,7 +57,7 @@ impl KfnotepadGui {
             pane_state.editor.replacement_selection = replacement_selection;
         }
         self.workspace.clear_tile_save_error(tile_id);
-        self.invalidate_syntax_cache(tile_id);
+        self.invalidate_syntax_cache_from(tile_id, first_changed_line, line_count);
         self.ensure_visible_syntax_cache_for_tile(tile_id);
         self.pending_close_tile = None;
         self.pending_app_quit = false;
@@ -83,7 +86,6 @@ impl KfnotepadGui {
                 return;
             }
         }
-        let invalidates_syntax = gui_replacement_inputs_invalidate_syntax(&inputs);
         self.replacement_ime_preedit = None;
 
         let Some(tile_id) = self
@@ -106,7 +108,16 @@ impl KfnotepadGui {
         let Some(tile) = self.workspace.tile_mut(tile_id) else {
             return;
         };
+        let mut first_changed_line = None;
         for input in inputs.iter() {
+            if let Some(candidate) = gui_replacement_input_syntax_start_line(
+                *input,
+                tile.state.cursor,
+                replacement_selection,
+            ) {
+                first_changed_line =
+                    Some(first_changed_line.map_or(candidate, |line: usize| line.min(candidate)));
+            }
             apply_gui_editor_replacement_input_with_mode(
                 &mut tile.document,
                 &mut tile.state.cursor,
@@ -125,8 +136,8 @@ impl KfnotepadGui {
             pane_state.editor.replacement_selection = replacement_selection;
         }
         self.workspace.clear_tile_save_error(tile_id);
-        if invalidates_syntax {
-            self.invalidate_syntax_cache(tile_id);
+        if let Some(first_changed_line) = first_changed_line {
+            self.invalidate_syntax_cache_from(tile_id, first_changed_line, line_count);
         }
         self.ensure_visible_syntax_cache_for_tile(tile_id);
         self.pending_close_tile = None;

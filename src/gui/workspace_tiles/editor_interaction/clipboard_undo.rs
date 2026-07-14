@@ -58,6 +58,9 @@ impl KfnotepadGui {
         let Some(tile) = self.workspace.tile_mut(tile_id) else {
             return false;
         };
+        let first_changed_line = selection
+            .map(|selection| selection.normalized().0.row)
+            .unwrap_or(tile.state.cursor.row);
         if !delete_gui_editor_replacement_selection(
             &mut tile.document,
             &mut tile.state.cursor,
@@ -76,7 +79,7 @@ impl KfnotepadGui {
             pane_state.editor.replacement_selection = selection;
         }
         self.workspace.clear_tile_save_error(tile_id);
-        self.invalidate_syntax_cache(tile_id);
+        self.invalidate_syntax_cache_from(tile_id, first_changed_line, line_count);
         self.ensure_visible_syntax_cache_for_tile(tile_id);
         self.search_highlight = None;
         self.pending_close_tile = None;

@@ -8,6 +8,8 @@ safety and privacy behavior.
 
 ### Engineering
 
+- Added incremental GUI syntax-parser checkpoints so direct edits, paste, and cut preserve the valid highlighted
+  prefix instead of reparsing every line from the start of a deeply scrolled document.
 - Added a bounded per-pane GUI visual-row layout cache keyed by document revision, viewport, body width, and wrapping
   mode. Rendering and pointer hit-testing now share the same row ranges while current selection and syntax styling
   remain uncached.

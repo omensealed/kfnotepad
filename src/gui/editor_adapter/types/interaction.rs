@@ -68,19 +68,22 @@ pub(crate) enum GuiEditorReplacementInput {
     ClearSelection,
 }
 
-pub(crate) fn gui_replacement_inputs_invalidate_syntax(
-    inputs: &[GuiEditorReplacementInput],
-) -> bool {
-    inputs.iter().any(|input| {
-        matches!(
-            input,
-            GuiEditorReplacementInput::InsertChar(_)
-                | GuiEditorReplacementInput::InsertNewline
-                | GuiEditorReplacementInput::DeleteBackward
-                | GuiEditorReplacementInput::DeleteForward
-                | GuiEditorReplacementInput::DeletePreviousWord
-                | GuiEditorReplacementInput::DeleteNextWord
-                | GuiEditorReplacementInput::DeleteToLineEnd
-        )
-    })
+pub(crate) fn gui_replacement_input_syntax_start_line(
+    input: GuiEditorReplacementInput,
+    cursor: DocumentCursor,
+    selection: Option<GuiEditorReplacementSelection>,
+) -> Option<usize> {
+    if let Some(selection) = selection {
+        return Some(selection.normalized().0.row);
+    }
+    match input {
+        GuiEditorReplacementInput::DeleteBackward
+        | GuiEditorReplacementInput::DeletePreviousWord => Some(cursor.row.saturating_sub(1)),
+        GuiEditorReplacementInput::InsertChar(_)
+        | GuiEditorReplacementInput::InsertNewline
+        | GuiEditorReplacementInput::DeleteForward
+        | GuiEditorReplacementInput::DeleteNextWord
+        | GuiEditorReplacementInput::DeleteToLineEnd => Some(cursor.row),
+        _ => None,
+    }
 }

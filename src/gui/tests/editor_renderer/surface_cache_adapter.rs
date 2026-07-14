@@ -299,6 +299,109 @@ fn gui_syntax_cache_rebuilds_after_replacement_edit() {
 }
 
 #[test]
+#[cfg(feature = "syntax")]
+fn gui_syntax_cache_deep_edit_restarts_from_nearest_checkpoint() {
+    let temp = TempArea::new("gui-syntax-cache-deep-edit");
+    let path = temp.path("large.rs");
+    let text = (0..4_000)
+        .map(|index| format!("fn function_{index}() -> usize {{ {index} }}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    fs::write(&path, text).expect("write large rust file");
+    let mut state = KfnotepadGui::new_with_current_dir(
+        GuiLaunch {
+            requested_paths: vec![path],
+        },
+        temp.root.clone(),
+    );
+    let tile_id = state.workspace.active_tile().id;
+
+    for _ in 0..100 {
+        let _ = update(&mut state, Message::ScrollActiveEditorViewport(20));
+    }
+
+    let cursor_row = state.workspace.active_tile().state.cursor.row;
+    let operations_before = state
+        .syntax_caches
+        .get(&tile_id)
+        .expect("extended syntax cache")
+        .highlighted_line_operations;
+    assert!(cursor_row > GUI_SYNTAX_CHECKPOINT_INTERVAL);
+
+    let _ = update(
+        &mut state,
+        Message::ReplacementEditorInputs(vec![GuiEditorReplacementInput::InsertChar('x')]),
+    );
+
+    let expected_until = state
+        .syntax_caches
+        .get(&tile_id)
+        .expect("syntax cache after deep edit")
+        .highlighted_until;
+    let expected = gui_test_syntax_cache_for_document(
+        &state.syntax_highlighter,
+        &state.workspace.active_tile().document,
+        expected_until,
+    );
+    let cache = state
+        .syntax_caches
+        .get(&tile_id)
+        .expect("syntax cache after deep edit");
+    let rehighlighted = cache
+        .highlighted_line_operations
+        .saturating_sub(operations_before);
+    assert!(
+        rehighlighted <= GUI_EDITOR_RENDER_LINE_BUDGET + GUI_SYNTAX_CHECKPOINT_INTERVAL,
+        "deep edit rehighlighted {rehighlighted} lines"
+    );
+    assert!(
+        cache
+            .checkpoints
+            .iter()
+            .any(|checkpoint| checkpoint.line <= cursor_row),
+        "deep edit should retain a parser checkpoint before the changed line"
+    );
+    assert_eq!(cache.lines, expected.lines);
+}
+
+#[test]
+fn gui_syntax_invalidation_start_accounts_for_backward_line_merges() {
+    let cursor = DocumentCursor { row: 5, column: 0 };
+    assert_eq!(
+        gui_replacement_input_syntax_start_line(
+            GuiEditorReplacementInput::DeleteBackward,
+            cursor,
+            None,
+        ),
+        Some(4)
+    );
+    assert_eq!(
+        gui_replacement_input_syntax_start_line(
+            GuiEditorReplacementInput::InsertChar('x'),
+            cursor,
+            None,
+        ),
+        Some(5)
+    );
+    assert_eq!(
+        gui_replacement_input_syntax_start_line(
+            GuiEditorReplacementInput::InsertChar('x'),
+            cursor,
+            GuiEditorReplacementSelection::new(DocumentCursor { row: 2, column: 1 }, cursor,),
+        ),
+        Some(2)
+    );
+    assert_eq!(
+        gui_replacement_input_syntax_start_line(
+            GuiEditorReplacementInput::Move(kfnotepad::CursorMove::Left),
+            cursor,
+            None,
+        ),
+        None
+    );
+}
+
+#[test]
 fn gui_editor_adapter_viewport_keeps_cursor_visible_for_gutter() {
     let mut adapter = GuiEditorAdapter::from_text("one\ntwo\nthree\nfour\nfive");
 
