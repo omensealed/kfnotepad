@@ -209,11 +209,14 @@ builds on native GitHub-hosted runners and publishes:
 - A macOS arm64 `.dmg` containing `kfnotepad.app`, the standalone terminal binary, and documentation.
 - One `SHA256SUMS` covering every uploaded package.
 
-The release workflow can also be dispatched manually for an existing `vX.Y.Z` tag. It refuses a tag whose version
-does not match `Cargo.toml`. GitHub-hosted runners already contain the native Windows and macOS packaging tools; no
-developer workstation tools are required for normal releases. The macOS bundle is ad-hoc signed but not Apple
-notarized, so Gatekeeper may require an explicit user approval. Public notarized distribution requires an Apple
-Developer ID certificate and App Store Connect credentials stored as GitHub Actions secrets.
+The release workflow can also be dispatched manually for an existing `vX.Y.Z` tag. Manual dispatch defaults to a
+non-publishing dry-run: it builds every native package, creates the consolidated `SHA256SUMS`, and uploads a seven-day
+`release-bundle` workflow artifact. Set the `publish_release` input only when that existing tag should be published.
+The workflow refuses a tag whose version does not match `Cargo.toml`. GitHub-hosted runners already contain the native
+Windows and macOS packaging tools; no developer workstation tools are required for normal releases. The macOS bundle
+is ad-hoc signed but not Apple notarized, so Gatekeeper may require an explicit user approval. Public notarized
+distribution requires an Apple Developer ID certificate and App Store Connect credentials stored as GitHub Actions
+secrets.
 
 Upload only the artifacts listed in `dist/SHA256SUMS` from the same local packaging run. The human reported a Linux Mint
 package smoke passing on 2026-07-02. Do not upload older local artifacts unless `dist/SHA256SUMS` is intentionally

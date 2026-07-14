@@ -51,7 +51,8 @@ This writes a tarball, Linux `.deb`, AppImage, and SHA-256 files under ignored `
 
 Version tags matching `vX.Y.Z` run the native GitHub release workflow. Releases include Linux packages, standalone
 Windows TUI/GUI `.exe` files plus a combined ZIP, and an unsigned macOS `.dmg` containing `kfnotepad.app` and the
-terminal binary. Published artifacts are covered by a consolidated `SHA256SUMS` file.
+terminal binary. Published artifacts are covered by a consolidated `SHA256SUMS` file. Manual workflow dispatches
+default to a non-publishing package dry-run.
 
 ## Selected direction
 
