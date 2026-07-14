@@ -28,15 +28,11 @@ impl KfnotepadGui {
             self.status_message = "external edit lock active; unlock to edit".to_string();
             return Task::none();
         }
-        if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-            if !self.delete_active_replacement_selection() {
-                self.status_message = "cut could not be applied".to_string();
-                return Task::none();
-            }
-            self.status_message = "cut selection".to_string();
-            return clipboard::write(selection);
+        if !self.delete_active_replacement_selection() {
+            self.status_message = "cut could not be applied".to_string();
+            return Task::none();
         }
-        self.perform_active_editor_command(GuiEditorCommand::Delete, "cut selection");
+        self.status_message = "cut selection".to_string();
         clipboard::write(selection)
     }
 
@@ -109,63 +105,39 @@ impl KfnotepadGui {
             self.status_message = "external edit lock active; unlock to edit".to_string();
             return;
         }
-        if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-            if self.apply_replacement_editor_bulk_text_to_active_tile(&contents) {
-                self.status_message = "pasted clipboard".to_string();
-            } else {
-                self.status_message = "paste could not be applied".to_string();
-            }
-            return;
+        if self.apply_replacement_editor_bulk_text_to_active_tile(&contents) {
+            self.status_message = "pasted clipboard".to_string();
+        } else {
+            self.status_message = "paste could not be applied".to_string();
         }
-        let selected_bytes = self
-            .active_editor_selection()
-            .map_or(0, |selection| selection.len());
-        let tile = self.workspace.active_tile();
-        let projected_bytes = tile
-            .document
-            .buffer
-            .byte_len()
-            .saturating_sub(selected_bytes)
-            .saturating_add(contents.len());
-        if let Err(BufferError::TooLarge { limit, .. }) =
-            tile.document.buffer.ensure_byte_len(projected_bytes)
-        {
-            self.status_message = format!("paste exceeds {limit} byte limit");
-            return;
-        }
-        self.perform_active_editor_command(GuiEditorCommand::Paste(contents), "pasted clipboard");
     }
 
     pub(in crate::gui::app::state) fn select_all_active_editor(&mut self) {
-        if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-            let Some(tile_id) = self
-                .panes
-                .get(self.active_pane)
-                .map(|pane_state| pane_state.tile_id)
-            else {
-                return;
-            };
-            let Some(end) = self
-                .workspace
-                .tile(tile_id)
-                .map(|tile| gui_editor_replacement_document_end_cursor(&tile.document.buffer))
-            else {
-                return;
-            };
-            if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
-                pane_state.editor.set_replacement_selection(
-                    DocumentCursor { row: 0, column: 0 },
-                    end,
-                    end,
-                );
-            }
-            if let Some(tile) = self.workspace.tile_mut(tile_id) {
-                tile.state.cursor = end;
-            }
-            self.status_message = "selected all".to_string();
+        let Some(tile_id) = self
+            .panes
+            .get(self.active_pane)
+            .map(|pane_state| pane_state.tile_id)
+        else {
             return;
+        };
+        let Some(end) = self
+            .workspace
+            .tile(tile_id)
+            .map(|tile| gui_editor_replacement_document_end_cursor(&tile.document.buffer))
+        else {
+            return;
+        };
+        if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
+            pane_state.editor.set_replacement_selection(
+                DocumentCursor { row: 0, column: 0 },
+                end,
+                end,
+            );
         }
-        self.perform_active_editor_command(GuiEditorCommand::SelectAll, "selected all");
+        if let Some(tile) = self.workspace.tile_mut(tile_id) {
+            tile.state.cursor = end;
+        }
+        self.status_message = "selected all".to_string();
     }
 
     pub(in crate::gui::app::state) fn undo_active_edit(&mut self) {

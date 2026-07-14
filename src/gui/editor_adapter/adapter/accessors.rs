@@ -26,6 +26,7 @@ impl GuiEditorAdapter {
         document_cursor_from_editor(self.cursor())
     }
 
+    #[cfg(test)]
     pub(crate) fn selection(&self) -> Option<String> {
         if let Some(selection) = self.replacement_selection {
             return gui_editor_replacement_copy_selection_from_text(&self.text(), Some(selection));

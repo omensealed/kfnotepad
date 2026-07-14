@@ -4,6 +4,7 @@ use super::*;
 
 #[derive(Debug, Clone)]
 pub(crate) enum Message {
+    #[cfg(test)]
     Edit(pane_grid::Pane, text_editor::Action),
     BrowserLocalTreeToggle(PathBuf),
     BrowserLocalTreeSelected(PathBuf, bool),

@@ -151,7 +151,7 @@ kfnotepad-gui FILE1 FILE2
   loaded, an empty untitled tile is opened instead. Partially restored workspaces do not reuse saved pane geometry,
   because the saved layout may refer to files that were skipped.
 - Tiles: each document is a resizable/movable pane-grid tile styled like a compact mini-window with a visible outer
-  frame and a 5px default tile gap. The live native editor viewport itself does not add a hover/focus border, so the
+  frame and a 5px default tile gap. The live editor viewport itself does not add a hover/focus border, so the
   tile frame is the primary window outline instead of a nested double-border editor box. Tile title bars show the
   document filename; normal saved state is implicit, while modified and save-failed states are shown explicitly.
   Hovering the title exposes the full path. Tile title controls use compact centered symbol glyphs with tooltips for

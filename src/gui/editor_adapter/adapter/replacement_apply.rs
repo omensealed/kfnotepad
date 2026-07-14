@@ -17,6 +17,7 @@ impl GuiEditorAdapter {
                     self.sync_viewport_to_cursor();
                 }
             },
+            #[cfg(test)]
             GuiEditorCommand::Delete => {
                 if let Some(removes_complete_text) = self.materialize_replacement_selection() {
                     self.content
@@ -33,6 +34,7 @@ impl GuiEditorAdapter {
                 self.replacement_selection = None;
                 self.sync_viewport_to_cursor();
             }
+            #[cfg(test)]
             GuiEditorCommand::Paste(contents) => {
                 if let Some(removes_complete_text) = self.materialize_replacement_selection() {
                     self.content
@@ -49,6 +51,7 @@ impl GuiEditorAdapter {
             GuiEditorCommand::ScrollViewportLines(delta) => {
                 self.scroll_viewport_by_lines(delta);
             }
+            #[cfg(test)]
             GuiEditorCommand::SelectAll => {
                 let text = self.text();
                 let start = DocumentCursor { row: 0, column: 0 };
@@ -57,6 +60,7 @@ impl GuiEditorAdapter {
                 self.replacement_selection = GuiEditorReplacementSelection::new(start, end);
                 self.sync_viewport_to_cursor();
             }
+            #[cfg(test)]
             GuiEditorCommand::SelectRightChars(count) => {
                 let start = self.document_cursor();
                 let text = self.text();
@@ -85,6 +89,7 @@ impl GuiEditorAdapter {
         }
     }
 
+    #[cfg(test)]
     fn materialize_replacement_selection(&mut self) -> Option<bool> {
         let Some(selection) = self.replacement_selection else {
             return Some(false);
@@ -150,6 +155,7 @@ impl GuiEditorAdapter {
         Some(removes_complete_text)
     }
 
+    #[cfg(test)]
     fn iced_selection_focus(&self) -> DocumentCursor {
         let position = self.cursor().position;
         DocumentCursor {

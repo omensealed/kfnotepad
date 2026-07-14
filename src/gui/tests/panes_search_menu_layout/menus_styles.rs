@@ -220,25 +220,8 @@ fn gui_menu_styles_use_app_theme_palette() {
 }
 
 #[test]
-fn gui_native_editor_and_form_styles_do_not_add_hover_borders() {
+fn gui_form_styles_do_not_add_hover_borders() {
     let palette = gui_theme_palette(EditorThemeId::Nocturne);
-
-    let active = gui_native_editor_style(palette, text_editor::Status::Active, false);
-    let hovered = gui_native_editor_style(palette, text_editor::Status::Hovered, false);
-    let focused = gui_native_editor_style(
-        palette,
-        text_editor::Status::Focused { is_hovered: true },
-        false,
-    );
-    let search = gui_native_editor_style(palette, text_editor::Status::Active, true);
-    assert_eq!(hovered.border, active.border);
-    assert_eq!(focused.border, active.border);
-    assert_eq!(active.border.width, 0.0);
-    assert_eq!(active.border.color, Color::TRANSPARENT);
-    assert!(search.selection.a > active.selection.a);
-    assert_eq!(search.selection.r, active.selection.r);
-    assert_eq!(search.selection.g, active.selection.g);
-    assert_eq!(search.selection.b, active.selection.b);
 
     let input_active = gui_text_input_style(palette, iced::widget::text_input::Status::Active);
     let input_hovered = gui_text_input_style(palette, iced::widget::text_input::Status::Hovered);

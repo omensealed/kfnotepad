@@ -4,22 +4,26 @@ use super::*;
 
 pub(crate) enum GuiEditorCommand {
     IcedAction(text_editor::Action),
+    #[cfg(test)]
     Delete,
     MoveTo(DocumentCursor),
+    #[cfg(test)]
     Paste(String),
     ScrollViewportLines(i32),
+    #[cfg(test)]
     SelectAll,
+    #[cfg(test)]
     SelectRightChars(usize),
 }
 
 pub(crate) fn gui_editor_command_invalidates_syntax(command: &GuiEditorCommand) -> bool {
     match command {
         GuiEditorCommand::IcedAction(action) => action.is_edit(),
+        #[cfg(test)]
         GuiEditorCommand::Delete | GuiEditorCommand::Paste(_) => true,
-        GuiEditorCommand::MoveTo(_)
-        | GuiEditorCommand::ScrollViewportLines(_)
-        | GuiEditorCommand::SelectAll
-        | GuiEditorCommand::SelectRightChars(_) => false,
+        GuiEditorCommand::MoveTo(_) | GuiEditorCommand::ScrollViewportLines(_) => false,
+        #[cfg(test)]
+        GuiEditorCommand::SelectAll | GuiEditorCommand::SelectRightChars(_) => false,
     }
 }
 
@@ -35,11 +39,11 @@ pub(crate) fn gui_editor_command_may_extend_syntax_cache(command: &GuiEditorComm
 pub(crate) fn gui_editor_command_mutates_text(command: &GuiEditorCommand) -> bool {
     match command {
         GuiEditorCommand::IcedAction(action) => action.is_edit(),
+        #[cfg(test)]
         GuiEditorCommand::Delete | GuiEditorCommand::Paste(_) => true,
-        GuiEditorCommand::MoveTo(_)
-        | GuiEditorCommand::ScrollViewportLines(_)
-        | GuiEditorCommand::SelectAll
-        | GuiEditorCommand::SelectRightChars(_) => false,
+        GuiEditorCommand::MoveTo(_) | GuiEditorCommand::ScrollViewportLines(_) => false,
+        #[cfg(test)]
+        GuiEditorCommand::SelectAll | GuiEditorCommand::SelectRightChars(_) => false,
     }
 }
 

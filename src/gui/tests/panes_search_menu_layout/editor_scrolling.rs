@@ -59,11 +59,11 @@ fn gui_viewport_scroll_message_routes_to_active_editor() {
 }
 
 #[test]
-fn gui_native_editor_scroll_keeps_gutter_synced_without_dirtying_document() {
-    let temp = TempArea::new("gui-native-scroll-gutter-sync");
-    let file = temp.path("native-scroll.txt");
+fn gui_iced_scroll_action_keeps_gutter_synced_without_dirtying_document() {
+    let temp = TempArea::new("gui-iced-scroll-gutter-sync");
+    let file = temp.path("iced-scroll.txt");
     let text = numbered_lines(100);
-    fs::write(&file, &text).expect("write native scroll");
+    fs::write(&file, &text).expect("write Iced scroll action fixture");
     let mut state = KfnotepadGui::new_with_current_dir(
         GuiLaunch {
             requested_paths: vec![file],

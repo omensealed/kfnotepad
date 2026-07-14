@@ -7,6 +7,7 @@ pub(super) fn dispatch_search_and_editor(
     message: Message,
 ) -> GuiDispatchResult {
     match message {
+        #[cfg(test)]
         Message::Edit(pane, action) => {
             GuiDispatchResult::Handled(handle_editor_edit(state, pane, action))
         }

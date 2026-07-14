@@ -91,13 +91,13 @@ pub(in crate::gui::app::state) fn gui_editor_effective_wrapping(
     gui_editor_wrapping(wrap_lines)
 }
 
-pub(in crate::gui::app::state) fn gui_editor_surface_model<'a>(
+pub(in crate::gui::app::state) fn gui_editor_surface_model(
     settings: EditorSettings,
     document: &TextDocument,
-    editor: &'a GuiEditorAdapter,
+    editor: &GuiEditorAdapter,
     syntax_highlighter: &SyntaxHighlighter,
     syntax_cache: Option<&GuiSyntaxCache>,
-) -> GuiEditorSurfaceModel<'a> {
+) -> GuiEditorSurfaceModel {
     let _ = syntax_highlighter;
     let render_state =
         editor.render_state(GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES, settings.gui_font_size);
@@ -106,7 +106,6 @@ pub(in crate::gui::app::state) fn gui_editor_surface_model<'a>(
     let viewport_slice =
         gui_editor_viewport_slice_with_cached_syntax(render_viewport_slice, syntax_cache);
     GuiEditorSurfaceModel {
-        content: render_state.content,
         editor_font: gui_editor_font(settings.gui_font_family),
         editor_size: u32::from(settings.gui_font_size),
         wrapping: gui_editor_effective_wrapping(settings.wrap_lines, settings.show_line_numbers),

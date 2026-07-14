@@ -153,9 +153,9 @@ Replacement-editor Cut deletes the selection in the shared document directly, re
 rebuilding the Iced mirror once instead of extracting adapter text into a temporary document and synchronizing it back.
 Search-result and Select All ranges are also formed from canonical shared-document cursors without reconstructing a
 temporary text buffer. Page movement updates the adapter viewport and clamps its cursor from line-count metadata only.
-The adapter compatibility path materializes external Delete/Paste selections through Iced cursor motions instead of
-extracting and rebuilding the complete document; production replacement-editor Cut/Paste continues to use the shared
-delta-backed document path directly.
+Test-only adapter compatibility checks materialize external Delete/Paste selections through Iced cursor motions
+instead of extracting and rebuilding the complete document. Production Cut/Paste uses only the shared delta-backed
+document path; the dormant native-Iced editor widget branch and its runtime selector have been removed.
 
 A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
 undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt

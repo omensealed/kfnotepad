@@ -1,5 +1,6 @@
 use super::*;
 
+#[cfg(test)]
 pub(in crate::gui::app::state) fn gui_editor_replacement_selected_text_from_text(
     text: &str,
     selection: GuiEditorReplacementSelection,
@@ -79,6 +80,7 @@ pub(in crate::gui::app::state) fn gui_editor_replacement_selected_text_from_text
     Some(selected.join("\n"))
 }
 
+#[cfg(test)]
 pub(in crate::gui::app::state) fn gui_editor_replacement_copy_selection_from_text(
     text: &str,
     selection: Option<GuiEditorReplacementSelection>,

@@ -7,9 +7,8 @@ impl GuiEditorAdapter {
         &self,
         visible_line_numbers: usize,
         editor_font_size: u16,
-    ) -> GuiEditorRenderState<'_> {
+    ) -> GuiEditorRenderState {
         GuiEditorRenderState {
-            content: &self.content,
             line_numbers: self.line_number_snapshot(visible_line_numbers, editor_font_size),
             #[cfg(test)]
             viewport_slice: self.viewport_slice(visible_line_numbers),

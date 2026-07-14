@@ -7,6 +7,7 @@ impl GuiEditorAdapter {
         self.apply(GuiEditorCommand::MoveTo(cursor));
     }
 
+    #[cfg(test)]
     pub(crate) fn select_right_chars(&mut self, count: usize) {
         self.apply(GuiEditorCommand::SelectRightChars(count));
     }

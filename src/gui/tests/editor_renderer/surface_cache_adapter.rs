@@ -46,7 +46,7 @@ fn gui_editor_surface_model_captures_backend_replacement_inputs() {
     let surface =
         gui_editor_surface_model(settings, &document, &adapter, &highlighter, Some(&cache));
 
-    assert_eq!(surface.content.text(), "fn main() {}\nsecond\n");
+    assert_eq!(adapter.text(), "fn main() {}\nsecond\n");
     assert_eq!(surface.editor_size, 18);
     assert_eq!(surface.wrapping, Wrapping::WordOrGlyph);
     assert_eq!(
@@ -319,7 +319,7 @@ fn gui_editor_adapter_exposes_parity_boundary_without_changing_backend() {
     );
 
     let render = adapter.render_state(3, 16);
-    assert_eq!(render.content.text(), "one\ntwo\nthree\n");
+    assert_eq!(adapter.text(), "one\ntwo\nthree\n");
     assert_eq!(
         render.line_numbers,
         GuiEditorLineNumberSnapshot {

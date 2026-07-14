@@ -51,7 +51,6 @@ pub(crate) const GUI_TAB_WIDTH: usize = 4;
 pub(crate) const GUI_EDITOR_SCROLLBAR_WIDTH: f32 = 6.0;
 pub(crate) const GUI_EDITOR_SCROLLBAR_THUMB_MIN_HEIGHT: f32 = 18.0;
 pub(crate) const GUI_REPLACEMENT_DRAG_TICK_MS: u64 = 40;
-pub(crate) const GUI_USE_READ_ONLY_EDITOR_RENDERER: bool = true;
 pub(crate) const GUI_TILE_RADIUS: f32 = 3.0;
 pub(crate) const GUI_HEADER_SPLIT_WIDTH: f32 = 1180.0;
 pub(crate) const GUI_SEARCH_SPLIT_WIDTH: f32 = 760.0;

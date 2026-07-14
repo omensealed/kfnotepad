@@ -2,6 +2,7 @@
 
 use super::*;
 
+#[cfg(test)]
 pub(super) fn handle_editor_edit(
     state: &mut KfnotepadGui,
     pane: pane_grid::Pane,
@@ -20,26 +21,24 @@ pub(super) fn handle_editor_edit(
         return Task::none();
     }
     state.search_highlight = None;
-    if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-        if let text_editor::Action::Edit(ref edit) = action {
-            if state.replacement_overwrite_mode {
-                if let text_editor::Edit::Paste(text) = edit {
-                    state.sync_pane_cursor_to_document(pane);
-                    state.apply_replacement_editor_bulk_text_to_active_tile(text);
-                    return Task::none();
-                }
-            }
-            if let Some(inputs) = replacement_inputs_from_edit(edit) {
+    if let text_editor::Action::Edit(ref edit) = action {
+        if state.replacement_overwrite_mode {
+            if let text_editor::Edit::Paste(text) = edit {
                 state.sync_pane_cursor_to_document(pane);
-                state.apply_replacement_editor_inputs_to_active_tile(inputs);
+                state.apply_replacement_editor_bulk_text_to_active_tile(text);
                 return Task::none();
             }
         }
-
-        if is_edit {
-            state.status_message = "edit ignored by read-only renderer".to_string();
+        if let Some(inputs) = replacement_inputs_from_edit(edit) {
+            state.sync_pane_cursor_to_document(pane);
+            state.apply_replacement_editor_inputs_to_active_tile(inputs);
             return Task::none();
         }
+    }
+
+    if is_edit {
+        state.status_message = "unsupported editor action ignored".to_string();
+        return Task::none();
     }
 
     if let Some(pane_state) = state.panes.get_mut(pane) {
@@ -72,33 +71,25 @@ pub(super) fn handle_replacement_editor_inputs(
     state: &mut KfnotepadGui,
     inputs: Vec<GuiEditorReplacementInput>,
 ) -> Task<Message> {
-    if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-        let Some(tile_id) = state
-            .panes
-            .get(state.active_pane)
-            .map(|pane_state| pane_state.tile_id)
-        else {
-            return Task::none();
-        };
-        if state.is_external_edit_locked(tile_id) {
-            state.status_message = "external edit lock active; unlock to edit".to_string();
-            return Task::none();
-        }
-        state.search_highlight = None;
-        state.apply_replacement_editor_inputs_to_active_tile(inputs);
-    } else {
-        state.status_message = "replacement editor inactive".to_string();
+    let Some(tile_id) = state
+        .panes
+        .get(state.active_pane)
+        .map(|pane_state| pane_state.tile_id)
+    else {
+        return Task::none();
+    };
+    if state.is_external_edit_locked(tile_id) {
+        state.status_message = "external edit lock active; unlock to edit".to_string();
+        return Task::none();
     }
+    state.search_highlight = None;
+    state.apply_replacement_editor_inputs_to_active_tile(inputs);
 
     Task::none()
 }
 
 pub(super) fn handle_replacement_editor_ime(state: &mut KfnotepadGui, event: input_method::Event) {
-    if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-        state.apply_replacement_editor_ime_event(event);
-    } else {
-        state.status_message = "replacement editor inactive".to_string();
-    }
+    state.apply_replacement_editor_ime_event(event);
 }
 
 pub(super) fn handle_toggle_replacement_overwrite_mode(state: &mut KfnotepadGui) {
@@ -110,6 +101,7 @@ pub(super) fn handle_toggle_replacement_overwrite_mode(state: &mut KfnotepadGui)
     };
 }
 
+#[cfg(test)]
 fn replacement_inputs_from_edit(
     edit: &text_editor::Edit,
 ) -> Option<Vec<GuiEditorReplacementInput>> {

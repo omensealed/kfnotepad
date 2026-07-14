@@ -9,15 +9,13 @@ pub(crate) struct GuiEditorAdapter {
     pub(crate) replacement_selection: Option<GuiEditorReplacementSelection>,
 }
 
-pub(crate) struct GuiEditorRenderState<'a> {
-    pub(crate) content: &'a text_editor::Content,
+pub(crate) struct GuiEditorRenderState {
     pub(crate) line_numbers: GuiEditorLineNumberSnapshot,
     #[cfg(test)]
     pub(crate) viewport_slice: GuiEditorViewportSlice,
 }
 
-pub(crate) struct GuiEditorSurfaceModel<'a> {
-    pub(crate) content: &'a text_editor::Content,
+pub(crate) struct GuiEditorSurfaceModel {
     pub(crate) editor_font: Font,
     pub(crate) editor_size: u32,
     pub(crate) wrapping: Wrapping,

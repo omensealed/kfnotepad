@@ -51,7 +51,6 @@ pub(in crate::gui::app::state::view) fn gui_pane_grid_view(
             pane_state.tile_id,
             &pane_state.editor,
             tile,
-            tile_palette,
         ))
         .title_bar(title_bar)
         .style(move |_theme| gui_tile_body_style(tile_palette, active_tile))

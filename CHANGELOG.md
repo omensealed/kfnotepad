@@ -4,6 +4,13 @@ Notable user-facing and engineering changes are recorded here. kfnotepad follows
 early development; minor releases may substantially revise internal architecture while preserving documented file
 safety and privacy behavior.
 
+## Unreleased
+
+### Engineering
+
+- Removed the dormant native-Iced GUI editor branch and its hardcoded backend selector. The app-owned editor renderer
+  is now the sole production GUI editing path; compatibility-only Iced action tests remain isolated to test builds.
+
 ## 0.2.0 - 2026-07-13
 
 ### Highlights

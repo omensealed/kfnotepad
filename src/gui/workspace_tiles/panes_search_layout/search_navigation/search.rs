@@ -4,11 +4,7 @@ use super::*;
 
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn search_active(&mut self, backwards: bool) {
-        if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-            self.sync_pane_cursor_to_document(self.active_pane);
-        } else {
-            self.sync_active_editor_to_document();
-        }
+        self.sync_pane_cursor_to_document(self.active_pane);
         let query = self.search_query.trim().to_string();
         self.remember_search_query(&query);
         self.search_history_open = false;
@@ -55,18 +51,14 @@ impl KfnotepadGui {
         self.move_active_editor_to_document_cursor();
         if matched_chars > 0 {
             if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
-                if GUI_USE_READ_ONLY_EDITOR_RENDERER {
-                    let start = match_start;
-                    let focus = DocumentCursor {
-                        row: start.row,
-                        column: start.column.saturating_add(matched_chars),
-                    };
-                    pane_state
-                        .editor
-                        .set_replacement_selection(start, focus, start);
-                } else {
-                    pane_state.editor.select_right_chars(matched_chars);
-                }
+                let start = match_start;
+                let focus = DocumentCursor {
+                    row: start.row,
+                    column: start.column.saturating_add(matched_chars),
+                };
+                pane_state
+                    .editor
+                    .set_replacement_selection(start, focus, start);
             }
         }
     }

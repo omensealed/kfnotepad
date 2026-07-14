@@ -6,7 +6,9 @@ use std::collections::HashSet;
 use std::path::PathBuf;
 
 use iced::advanced::input_method;
-use iced::widget::{pane_grid, text_editor};
+use iced::widget::pane_grid;
+#[cfg(test)]
+use iced::widget::text_editor;
 use iced::{window, Size};
 use kfnotepad::{FileSidebarEntryKind, GuiLeftPanelMode, GuiTileId, TextDocument};
 use nerd_font_symbols as nf;

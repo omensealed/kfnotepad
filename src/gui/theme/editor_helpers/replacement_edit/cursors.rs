@@ -72,6 +72,7 @@ pub(in crate::gui::app::state) fn document_cursor_is_before_or_equal(
     (left.row, left.column) <= (right.row, right.column)
 }
 
+#[cfg(test)]
 pub(in crate::gui::app::state) fn gui_editor_replacement_text_end_cursor(
     text: &str,
 ) -> DocumentCursor {
