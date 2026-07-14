@@ -3,7 +3,7 @@ all-features = true
 
 [advisories]
 ignore = [
-    { id = "RUSTSEC-2025-0141", reason = "bincode 1.3.3 is pulled by syntect dump loading; syntect has no safe replacement in the current release line." },
+    { id = "RUSTSEC-2025-0141", reason = "syntect 5.3 parsing requires bincode 1.3 for bundled trusted syntax/theme dumps; upstream replacement PR #694 is not released yet." },
     { id = "RUSTSEC-2024-0436", reason = "paste is pulled by iced/wgpu through metal; no safe update is available in the current Iced stack." },
     { id = "RUSTSEC-2026-0192", reason = "ttf-parser is pulled by iced/cosmic-text/fontdb and iced_fonts; no safe update is available in the current Iced stack." },
     { id = "RUSTSEC-2026-0194", reason = "remaining quick-xml 0.39.x path is wayland-scanner build-time protocol XML generation; upstream 0.31.10 has no safe quick-xml 0.41 update yet." },
