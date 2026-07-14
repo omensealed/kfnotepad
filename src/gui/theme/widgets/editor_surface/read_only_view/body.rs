@@ -16,11 +16,9 @@ pub(super) fn gui_editor_read_only_body(
             }),
     )
     .on_move(move |point| {
-        let pointer = gui_editor_replacement_mouse_point_from_body_point(
+        let pointer = gui_editor_replacement_mouse_point_from_visual_rows(
             point,
-            &context.source_lines,
-            context.first_line,
-            context.wrapping,
+            &context.visual_rows,
             GuiEditorBodyHitTest {
                 columns: context.body_columns,
                 visible_rows: context.visible_row_budget,

@@ -420,3 +420,57 @@ fn gui_editor_adapter_page_scroll_does_not_reconstruct_a_text_buffer() {
         }
     );
 }
+
+#[test]
+fn gui_editor_visual_layout_cache_reuses_ranges_and_invalidates_on_key_changes() {
+    let mut buffer = TextBuffer::from_text("alpha beta gamma\nsecond line\n");
+    let adapter = GuiEditorAdapter::new(
+        gui_editor_line_count(&buffer),
+        DocumentCursor { row: 0, column: 0 },
+    );
+    let slice = adapter.render_viewport_slice_from_lines(buffer.lines(), 8);
+
+    let first = gui_editor_cached_visual_rows(
+        &adapter.visual_layout_cache,
+        &slice.lines,
+        slice.first_line,
+        buffer.edit_revision(),
+        Wrapping::WordOrGlyph,
+        8,
+    );
+    let second = gui_editor_cached_visual_rows(
+        &adapter.visual_layout_cache,
+        &slice.lines,
+        slice.first_line,
+        buffer.edit_revision(),
+        Wrapping::WordOrGlyph,
+        8,
+    );
+
+    assert_eq!(first, second);
+    assert_eq!(adapter.visual_layout_cache_stats(), (1, 1));
+
+    let _narrow = gui_editor_cached_visual_rows(
+        &adapter.visual_layout_cache,
+        &slice.lines,
+        slice.first_line,
+        buffer.edit_revision(),
+        Wrapping::WordOrGlyph,
+        4,
+    );
+    assert_eq!(adapter.visual_layout_cache_stats(), (1, 2));
+
+    buffer.insert_char(0, 0, '!').expect("edit buffer");
+    let edited_slice = adapter.render_viewport_slice_from_lines(buffer.lines(), 8);
+    let edited = gui_editor_cached_visual_rows(
+        &adapter.visual_layout_cache,
+        &edited_slice.lines,
+        edited_slice.first_line,
+        buffer.edit_revision(),
+        Wrapping::WordOrGlyph,
+        4,
+    );
+
+    assert_eq!(adapter.visual_layout_cache_stats(), (1, 3));
+    assert!(edited[0].line.text.starts_with('!'));
+}

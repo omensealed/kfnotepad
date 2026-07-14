@@ -113,6 +113,8 @@ pub(in crate::gui::app::state) fn gui_editor_surface_model(
             .show_line_numbers
             .then_some(render_state.line_numbers),
         viewport_slice,
+        document_revision: document.buffer.edit_revision(),
+        visual_layout_cache: editor.visual_layout_cache.clone(),
     }
 }
 

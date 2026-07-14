@@ -8,6 +8,9 @@ safety and privacy behavior.
 
 ### Engineering
 
+- Added a bounded per-pane GUI visual-row layout cache keyed by document revision, viewport, body width, and wrapping
+  mode. Rendering and pointer hit-testing now share the same row ranges while current selection and syntax styling
+  remain uncached.
 - Removed the GUI's duplicate Iced full-text mirror. The shared `TextBuffer` is now the canonical editor text state,
   while the GUI adapter retains only interaction and viewport metadata.
 - Removed the dormant native-Iced GUI editor branch and its hardcoded backend selector. The app-owned editor renderer

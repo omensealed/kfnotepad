@@ -16,9 +16,7 @@ pub(super) struct GuiReadOnlyLineRowContext {
 
 pub(super) struct GuiReadOnlyBodyContext {
     pub(super) pane: pane_grid::Pane,
-    pub(super) source_lines: Vec<GuiEditorViewportLine>,
-    pub(super) first_line: usize,
-    pub(super) wrapping: Wrapping,
+    pub(super) visual_rows: Vec<GuiEditorReadOnlyVisualRow>,
     pub(super) body_columns: usize,
     pub(super) visible_row_budget: usize,
     pub(super) gutter_width: f32,

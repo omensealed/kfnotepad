@@ -50,6 +50,7 @@ pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_point_from_visual
     }
 }
 
+#[cfg(test)]
 pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_point_from_body_point(
     point: iced::Point,
     source_lines: &[GuiEditorViewportLine],
@@ -58,14 +59,24 @@ pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_point_from_body_p
     hit_test: GuiEditorBodyHitTest,
     settings: EditorSettings,
 ) -> GuiEditorReplacementMousePoint {
-    let text_point = iced::Point::new(point.x - hit_test.text_origin_x, point.y);
-    let row_height = gui_editor_replacement_row_height(settings);
-    let target_visual_row = (point.y.max(0.0) / row_height).floor() as usize;
     let visual_rows =
         gui_editor_read_only_visual_rows(source_lines, first_line, wrapping, hit_test.columns)
             .into_iter()
             .take(hit_test.visible_rows.max(1))
             .collect::<Vec<_>>();
+
+    gui_editor_replacement_mouse_point_from_visual_rows(point, &visual_rows, hit_test, settings)
+}
+
+pub(in crate::gui::app::state) fn gui_editor_replacement_mouse_point_from_visual_rows(
+    point: iced::Point,
+    visual_rows: &[GuiEditorReadOnlyVisualRow],
+    hit_test: GuiEditorBodyHitTest,
+    settings: EditorSettings,
+) -> GuiEditorReplacementMousePoint {
+    let text_point = iced::Point::new(point.x - hit_test.text_origin_x, point.y);
+    let row_height = gui_editor_replacement_row_height(settings);
+    let target_visual_row = (point.y.max(0.0) / row_height).floor() as usize;
 
     if let Some(visual_row) =
         visual_rows.get(target_visual_row.min(visual_rows.len().saturating_sub(1)))

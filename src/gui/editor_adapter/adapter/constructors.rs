@@ -10,6 +10,9 @@ impl GuiEditorAdapter {
             viewport: GuiEditorViewportState::new(GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES),
             viewport_tracks_cursor: true,
             replacement_selection: None,
+            visual_layout_cache: std::sync::Arc::new(std::sync::Mutex::new(
+                GuiEditorVisualLayoutCache::default(),
+            )),
         };
         adapter.sync_viewport_to_cursor();
         adapter

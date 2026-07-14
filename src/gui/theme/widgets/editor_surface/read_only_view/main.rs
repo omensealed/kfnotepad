@@ -18,6 +18,8 @@ pub(in crate::gui::app::state) fn gui_editor_read_only_view(
     let wrapping = editor_surface.wrapping;
     let editor_font = editor_surface.editor_font;
     let editor_size = editor_surface.editor_size;
+    let document_revision = editor_surface.document_revision;
+    let visual_layout_cache = editor_surface.visual_layout_cache.clone();
 
     responsive(move |surface_size| {
         let gutter_width = line_number_width.unwrap_or_default()
@@ -35,10 +37,17 @@ pub(in crate::gui::app::state) fn gui_editor_read_only_view(
             visible_row_budget,
             surface_size.height,
         );
-        let visual_rows =
-            gui_editor_read_only_visual_rows(&source_lines, first_line, wrapping, body_columns)
-                .into_iter()
-                .take(visible_row_budget);
+        let visual_rows = gui_editor_cached_visual_rows(
+            &visual_layout_cache,
+            &source_lines,
+            first_line,
+            document_revision,
+            wrapping,
+            body_columns,
+        )
+        .into_iter()
+        .take(visible_row_budget)
+        .collect::<Vec<_>>();
         let mut editor_rows = iced::widget::Column::new()
             .spacing(0)
             .width(Length::Fill)
@@ -57,7 +66,7 @@ pub(in crate::gui::app::state) fn gui_editor_read_only_view(
             search_highlight_active,
         };
 
-        for (rendered_row, visual_row) in visual_rows.enumerate() {
+        for (rendered_row, visual_row) in visual_rows.iter().cloned().enumerate() {
             let (line_row, row_ime_request) = gui_editor_read_only_line_row(
                 line_row_context,
                 visual_row,
@@ -74,9 +83,7 @@ pub(in crate::gui::app::state) fn gui_editor_read_only_view(
             editor_rows,
             GuiReadOnlyBodyContext {
                 pane,
-                source_lines: source_lines.clone(),
-                first_line,
-                wrapping,
+                visual_rows,
                 body_columns,
                 visible_row_budget,
                 gutter_width,

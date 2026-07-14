@@ -10,6 +10,7 @@ impl GuiEditorAdapter {
             viewport: self.viewport,
             viewport_tracks_cursor: self.viewport_tracks_cursor,
             replacement_selection: self.replacement_selection,
+            visual_layout_cache: self.visual_layout_cache.clone(),
         }
     }
 
@@ -25,5 +26,14 @@ impl GuiEditorAdapter {
         self.line_count = line_count.max(1);
         self.cursor = cursor;
         self.sync_viewport_to_cursor();
+    }
+
+    #[cfg(test)]
+    pub(crate) fn visual_layout_cache_stats(&self) -> (usize, usize) {
+        let cache = self
+            .visual_layout_cache
+            .lock()
+            .expect("visual layout cache lock");
+        (cache.hits, cache.misses)
     }
 }

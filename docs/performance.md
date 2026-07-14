@@ -155,6 +155,13 @@ temporary text buffer. Page movement updates the adapter viewport and clamps its
 Production Cut/Paste uses only the shared delta-backed document path; the dormant native-Iced editor widget branch,
 its runtime selector, and the duplicate Iced content mirror have been removed.
 
+A per-pane visual-row layout cache now retains one bounded set of wrap ranges keyed by document revision, first
+source line, source-line count, body columns, and wrapping mode. Responsive redraws with unchanged geometry reuse
+those grapheme-aware ranges, and pointer hit-testing consumes the exact rows used for rendering. The cache does not
+retain cursor, selection, syntax segments, or theme styling; those are materialized from current state on every draw
+so interaction and highlighting cannot become stale. Edits and viewport or width changes invalidate the entry through
+the key.
+
 A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
 undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt
 precedence, and coalesced history storage. These local results are a forward baseline, not a portable performance

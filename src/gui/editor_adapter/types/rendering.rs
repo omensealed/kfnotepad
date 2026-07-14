@@ -50,6 +50,34 @@ pub(crate) struct GuiEditorReadOnlyVisualRow {
     pub(crate) show_line_number: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct GuiEditorVisualLayoutKey {
+    pub(crate) document_revision: u64,
+    pub(crate) first_line: usize,
+    pub(crate) source_line_count: usize,
+    pub(crate) body_columns: usize,
+    pub(crate) wrapping: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct GuiEditorVisualRowLayout {
+    pub(crate) source_line_index: usize,
+    pub(crate) viewport_row: usize,
+    pub(crate) source_column_start: usize,
+    pub(crate) source_column_end: usize,
+    pub(crate) show_line_number: bool,
+}
+
+#[derive(Debug, Default)]
+pub(crate) struct GuiEditorVisualLayoutCache {
+    pub(crate) key: Option<GuiEditorVisualLayoutKey>,
+    pub(crate) rows: Vec<GuiEditorVisualRowLayout>,
+    #[cfg(test)]
+    pub(crate) hits: usize,
+    #[cfg(test)]
+    pub(crate) misses: usize,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub(crate) struct GuiEditorScrollbarModel {
     pub(crate) visible: bool,

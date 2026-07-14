@@ -1,16 +1,62 @@
 use super::*;
 use unicode_segmentation::UnicodeSegmentation;
 
+#[cfg(test)]
 pub(in crate::gui::app::state) fn gui_editor_read_only_visual_rows(
     lines: &[GuiEditorViewportLine],
     first_line: usize,
     wrapping: Wrapping,
     body_columns: usize,
 ) -> Vec<GuiEditorReadOnlyVisualRow> {
+    let layouts = gui_editor_visual_row_layouts(lines, first_line, wrapping, body_columns);
+    gui_editor_materialize_visual_rows(lines, &layouts)
+}
+
+pub(in crate::gui::app::state) fn gui_editor_cached_visual_rows(
+    cache: &std::sync::Mutex<GuiEditorVisualLayoutCache>,
+    lines: &[GuiEditorViewportLine],
+    first_line: usize,
+    document_revision: u64,
+    wrapping: Wrapping,
+    body_columns: usize,
+) -> Vec<GuiEditorReadOnlyVisualRow> {
+    let key = GuiEditorVisualLayoutKey {
+        document_revision,
+        first_line,
+        source_line_count: lines.len(),
+        body_columns: body_columns.max(1),
+        wrapping: wrapping != Wrapping::None,
+    };
+    let mut cache = cache
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+    if cache.key != Some(key) {
+        cache.rows = gui_editor_visual_row_layouts(lines, first_line, wrapping, body_columns);
+        cache.key = Some(key);
+        #[cfg(test)]
+        {
+            cache.misses = cache.misses.saturating_add(1);
+        }
+    } else {
+        #[cfg(test)]
+        {
+            cache.hits = cache.hits.saturating_add(1);
+        }
+    }
+
+    gui_editor_materialize_visual_rows(lines, &cache.rows)
+}
+
+fn gui_editor_visual_row_layouts(
+    lines: &[GuiEditorViewportLine],
+    first_line: usize,
+    wrapping: Wrapping,
+    body_columns: usize,
+) -> Vec<GuiEditorVisualRowLayout> {
     let mut rows = Vec::new();
     let wrap_columns = body_columns.max(1);
 
-    for line in lines {
+    for (source_line_index, line) in lines.iter().enumerate() {
         let viewport_row = line.number.saturating_sub(first_line);
         let ranges = if wrapping == Wrapping::None {
             vec![(0, line.text.chars().count())]
@@ -19,16 +65,39 @@ pub(in crate::gui::app::state) fn gui_editor_read_only_visual_rows(
         };
 
         for (index, (start, end)) in ranges.into_iter().enumerate() {
-            rows.push(GuiEditorReadOnlyVisualRow {
-                line: gui_editor_viewport_line_slice(line, start, end),
+            rows.push(GuiEditorVisualRowLayout {
+                source_line_index,
                 viewport_row,
                 source_column_start: start,
+                source_column_end: end,
                 show_line_number: index == 0,
             });
         }
     }
 
     rows
+}
+
+fn gui_editor_materialize_visual_rows(
+    lines: &[GuiEditorViewportLine],
+    layouts: &[GuiEditorVisualRowLayout],
+) -> Vec<GuiEditorReadOnlyVisualRow> {
+    layouts
+        .iter()
+        .filter_map(|layout| {
+            let line = lines.get(layout.source_line_index)?;
+            Some(GuiEditorReadOnlyVisualRow {
+                line: gui_editor_viewport_line_slice(
+                    line,
+                    layout.source_column_start,
+                    layout.source_column_end,
+                ),
+                viewport_row: layout.viewport_row,
+                source_column_start: layout.source_column_start,
+                show_line_number: layout.show_line_number,
+            })
+        })
+        .collect()
 }
 
 pub(in crate::gui::app::state) fn gui_editor_word_wrap_ranges(
