@@ -112,7 +112,7 @@ fn gui_syntax_theme_role_palettes_stay_varied() {
 
 #[test]
 #[cfg(feature = "syntax")]
-fn gui_highlighter_uses_shared_syntax_tokens_and_preset_theme_mapping() {
+fn gui_highlighter_uses_shared_syntax_tokens() {
     let temp = TempArea::new("gui-syntax-highlight");
     let rust_path = temp.path("main.rs");
     let text_path = temp.path("note.txt");
@@ -145,14 +145,6 @@ fn gui_highlighter_uses_shared_syntax_tokens_and_preset_theme_mapping() {
             .syntax_highlighter
             .syntax_token_for_document(&text_tile.document),
         "txt"
-    );
-    assert_eq!(
-        gui_highlighter_theme(EditorThemeId::Paper),
-        highlighter::Theme::InspiredGitHub
-    );
-    assert_eq!(
-        gui_highlighter_theme(EditorThemeId::Terror),
-        highlighter::Theme::Base16Eighties
     );
 }
 

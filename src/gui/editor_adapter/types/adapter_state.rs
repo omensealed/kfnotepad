@@ -21,10 +21,6 @@ pub(crate) struct GuiEditorSurfaceModel<'a> {
     pub(crate) editor_font: Font,
     pub(crate) editor_size: u32,
     pub(crate) wrapping: Wrapping,
-    #[cfg(feature = "syntax")]
-    pub(crate) syntax_token: String,
-    #[cfg(feature = "syntax")]
-    pub(crate) highlighter_theme: highlighter::Theme,
     pub(crate) line_numbers: Option<GuiEditorLineNumberSnapshot>,
     pub(crate) viewport_slice: GuiEditorViewportSlice,
 }

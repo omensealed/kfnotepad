@@ -49,8 +49,6 @@ fn gui_editor_surface_model_captures_backend_replacement_inputs() {
     assert_eq!(surface.content.text(), "fn main() {}\nsecond\n");
     assert_eq!(surface.editor_size, 18);
     assert_eq!(surface.wrapping, Wrapping::WordOrGlyph);
-    #[cfg(feature = "syntax")]
-    assert_eq!(surface.syntax_token, "rs");
     assert_eq!(
         surface.line_numbers,
         Some(GuiEditorLineNumberSnapshot {

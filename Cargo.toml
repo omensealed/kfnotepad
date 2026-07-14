@@ -22,7 +22,6 @@ gui = [
 
 syntax = [
     "dep:syntect",
-    "iced?/highlighter",
 ]
 
 [dependencies]

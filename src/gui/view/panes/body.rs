@@ -46,11 +46,6 @@ pub(in crate::gui::app::state::view) fn gui_pane_body<'a>(
                 .size(editor_surface.editor_size)
                 .line_height(GUI_EDITOR_LINE_HEIGHT)
                 .wrapping(editor_surface.wrapping);
-            #[cfg(feature = "syntax")]
-            let editor = editor.highlight(
-                &editor_surface.syntax_token,
-                editor_surface.highlighter_theme,
-            );
             let editor = editor
                 .style(move |_theme, status| {
                     gui_native_editor_style(tile_palette, status, search_highlight_active)

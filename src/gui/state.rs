@@ -16,8 +16,6 @@ use iced::advanced::{
     widget::{Operation as AdvancedOperation, Tree, Widget},
     Clipboard as AdvancedClipboard, Layout as AdvancedLayout, Shell as AdvancedShell,
 };
-#[cfg(feature = "syntax")]
-use iced::highlighter;
 use iced::keyboard::key::{Key, Named};
 use iced::widget::{
     button, checkbox, column, container, mouse_area, pane_grid, responsive, rich_text, row,
