@@ -1,5 +1,4 @@
 use super::*;
-use iced::widget::text_editor;
 use kfnotepad::DEFAULT_GUI_FONT_SIZE;
 use std::fs;
 use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};

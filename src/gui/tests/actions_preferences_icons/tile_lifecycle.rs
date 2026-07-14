@@ -17,7 +17,7 @@ fn gui_close_only_clean_pane_resets_to_blank_tile() {
         state.workspace.active_tile().document.path,
         temp.path("untitled.txt")
     );
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert_eq!(
         fs::read_to_string(&file).expect("original file unchanged"),
         "only\n"
@@ -33,11 +33,7 @@ fn gui_close_only_dirty_pane_requires_confirmation_before_blank_reset() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![file.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("dirty\n");
+    state.replace_active_document_text("dirty\n");
 
     let _ = update(&mut state, Message::CloseActivePane);
 
@@ -55,7 +51,7 @@ fn gui_close_only_dirty_pane_requires_confirmation_before_blank_reset() {
         state.workspace.active_tile().document.path,
         temp.path("untitled.txt")
     );
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert_eq!(
         fs::read_to_string(&file).expect("original file unchanged"),
         "only\n"
@@ -74,11 +70,7 @@ fn gui_minimize_active_pane_hides_tile_and_focuses_visible_fallback() {
     });
     let second_pane = state.active_pane;
     let second_tile_id = state.panes.get(second_pane).expect("second pane").tile_id;
-    state
-        .panes
-        .get_mut(second_pane)
-        .expect("second pane")
-        .editor = GuiEditorAdapter::from_text("dirty second\n");
+    state.replace_active_document_text("dirty second\n");
 
     let _ = update(&mut state, Message::ToggleActiveMinimize);
 
@@ -115,7 +107,7 @@ fn gui_minimize_active_pane_hides_tile_and_focuses_visible_fallback() {
             .minimized
     );
     assert_eq!(state.workspace.active_tile().document.path, second);
-    assert_eq!(state.active_editor().text(), "dirty second\n");
+    assert_eq!(state.active_document_text(), "dirty second\n");
     assert_eq!(state.status_message, "restored tile");
     assert_eq!(state.panes.len(), 2);
     assert!(state.minimized_panes.is_empty());
@@ -180,7 +172,7 @@ fn gui_close_last_visible_tile_promotes_minimized_tile() {
             .expect("second tile")
             .minimized
     );
-    assert_eq!(state.active_editor().text(), "second\n");
+    assert_eq!(state.active_document_text(), "second\n");
     assert_eq!(state.status_message, format!("closed {}", first.display()));
 }
 

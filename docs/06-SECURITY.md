@@ -42,7 +42,8 @@ Threat model status: current as of 2026-07-13 for the arbitrary-file terminal/ed
 
 - User file contents may contain personal data or secrets.
 - Search queries, open tab buffers, and in-memory undo entries may contain user file content.
-- GUI open tile buffers, search queries, and Iced editor content may contain user file content.
+- GUI open tile buffers and search queries may contain user file content; adapter state contains only cursor, selection,
+  viewport, and display metadata.
 - Error messages may include paths and OS errors, but must not include file contents.
 - `config.toml` stores only display preferences. `gui-layout.v1` stores only pane geometry, browser visibility,
   browser width, and minimized ordinals; it must not store document text, file paths, cursor positions, search

@@ -73,7 +73,7 @@ fn gui_browser_file_double_click_replaces_initial_blank_tile() {
     assert_eq!(state.workspace.tiles.len(), 1);
     assert_eq!(state.panes.len(), 1);
     assert_eq!(state.workspace.active_tile().document.path, file);
-    assert_eq!(state.active_editor().text(), "browser file\n");
+    assert_eq!(state.active_document_text(), "browser file\n");
 }
 
 #[test]
@@ -138,7 +138,7 @@ fn gui_browser_tree_file_double_click_uses_existing_open_adapter() {
     assert_eq!(state.workspace.tiles.len(), 1);
     assert_eq!(state.panes.len(), 1);
     assert_eq!(state.workspace.active_tile().document.path, file);
-    assert_eq!(state.active_editor().text(), "tree file\n");
+    assert_eq!(state.active_document_text(), "tree file\n");
 }
 
 #[test]

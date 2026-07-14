@@ -12,25 +12,21 @@ fn gui_external_file_change_refreshes_clean_tile_and_locks_editing() {
         temp.root.clone(),
     );
     let tile_id = state.workspace.active_tile().id;
-    let pane = state.active_pane;
 
     fs::write(&file, "one\ntwo\n").expect("external write");
     state.poll_external_file_changes();
 
-    assert_eq!(state.active_editor().text(), "one\ntwo\n");
+    assert_eq!(state.active_document_text(), "one\ntwo\n");
     assert!(!state.workspace.active_tile().document.buffer.is_dirty());
     assert!(state.is_external_edit_locked(tile_id));
     assert_eq!(state.status_message, "external update loaded: watched.txt");
 
     let _ = update(
         &mut state,
-        Message::Edit(
-            pane,
-            text_editor::Action::Edit(text_editor::Edit::Insert('X')),
-        ),
+        Message::ReplacementEditorInputs(vec![GuiEditorReplacementInput::InsertChar('X')]),
     );
 
-    assert_eq!(state.active_editor().text(), "one\ntwo\n");
+    assert_eq!(state.active_document_text(), "one\ntwo\n");
     assert_eq!(
         state.status_message,
         "external edit lock active; unlock to edit"
@@ -38,7 +34,7 @@ fn gui_external_file_change_refreshes_clean_tile_and_locks_editing() {
 
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::SelectAll));
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Cut));
-    assert_eq!(state.active_editor().text(), "one\ntwo\n");
+    assert_eq!(state.active_document_text(), "one\ntwo\n");
     assert_eq!(
         state.status_message,
         "external edit lock active; unlock to edit"
@@ -80,7 +76,7 @@ fn gui_external_file_change_detects_same_size_coarse_mtime_rewrite() {
     );
     state.poll_external_file_changes();
 
-    assert_eq!(state.active_editor().text(), "bravo\n");
+    assert_eq!(state.active_document_text(), "bravo\n");
     assert!(state.is_external_edit_locked(tile_id));
 }
 
@@ -152,21 +148,17 @@ fn gui_external_file_unlock_allows_editing_again() {
         temp.root.clone(),
     );
     let tile_id = state.workspace.active_tile().id;
-    let pane = state.active_pane;
     fs::write(&file, "external\n").expect("external write");
     state.poll_external_file_changes();
 
     let _ = update(&mut state, Message::UnlockExternalEdit(tile_id));
     let _ = update(
         &mut state,
-        Message::Edit(
-            pane,
-            text_editor::Action::Edit(text_editor::Edit::Insert('X')),
-        ),
+        Message::ReplacementEditorInputs(vec![GuiEditorReplacementInput::InsertChar('X')]),
     );
 
     assert!(!state.is_external_edit_locked(tile_id));
-    assert_eq!(state.active_editor().text(), "Xexternal\n");
+    assert_eq!(state.active_document_text(), "Xexternal\n");
     assert!(state.workspace.active_tile().document.buffer.is_dirty());
 }
 
@@ -188,7 +180,7 @@ fn gui_external_file_change_continues_refreshing_while_locked() {
     fs::write(&file, "external one\nexternal two\n").expect("external write two");
     state.poll_external_file_changes();
 
-    assert_eq!(state.active_editor().text(), "external one\nexternal two\n");
+    assert_eq!(state.active_document_text(), "external one\nexternal two\n");
     assert!(state.is_external_edit_locked(tile_id));
 }
 
@@ -204,17 +196,12 @@ fn gui_external_file_change_does_not_overwrite_dirty_tile() {
         temp.root.clone(),
     );
     let tile_id = state.workspace.active_tile().id;
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("local dirty\n");
-    state.sync_active_editor_to_document();
+    state.replace_active_document_text("local dirty\n");
 
     fs::write(&file, "external replacement\n").expect("external write");
     state.poll_external_file_changes();
 
-    assert_eq!(state.active_editor().text(), "local dirty\n");
+    assert_eq!(state.active_document_text(), "local dirty\n");
     assert!(state.workspace.active_tile().document.buffer.is_dirty());
     assert!(state.is_external_edit_locked(tile_id));
     assert!(state

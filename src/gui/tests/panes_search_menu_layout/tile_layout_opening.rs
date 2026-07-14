@@ -116,7 +116,7 @@ fn gui_open_replaces_initial_blank_tile_but_not_dirty_or_real_tiles() {
     assert_eq!(state.workspace.tiles.len(), 1);
     assert_eq!(state.panes.len(), 1);
     assert_eq!(state.workspace.active_tile().document.path, file);
-    assert_eq!(state.active_editor().text(), "opened\n");
+    assert_eq!(state.active_document_text(), "opened\n");
     assert_eq!(
         state.workspace.active_tile().save_status(),
         GuiTileSaveStatus::Saved
@@ -156,7 +156,7 @@ fn gui_open_focuses_existing_file_instead_of_duplicate_tile() {
     assert_eq!(state.workspace.tiles.len(), 2);
     assert_eq!(state.panes.len(), 2);
     assert_eq!(state.workspace.active_tile().document.path, first);
-    assert_eq!(state.active_editor().text(), "first\n");
+    assert_eq!(state.active_document_text(), "first\n");
     assert!(state.status_message.starts_with("already open: "));
 }
 

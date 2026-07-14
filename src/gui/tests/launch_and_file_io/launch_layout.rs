@@ -11,7 +11,7 @@ fn gui_launch_loads_requested_file_into_editor_state() {
     });
 
     assert_eq!(state.workspace.active_tile().document.path, path);
-    assert_eq!(state.active_editor().text(), "alpha\nbeta\n");
+    assert_eq!(state.active_document_text(), "alpha\nbeta\n");
     assert_eq!(
         state.workspace.active_tile().save_status(),
         GuiTileSaveStatus::Saved
@@ -33,7 +33,7 @@ fn gui_launches_multiple_requested_files_as_tiles_and_panes() {
     assert_eq!(state.workspace.tiles.len(), 2);
     assert_eq!(state.panes.len(), 2);
     assert_eq!(state.workspace.active_tile().document.path, second);
-    assert_eq!(state.active_editor().text(), "second\n");
+    assert_eq!(state.active_document_text(), "second\n");
     assert!(state.panes.iter().any(|(_pane, pane_state)| state
         .workspace
         .tile(pane_state.tile_id)
@@ -172,7 +172,7 @@ fn gui_new_tile_splits_active_pane_without_creating_a_file() {
     assert_eq!(state.workspace.tiles.len(), 2);
     assert_eq!(state.panes.len(), 2);
     assert_eq!(state.workspace.active_tile().document.path, expected);
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert!(!temp.path("untitled-2.txt").exists());
     assert_eq!(
         fs::read_to_string(&existing_untitled).expect("read existing untitled"),

@@ -71,11 +71,3 @@ pub(in crate::gui::app::state) fn document_cursor_is_before_or_equal(
 ) -> bool {
     (left.row, left.column) <= (right.row, right.column)
 }
-
-#[cfg(test)]
-pub(in crate::gui::app::state) fn gui_editor_replacement_text_end_cursor(
-    text: &str,
-) -> DocumentCursor {
-    let buffer = TextBuffer::from_text(text);
-    gui_editor_replacement_document_end_cursor(&buffer)
-}

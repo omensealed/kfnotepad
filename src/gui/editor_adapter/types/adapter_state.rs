@@ -3,7 +3,8 @@
 use super::*;
 
 pub(crate) struct GuiEditorAdapter {
-    pub(crate) content: text_editor::Content,
+    pub(crate) cursor: DocumentCursor,
+    pub(crate) line_count: usize,
     pub(crate) viewport: GuiEditorViewportState,
     pub(crate) viewport_tracks_cursor: bool,
     pub(crate) replacement_selection: Option<GuiEditorReplacementSelection>,
@@ -11,8 +12,6 @@ pub(crate) struct GuiEditorAdapter {
 
 pub(crate) struct GuiEditorRenderState {
     pub(crate) line_numbers: GuiEditorLineNumberSnapshot,
-    #[cfg(test)]
-    pub(crate) viewport_slice: GuiEditorViewportSlice,
 }
 
 pub(crate) struct GuiEditorSurfaceModel {

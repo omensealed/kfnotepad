@@ -27,7 +27,7 @@ fn gui_browser_create_file_creates_refreshes_and_opens_new_file() {
     assert_eq!(fs::read_to_string(&created).expect("read created file"), "");
     assert_eq!(state.workspace.tiles.len(), 1);
     assert_eq!(state.workspace.active_tile().document.path, created);
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert!(state
         .browser
         .as_ref()

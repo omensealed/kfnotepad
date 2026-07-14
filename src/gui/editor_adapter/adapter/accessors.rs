@@ -3,38 +3,27 @@
 use super::*;
 
 impl GuiEditorAdapter {
-    pub(crate) fn text(&self) -> String {
-        self.content.text()
-    }
-
     pub(crate) fn clone_for_relayout(&self) -> Self {
-        let mut adapter = Self {
-            content: self.content.clone(),
+        Self {
+            cursor: self.cursor,
+            line_count: self.line_count,
             viewport: self.viewport,
             viewport_tracks_cursor: self.viewport_tracks_cursor,
             replacement_selection: self.replacement_selection,
-        };
-        adapter.content.move_to(self.cursor());
-        adapter
-    }
-
-    pub(crate) fn cursor(&self) -> text_editor::Cursor {
-        self.content.cursor()
+        }
     }
 
     pub(crate) fn document_cursor(&self) -> DocumentCursor {
-        document_cursor_from_editor(self.cursor())
-    }
-
-    #[cfg(test)]
-    pub(crate) fn selection(&self) -> Option<String> {
-        if let Some(selection) = self.replacement_selection {
-            return gui_editor_replacement_copy_selection_from_text(&self.text(), Some(selection));
-        }
-        self.content.selection()
+        self.cursor
     }
 
     pub(crate) fn line_count(&self) -> usize {
-        self.content.line_count()
+        self.line_count
+    }
+
+    pub(crate) fn sync_document_metadata(&mut self, line_count: usize, cursor: DocumentCursor) {
+        self.line_count = line_count.max(1);
+        self.cursor = cursor;
+        self.sync_viewport_to_cursor();
     }
 }

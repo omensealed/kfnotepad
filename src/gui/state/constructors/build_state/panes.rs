@@ -10,12 +10,17 @@ pub(super) fn build_workspace_and_pane_states(
     let mut workspace = GuiWorkspace::from_document(first_document);
     let mut pane_states = vec![GuiPane::new(
         workspace.active,
-        text_editor::Content::with_text(&workspace.active_tile().document.buffer.to_text()),
+        gui_editor_line_count(&workspace.active_tile().document.buffer),
+        workspace.active_tile().state.cursor,
     )];
     for document in documents {
-        let editor = text_editor::Content::with_text(&document.buffer.to_text());
+        let line_count = gui_editor_line_count(&document.buffer);
         let tile_id = workspace.open_tile(document);
-        pane_states.push(GuiPane::new(tile_id, editor));
+        pane_states.push(GuiPane::new(
+            tile_id,
+            line_count,
+            DocumentCursor { row: 0, column: 0 },
+        ));
     }
     (workspace, pane_states)
 }

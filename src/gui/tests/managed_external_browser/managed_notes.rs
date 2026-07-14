@@ -29,7 +29,7 @@ fn gui_managed_note_prompt_creates_and_opens_note_in_new_pane() {
     assert_eq!(state.path_prompt, None);
     assert_eq!(state.workspace.tiles.len(), 2);
     assert_eq!(state.workspace.active_tile().document.path, expected);
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert_eq!(
         fs::read_to_string(notes_dir.join("daily-note.md")).expect("read note"),
         ""
@@ -77,7 +77,7 @@ fn gui_managed_notes_panel_lists_and_opens_existing_note() {
         state.workspace.active_tile().document.path,
         notes_dir.join("alpha.md")
     );
-    assert_eq!(state.active_editor().text(), "alpha\n");
+    assert_eq!(state.active_document_text(), "alpha\n");
 }
 
 #[test]

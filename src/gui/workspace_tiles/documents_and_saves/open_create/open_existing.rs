@@ -16,14 +16,15 @@ impl KfnotepadGui {
             return true;
         }
 
-        let editor = text_editor::Content::with_text(&document.buffer.to_text());
+        let line_count = gui_editor_line_count(&document.buffer);
         let tile_id = self.workspace.open_tile(document);
         let split_axis = split_axis_for_pane(&self.panes, self.active_pane);
         let was_maximized = self.panes.maximized().is_some();
-        if let Some((pane, _split)) =
-            self.panes
-                .split(split_axis, self.active_pane, GuiPane::new(tile_id, editor))
-        {
+        if let Some((pane, _split)) = self.panes.split(
+            split_axis,
+            self.active_pane,
+            GuiPane::new(tile_id, line_count, DocumentCursor { row: 0, column: 0 }),
+        ) {
             self.active_pane = pane;
             self.workspace.focus_tile(tile_id);
             if was_maximized {

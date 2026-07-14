@@ -143,19 +143,17 @@ extends at end-of-line when needed, and records one exact replacement delta. TUI
 for newline-free ASCII input when no prompt or overlay owns paste input. Unicode and multiline overwrite paste retain
 the established characterwise behavior inside one byte-budgeted compound group.
 
-The GUI replacement editor uses the same bulk document operation for overwrite-mode editor and clipboard paste. It
-rebuilds the Iced editor mirror once after the shared edit because Iced's public editor API has no bulk arbitrary-range
-replacement operation; insert-mode editor paste retains its existing per-input delta synchronization and performs no
-full mirror rebuild. Both modes keep one shared undo step, including paste over an active selection.
+The GUI replacement editor uses the same bulk document operation for overwrite-mode editor and clipboard paste. The
+shared `TextBuffer` is the sole full-text state; the GUI adapter retains only cursor, selection, viewport, and display
+line metadata. Both modes keep one shared undo step, including paste over an active selection.
 Multi-character IME commits use that bulk path in overwrite mode after the keyboard bridge removes control characters;
 single-character commits and mixed input batches retain the ordinary replacement-input path.
-Replacement-editor Cut deletes the selection in the shared document directly, retaining exact undo history and
-rebuilding the Iced mirror once instead of extracting adapter text into a temporary document and synchronizing it back.
+Replacement-editor Cut deletes the selection in the shared document directly and retains exact undo history without
+extracting or reconstructing another full-document representation.
 Search-result and Select All ranges are also formed from canonical shared-document cursors without reconstructing a
 temporary text buffer. Page movement updates the adapter viewport and clamps its cursor from line-count metadata only.
-Test-only adapter compatibility checks materialize external Delete/Paste selections through Iced cursor motions
-instead of extracting and rebuilding the complete document. Production Cut/Paste uses only the shared delta-backed
-document path; the dormant native-Iced editor widget branch and its runtime selector have been removed.
+Production Cut/Paste uses only the shared delta-backed document path; the dormant native-Iced editor widget branch,
+its runtime selector, and the duplicate Iced content mirror have been removed.
 
 A separate equal-byte-length replacement path avoids delete-then-insert behavior for ordinary character overwrite,
 undo, and redo. Structural tests cover EOL extension, Unicode/multiline fallback, one-step undo/redo, search-prompt

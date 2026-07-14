@@ -66,12 +66,11 @@ impl KfnotepadGui {
             return false;
         }
         let cursor = tile.state.cursor;
+        let line_count = gui_editor_line_count(&tile.document.buffer);
         viewport.keep_cursor_visible(cursor, tile.document.buffer.line_count());
-        let text = tile.document.buffer.to_text();
 
         if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
-            pane_state.editor = GuiEditorAdapter::new(text_editor::Content::with_text(&text));
-            pane_state.editor.move_to(cursor);
+            pane_state.editor.sync_document_metadata(line_count, cursor);
             pane_state.editor.viewport = viewport;
             pane_state.editor.viewport_tracks_cursor = true;
             pane_state.editor.replacement_selection = selection;
@@ -162,8 +161,8 @@ impl KfnotepadGui {
         }
 
         let mut applied = false;
-        let mut text = String::new();
         let mut cursor = DocumentCursor { row: 0, column: 0 };
+        let mut line_count = 1;
         if let Some(tile) = self.workspace.tile_mut(tile_id) {
             let result = if undo {
                 undo_document_edit(&mut tile.document, &mut tile.state.cursor)
@@ -171,8 +170,8 @@ impl KfnotepadGui {
                 redo_document_edit(&mut tile.document, &mut tile.state.cursor)
             };
             applied = result == UndoRedoResult::Applied;
-            text = tile.document.buffer.to_text();
             cursor = tile.state.cursor;
+            line_count = gui_editor_line_count(&tile.document.buffer);
         }
 
         if !applied {
@@ -186,9 +185,8 @@ impl KfnotepadGui {
 
         if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
             let mut viewport = pane_state.editor.viewport;
-            viewport.keep_cursor_visible(cursor, text.lines().count().max(1));
-            pane_state.editor = GuiEditorAdapter::new(text_editor::Content::with_text(&text));
-            pane_state.editor.move_to(cursor);
+            viewport.keep_cursor_visible(cursor, line_count);
+            pane_state.editor.sync_document_metadata(line_count, cursor);
             pane_state.editor.viewport = viewport;
             pane_state.editor.replacement_selection = None;
         }

@@ -31,7 +31,7 @@ fn gui_workspace_auto_restore_is_disabled_by_default() {
     );
 
     assert_ne!(state.workspace.active_tile().document.path, file);
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert_eq!(state.status_message, "started empty GUI document tile");
 }
 
@@ -86,7 +86,7 @@ fn gui_workspace_auto_restore_opens_current_workspace_when_enabled() {
 
     assert_eq!(state.workspace.tiles.len(), 2);
     assert_eq!(state.workspace.active_tile().document.path, second);
-    assert_eq!(state.active_editor().text(), "second\n");
+    assert_eq!(state.active_document_text(), "second\n");
     assert!(!state.browser_visible);
     assert_eq!(state.browser_width, 240.0);
     assert!(
@@ -144,7 +144,7 @@ fn gui_workspace_auto_restore_yields_to_explicit_file_args() {
 
     assert_eq!(state.workspace.tiles.len(), 1);
     assert_eq!(state.workspace.active_tile().document.path, explicit);
-    assert_eq!(state.active_editor().text(), "explicit\n");
+    assert_eq!(state.active_document_text(), "explicit\n");
     assert!(!state.status_message.contains("restored last workspace"));
 }
 
@@ -200,7 +200,7 @@ fn gui_workspace_auto_restore_yields_to_explicit_project_launch() {
 
     assert_eq!(state.workspace.tiles.len(), 1);
     assert_eq!(state.workspace.active_tile().document.path, explicit);
-    assert_eq!(state.active_editor().text(), "explicit\n");
+    assert_eq!(state.active_document_text(), "explicit\n");
     assert!(state
         .status_message
         .contains("opened workspace project explicit"));
@@ -246,7 +246,7 @@ fn gui_workspace_auto_restore_invalid_path_opens_blank_without_writing_files() {
     );
 
     assert_eq!(state.workspace.tiles.len(), 1);
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert_eq!(
         state.workspace.active_tile().document.path,
         temp.root.join("untitled.txt")

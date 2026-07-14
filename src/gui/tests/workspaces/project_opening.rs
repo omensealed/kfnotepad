@@ -38,7 +38,7 @@ fn gui_workspace_project_click_opens_clean_project_in_current_window() {
         vec![first, second.clone()]
     );
     assert_eq!(state.workspace.active_tile().document.path, second);
-    assert_eq!(state.active_editor().text(), "second\n");
+    assert_eq!(state.active_document_text(), "second\n");
     assert_eq!(state.status_message, "opened workspace project project");
 }
 
@@ -55,9 +55,7 @@ fn gui_workspace_project_click_requires_confirmation_for_dirty_workspace() {
         },
         temp.root.clone(),
     );
-    state.panes.get_mut(state.active_pane).expect("pane").editor =
-        GuiEditorAdapter::from_text("dirty\n");
-    state.sync_active_editor_to_document();
+    state.replace_active_document_text("dirty\n");
     state.workspace_projects = vec![GuiWorkspaceProjectEntry {
         path: temp.path("workspaces").join("project.v1"),
         project: GuiWorkspaceProject {
@@ -81,7 +79,7 @@ fn gui_workspace_project_click_requires_confirmation_for_dirty_workspace() {
 
     assert_eq!(state.pending_project_open, None);
     assert_eq!(state.workspace.active_tile().document.path, project_file);
-    assert_eq!(state.active_editor().text(), "project\n");
+    assert_eq!(state.active_document_text(), "project\n");
 }
 
 #[test]
@@ -114,7 +112,7 @@ fn gui_workspace_project_click_skips_missing_files_and_loads_available_tiles() {
     assert_eq!(state.workspace.tiles.len(), 1);
     assert_eq!(state.pending_project_open, None);
     assert_eq!(state.workspace.active_tile().document.path, available);
-    assert_eq!(state.active_editor().text(), "available\n");
+    assert_eq!(state.active_document_text(), "available\n");
     assert!(state
         .status_message
         .contains("opened workspace project project"));
@@ -156,6 +154,6 @@ fn gui_workspace_project_click_uses_blank_tile_when_no_files_load() {
         state.workspace.active_tile().document.path,
         temp.root.join("untitled.txt")
     );
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert!(state.status_message.contains("opened blank tile"));
 }

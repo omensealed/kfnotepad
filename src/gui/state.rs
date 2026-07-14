@@ -6,8 +6,6 @@ use std::collections::{HashMap, HashSet};
 use std::ops::Range;
 use std::path::{Component, Path, PathBuf};
 use std::process::Command;
-#[cfg(test)]
-use std::sync::Arc;
 use std::time::Duration;
 use std::{env, fs, io};
 
@@ -20,7 +18,7 @@ use iced::advanced::{
 use iced::keyboard::key::{Key, Named};
 use iced::widget::{
     button, checkbox, column, container, mouse_area, pane_grid, responsive, rich_text, row,
-    scrollable, slider, span, text, text::Wrapping, text_editor, text_input,
+    scrollable, slider, span, text, text::Wrapping, text_input,
 };
 use iced::{
     clipboard, event, keyboard, mouse, window, Alignment, Background, Border, Color, Element,

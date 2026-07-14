@@ -29,11 +29,7 @@ fn gui_close_dirty_pane_requires_second_request() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![first.clone(), second.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("discard me\n");
+    state.replace_active_document_text("discard me\n");
 
     let _ = update(&mut state, Message::CloseActivePane);
 
@@ -82,11 +78,7 @@ fn gui_window_close_dirty_state_requires_second_request_without_saving() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![file.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("discard from app close\n");
+    state.replace_active_document_text("discard from app close\n");
 
     let _task = update(
         &mut state,
@@ -123,11 +115,7 @@ fn gui_ctrl_q_quit_uses_window_close_dirty_confirmation() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![file.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("dirty from ctrl-q\n");
+    state.replace_active_document_text("dirty from ctrl-q\n");
 
     let _task = update(&mut state, Message::QuitRequested(window::Id::unique()));
 
@@ -150,11 +138,7 @@ fn gui_window_close_pending_confirmation_clears_after_save() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![file.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("saved before close\n");
+    state.replace_active_document_text("saved before close\n");
 
     let _task = update(
         &mut state,
@@ -201,11 +185,7 @@ fn gui_save_async_completion_keeps_dirty_when_text_changed_before_finish() {
         requested_paths: vec![path.clone()],
     });
     let tile_id = state.workspace.active_tile().id;
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("queued save text\n");
+    state.replace_active_document_text("queued save text\n");
 
     let _task = update(&mut state, Message::SaveRequested);
     let source_revision = state
@@ -256,11 +236,7 @@ fn gui_repeated_save_requests_coalesce_to_one_follow_up_per_tile() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![path.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("saved\n");
+    state.replace_active_document_text("saved\n");
     let tile_id = state.workspace.active_tile().id;
 
     let _first = update(&mut state, Message::SaveRequested);

@@ -2,18 +2,19 @@ use super::*;
 
 #[test]
 fn gui_editor_viewport_slice_uses_same_viewport_as_gutter() {
-    let mut adapter = GuiEditorAdapter::from_text(&numbered_lines(100));
+    let buffer = TextBuffer::from_text(&numbered_lines(100));
+    let mut adapter =
+        GuiEditorAdapter::new(buffer.line_count(), DocumentCursor { row: 0, column: 0 });
 
-    adapter.apply(GuiEditorCommand::ScrollViewportLines(2));
+    adapter.scroll_viewport_by_lines(2);
     let render = adapter.render_state(GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES, 16);
+    let viewport_slice = adapter
+        .render_viewport_slice_from_lines(buffer.lines(), GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES);
 
+    assert_eq!(render.line_numbers.gutter_start, viewport_slice.first_line);
+    assert_eq!(viewport_slice.line_count, 100);
     assert_eq!(
-        render.line_numbers.gutter_start,
-        render.viewport_slice.first_line
-    );
-    assert_eq!(render.viewport_slice.line_count, 100);
-    assert_eq!(
-        render.viewport_slice.lines.first(),
+        viewport_slice.lines.first(),
         Some(&GuiEditorViewportLine {
             number: 3,
             text: "3".to_string(),
@@ -23,7 +24,7 @@ fn gui_editor_viewport_slice_uses_same_viewport_as_gutter() {
         })
     );
     assert_eq!(
-        render.viewport_slice.lines.last(),
+        viewport_slice.lines.last(),
         Some(&GuiEditorViewportLine {
             number: 34,
             text: "34".to_string(),
@@ -33,18 +34,22 @@ fn gui_editor_viewport_slice_uses_same_viewport_as_gutter() {
         })
     );
     assert_eq!(
-        render.viewport_slice.lines.len(),
+        viewport_slice.lines.len(),
         GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES
     );
 }
 
 #[test]
 fn gui_editor_viewport_slice_preserves_trailing_blank_line() {
-    let adapter = GuiEditorAdapter::from_text("one\ntwo\n");
-    let render = adapter.render_state(5, 16);
+    let buffer = TextBuffer::from_text("one\ntwo\n");
+    let adapter = GuiEditorAdapter::new(
+        gui_editor_line_count(&buffer),
+        DocumentCursor { row: 0, column: 0 },
+    );
+    let viewport_slice = adapter.render_viewport_slice_from_lines(buffer.lines(), 5);
 
     assert_eq!(
-        render.viewport_slice,
+        viewport_slice,
         GuiEditorViewportSlice {
             line_count: 3,
             first_line: 1,
@@ -676,11 +681,14 @@ fn gui_editor_viewport_line_slice_preserves_grapheme_clusters() {
 
 #[test]
 fn gui_editor_read_only_render_model_scrolls_text_and_gutter_together() {
-    let mut adapter = GuiEditorAdapter::from_text(&numbered_lines(100));
+    let buffer = TextBuffer::from_text(&numbered_lines(100));
+    let mut adapter =
+        GuiEditorAdapter::new(buffer.line_count(), DocumentCursor { row: 0, column: 0 });
 
-    adapter.apply(GuiEditorCommand::ScrollViewportLines(2));
-    let render = adapter.render_state(GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES, 16);
-    let model = gui_editor_read_only_render_model(&render.viewport_slice);
+    adapter.scroll_viewport_by_lines(2);
+    let viewport_slice = adapter
+        .render_viewport_slice_from_lines(buffer.lines(), GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES);
+    let model = gui_editor_read_only_render_model(&viewport_slice);
 
     assert_eq!(model.first_line, 3);
     assert_eq!(model.line_count, 100);

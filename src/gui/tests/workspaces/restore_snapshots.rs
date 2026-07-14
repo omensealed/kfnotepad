@@ -44,7 +44,7 @@ fn gui_restore_last_workspace_toggle_saves_current_workspace_for_relaunch() {
 
     assert_eq!(restored.workspace.tiles.len(), 2);
     assert_eq!(restored.workspace.active_tile().document.path, second);
-    assert_eq!(restored.active_editor().text(), "second\n");
+    assert_eq!(restored.active_document_text(), "second\n");
     assert!(restored
         .status_message
         .contains("restored last workspace project current workspace"));
@@ -75,7 +75,7 @@ fn gui_restore_last_workspace_updates_snapshot_after_later_file_open() {
     );
 
     let _ = update(&mut state, Message::RestoreLastWorkspaceChanged(true));
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
 
     assert!(state.open_path_in_new_pane(opened.clone()));
 
@@ -92,7 +92,7 @@ fn gui_restore_last_workspace_updates_snapshot_after_later_file_open() {
 
     assert_eq!(restored.workspace.tiles.len(), 1);
     assert_eq!(restored.workspace.active_tile().document.path, opened);
-    assert_eq!(restored.active_editor().text(), "opened later\n");
+    assert_eq!(restored.active_document_text(), "opened later\n");
     assert!(restored
         .status_message
         .contains("restored last workspace project current workspace"));
@@ -141,7 +141,7 @@ fn gui_restore_last_workspace_updates_snapshot_from_explicit_launch_files() {
 
     assert_eq!(restored.workspace.tiles.len(), 2);
     assert_eq!(restored.workspace.active_tile().document.path, second);
-    assert_eq!(restored.active_editor().text(), "second launch\n");
+    assert_eq!(restored.active_document_text(), "second launch\n");
     assert!(restored
         .status_message
         .contains("restored last workspace project current workspace"));

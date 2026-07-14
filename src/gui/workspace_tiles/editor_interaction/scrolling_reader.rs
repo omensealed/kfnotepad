@@ -4,14 +4,27 @@ use super::*;
 
 impl KfnotepadGui {
     pub(in crate::gui::app::state) fn scroll_active_editor_viewport(&mut self, delta: i32) {
-        self.perform_active_editor_command(
-            GuiEditorCommand::ScrollViewportLines(delta),
-            if delta < 0 {
-                "viewport up"
-            } else {
-                "viewport down"
-            },
-        );
+        let Some(tile_id) = self
+            .panes
+            .get(self.active_pane)
+            .map(|pane_state| pane_state.tile_id)
+        else {
+            return;
+        };
+        if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
+            pane_state.editor.scroll_viewport_by_lines(delta);
+        }
+        self.sync_pane_cursor_to_document(self.active_pane);
+        self.workspace.clear_tile_save_error(tile_id);
+        self.ensure_visible_syntax_cache_for_tile(tile_id);
+        self.pending_close_tile = None;
+        self.pending_app_quit = false;
+        self.pending_project_open = None;
+        self.status_message = if delta < 0 {
+            "viewport up".to_string()
+        } else {
+            "viewport down".to_string()
+        };
     }
 
     pub(in crate::gui::app::state) fn scroll_active_editor_viewport_preserving_cursor(

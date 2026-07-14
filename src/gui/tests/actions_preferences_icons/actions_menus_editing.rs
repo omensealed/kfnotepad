@@ -143,11 +143,7 @@ fn gui_menu_file_and_view_commands_route_existing_actions() {
         gui_restore_last_workspace: false,
         ..EditorSettings::default()
     };
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("saved by menu\n");
+    state.replace_active_document_text("saved by menu\n");
     let save_tile_id = state.workspace.active_tile().id;
 
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Save));
@@ -276,14 +272,14 @@ fn gui_menu_undo_redo_route_replacement_editor_history() {
         &mut state,
         Message::ReplacementEditorInputs(vec![GuiEditorReplacementInput::InsertChar('X')]),
     );
-    assert_eq!(state.active_editor().text(), "Xhello\n");
+    assert_eq!(state.active_document_text(), "Xhello\n");
 
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Undo));
-    assert_eq!(state.active_editor().text(), "hello\n");
+    assert_eq!(state.active_document_text(), "hello\n");
     assert_eq!(state.status_message, "undo");
 
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Redo));
-    assert_eq!(state.active_editor().text(), "Xhello\n");
+    assert_eq!(state.active_document_text(), "Xhello\n");
     assert_eq!(state.status_message, "redo");
 }
 
@@ -305,7 +301,7 @@ fn gui_insert_key_toggles_overwrite_for_replacement_editor() {
         &mut state,
         Message::ReplacementEditorInputs(vec![GuiEditorReplacementInput::InsertChar('X')]),
     );
-    assert_eq!(state.active_editor().text(), "Xbc\n");
+    assert_eq!(state.active_document_text(), "Xbc\n");
 
     let _ = update(&mut state, Message::ToggleReplacementOverwriteMode);
     assert!(!state.replacement_overwrite_mode);
@@ -313,7 +309,7 @@ fn gui_insert_key_toggles_overwrite_for_replacement_editor() {
         &mut state,
         Message::ReplacementEditorInputs(vec![GuiEditorReplacementInput::InsertChar('Y')]),
     );
-    assert_eq!(state.active_editor().text(), "XYbc\n");
+    assert_eq!(state.active_document_text(), "XYbc\n");
 }
 
 #[test]
@@ -340,7 +336,7 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
     assert_eq!(kfnotepad::from_text_call_count(), 0);
     assert_eq!(state.status_message, "selected all");
     assert_eq!(
-        state.active_editor().selection().as_deref(),
+        state.active_editor_selection_text().as_deref(),
         Some("alpha\n")
     );
 
@@ -355,7 +351,7 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
     kfnotepad::reset_from_text_call_count();
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Cut));
     assert_eq!(state.status_message, "cut selection");
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
     assert_eq!(kfnotepad::to_text_call_count(), 2);
     assert_eq!(kfnotepad::from_text_call_count(), 0);
     assert_eq!(state.workspace.active_tile().document.buffer.to_text(), "");
@@ -370,16 +366,16 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
     );
 
     state.undo_active_edit();
-    assert_eq!(state.active_editor().text(), "alpha\n");
+    assert_eq!(state.active_document_text(), "alpha\n");
     state.redo_active_edit();
-    assert_eq!(state.active_editor().text(), "");
+    assert_eq!(state.active_document_text(), "");
 
     let _ = update(
         &mut state,
         Message::ClipboardPasted(Some("omega".to_string())),
     );
     assert_eq!(state.status_message, "pasted clipboard");
-    assert_eq!(state.active_editor().text(), "omega");
+    assert_eq!(state.active_document_text(), "omega");
     assert_eq!(
         state.workspace.active_tile().document.buffer.to_text(),
         "omega"
@@ -387,7 +383,7 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
 
     let _ = update(&mut state, Message::ClipboardPasted(None));
     assert_eq!(state.status_message, "clipboard is empty");
-    assert_eq!(state.active_editor().text(), "omega");
+    assert_eq!(state.active_document_text(), "omega");
 
     state.replacement_overwrite_mode = true;
     state
@@ -399,9 +395,9 @@ fn gui_menu_clipboard_commands_route_editor_actions() {
     state.sync_pane_cursor_to_document(state.active_pane);
     let _ = update(&mut state, Message::ClipboardPasted(Some("XY".to_string())));
     assert_eq!(state.status_message, "pasted clipboard");
-    assert_eq!(state.active_editor().text(), "oXYga");
+    assert_eq!(state.active_document_text(), "oXYga");
     state.undo_active_edit();
-    assert_eq!(state.active_editor().text(), "omega");
+    assert_eq!(state.active_document_text(), "omega");
 }
 
 #[test]
@@ -424,9 +420,9 @@ fn gui_menu_partial_cut_uses_shared_selection_without_document_reconstruction() 
     kfnotepad::reset_from_text_call_count();
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::Cut));
 
-    assert_eq!(state.active_editor().text(), "pha\n");
+    assert_eq!(state.active_document_text(), "pha\n");
     assert_eq!(kfnotepad::to_text_call_count(), 1);
     assert_eq!(kfnotepad::from_text_call_count(), 0);
     state.undo_active_edit();
-    assert_eq!(state.active_editor().text(), "alpha\n");
+    assert_eq!(state.active_document_text(), "alpha\n");
 }

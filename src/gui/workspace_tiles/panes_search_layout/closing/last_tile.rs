@@ -39,7 +39,7 @@ impl KfnotepadGui {
         tile.state = EditorTabState::default();
         tile.minimized = false;
         if let Some(pane_state) = self.panes.get_mut(pane) {
-            pane_state.editor = GuiEditorAdapter::new(text_editor::Content::with_text(""));
+            pane_state.editor = GuiEditorAdapter::new(1, DocumentCursor { row: 0, column: 0 });
         }
         self.active_pane = pane;
         self.workspace.focus_tile(tile_id);

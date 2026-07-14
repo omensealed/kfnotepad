@@ -69,10 +69,10 @@ pub(super) struct GuiPane {
 }
 
 impl GuiPane {
-    pub(super) fn new(tile_id: GuiTileId, editor: text_editor::Content) -> Self {
+    pub(super) fn new(tile_id: GuiTileId, line_count: usize, cursor: DocumentCursor) -> Self {
         Self {
             tile_id,
-            editor: GuiEditorAdapter::new(editor),
+            editor: GuiEditorAdapter::new(line_count, cursor),
         }
     }
 }

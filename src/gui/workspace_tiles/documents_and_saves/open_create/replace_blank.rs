@@ -16,7 +16,7 @@ impl KfnotepadGui {
             return false;
         };
         let tile_id = pane_state.tile_id;
-        let editor = text_editor::Content::with_text(&document.buffer.to_text());
+        let line_count = gui_editor_line_count(&document.buffer);
         let Some(tile) = self.workspace.tile_mut(tile_id) else {
             return false;
         };
@@ -25,7 +25,7 @@ impl KfnotepadGui {
         tile.state = EditorTabState::default();
         tile.minimized = false;
         self.workspace.focus_tile(tile_id);
-        pane_state.editor = GuiEditorAdapter::new(editor);
+        pane_state.editor = GuiEditorAdapter::new(line_count, DocumentCursor { row: 0, column: 0 });
         self.pending_close_tile = None;
         self.pending_app_quit = false;
         self.pending_project_open = None;

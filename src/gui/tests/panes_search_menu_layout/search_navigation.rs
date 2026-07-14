@@ -24,7 +24,10 @@ fn gui_search_next_and_previous_update_shared_and_editor_cursor() {
         state.active_editor().document_cursor(),
         DocumentCursor { row: 1, column: 5 }
     );
-    assert_eq!(state.active_editor().selection().as_deref(), Some("alpha"));
+    assert_eq!(
+        state.active_editor_selection_text().as_deref(),
+        Some("alpha")
+    );
     assert_eq!(state.status_message, "found next: alpha");
     let highlight = state.search_highlight.as_ref().expect("search highlight");
     assert_eq!(highlight.tile_id, state.workspace.active_tile().id);
@@ -40,7 +43,10 @@ fn gui_search_next_and_previous_update_shared_and_editor_cursor() {
         state.active_editor().document_cursor(),
         DocumentCursor { row: 0, column: 0 }
     );
-    assert_eq!(state.active_editor().selection().as_deref(), Some("alpha"));
+    assert_eq!(
+        state.active_editor_selection_text().as_deref(),
+        Some("alpha")
+    );
     assert_eq!(state.status_message, "found previous: alpha");
     assert_eq!(
         state

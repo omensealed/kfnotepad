@@ -9,18 +9,14 @@ fn gui_editor_sync_marks_document_dirty() {
         requested_paths: vec![path],
     });
 
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("changed\n");
+    state.replace_active_document_text("changed\n");
     state
         .panes
         .get_mut(state.active_pane)
         .expect("active pane")
         .editor
         .move_to(DocumentCursor { row: 0, column: 4 });
-    state.sync_active_editor_to_document();
+    state.sync_pane_cursor_to_document(state.active_pane);
 
     assert_eq!(
         state.workspace.active_tile().document.buffer.to_text(),
@@ -44,12 +40,7 @@ fn gui_save_active_tile_uses_existing_save_adapter() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![path.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("saved through gui\n");
-    state.sync_active_editor_to_document();
+    state.replace_active_document_text("saved through gui\n");
 
     state.save_active_tile();
 
@@ -75,12 +66,7 @@ fn gui_save_only_writes_the_focused_tile() {
         requested_paths: vec![first.clone(), second.clone()],
     });
 
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("second changed\n");
-    state.sync_active_editor_to_document();
+    state.replace_active_document_text("second changed\n");
     state.save_active_tile();
 
     assert_eq!(fs::read_to_string(&first).expect("read first"), "first\n");

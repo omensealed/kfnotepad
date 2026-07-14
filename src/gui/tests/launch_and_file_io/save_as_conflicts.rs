@@ -12,11 +12,7 @@ fn gui_save_as_prompt_writes_to_relative_path_and_retargets_tile() {
         },
         temp.root.clone(),
     );
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("saved elsewhere\n");
+    state.replace_active_document_text("saved elsewhere\n");
 
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::SaveAsPath));
     assert_eq!(state.path_prompt, Some(GuiPathPrompt::SaveAs));
@@ -53,11 +49,7 @@ fn gui_save_as_refuses_path_already_open_in_another_tile() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![first.clone(), second.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("second retarget attempt\n");
+    state.replace_active_document_text("second retarget attempt\n");
 
     let saved = state.save_active_tile_as(first.clone());
 
@@ -103,11 +95,7 @@ fn gui_save_as_failure_keeps_original_tile_path_and_prompt_open() {
         },
         temp.root.clone(),
     );
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("not saved\n");
+    state.replace_active_document_text("not saved\n");
 
     let _ = update(&mut state, Message::MenuCommand(GuiMenuCommand::SaveAsPath));
     let _ = update(
@@ -137,11 +125,7 @@ fn gui_save_refuses_external_modification_since_open() {
     let mut state = KfnotepadGui::new(GuiLaunch {
         requested_paths: vec![path.clone()],
     });
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("gui edit\n");
+    state.replace_active_document_text("gui edit\n");
     fs::write(&path, "external\n").expect("external edit");
 
     state.save_active_tile();

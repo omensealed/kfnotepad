@@ -46,7 +46,7 @@ fn gui_editor_surface_model_captures_backend_replacement_inputs() {
     let surface =
         gui_editor_surface_model(settings, &document, &adapter, &highlighter, Some(&cache));
 
-    assert_eq!(adapter.text(), "fn main() {}\nsecond\n");
+    assert_eq!(document.buffer.to_text(), "fn main() {}\nsecond\n");
     assert_eq!(surface.editor_size, 18);
     assert_eq!(surface.wrapping, Wrapping::WordOrGlyph);
     assert_eq!(
@@ -119,7 +119,7 @@ fn gui_editor_surface_model_renders_beyond_stale_logical_viewport_height() {
         buffer: TextBuffer::from_text(&text),
     };
     let mut adapter = GuiEditorAdapter::from_text(&text);
-    adapter.apply(GuiEditorCommand::ScrollViewportLines(30));
+    adapter.scroll_viewport_by_lines(30);
     let highlighter = SyntaxHighlighter::default();
 
     let surface = gui_editor_surface_model(
@@ -165,7 +165,7 @@ fn gui_editor_surface_model_bounds_large_document_source_slice() {
         buffer: TextBuffer::from_text(&text),
     };
     let mut adapter = GuiEditorAdapter::from_text(&text);
-    adapter.apply(GuiEditorCommand::ScrollViewportLines(1_200));
+    adapter.scroll_viewport_by_lines(1_200);
     let highlighter = SyntaxHighlighter::default();
 
     let surface = gui_editor_surface_model(
@@ -299,145 +299,6 @@ fn gui_syntax_cache_rebuilds_after_replacement_edit() {
 }
 
 #[test]
-fn gui_editor_adapter_exposes_parity_boundary_without_changing_backend() {
-    let mut adapter = GuiEditorAdapter::from_text("one\ntwo\nthree\n");
-
-    assert_eq!(adapter.text(), "one\ntwo\nthree\n");
-    assert_eq!(adapter.line_count(), 4);
-    assert_eq!(
-        adapter.document_cursor(),
-        DocumentCursor { row: 0, column: 0 }
-    );
-
-    adapter.apply(GuiEditorCommand::MoveTo(DocumentCursor {
-        row: 1,
-        column: 2,
-    }));
-    assert_eq!(
-        adapter.document_cursor(),
-        DocumentCursor { row: 1, column: 2 }
-    );
-
-    let render = adapter.render_state(3, 16);
-    assert_eq!(adapter.text(), "one\ntwo\nthree\n");
-    assert_eq!(
-        render.line_numbers,
-        GuiEditorLineNumberSnapshot {
-            line_count: 4,
-            gutter_start: 1,
-            text: "1\n2\n3".to_string(),
-            width: gui_line_number_gutter_width(4, 16),
-        }
-    );
-
-    adapter.move_to(DocumentCursor { row: 1, column: 0 });
-    adapter.select_right_chars(3);
-    assert_eq!(adapter.selection().as_deref(), Some("two"));
-
-    adapter.apply(GuiEditorCommand::SelectAll);
-    assert_eq!(adapter.selection().as_deref(), Some("one\ntwo\nthree\n"));
-
-    kfnotepad::reset_to_text_call_count();
-    kfnotepad::reset_from_text_call_count();
-    adapter.apply(GuiEditorCommand::Paste("alpha".to_string()));
-    assert_eq!(kfnotepad::to_text_call_count(), 0);
-    assert_eq!(kfnotepad::from_text_call_count(), 0);
-    assert_eq!(adapter.text(), "alpha");
-    assert_eq!(
-        adapter.document_cursor(),
-        DocumentCursor { row: 0, column: 5 }
-    );
-
-    adapter.apply(GuiEditorCommand::MoveTo(DocumentCursor {
-        row: 0,
-        column: 0,
-    }));
-    adapter.apply(GuiEditorCommand::SelectRightChars(1));
-    kfnotepad::reset_to_text_call_count();
-    kfnotepad::reset_from_text_call_count();
-    adapter.apply(GuiEditorCommand::Delete);
-    assert_eq!(kfnotepad::to_text_call_count(), 0);
-    assert_eq!(kfnotepad::from_text_call_count(), 0);
-    assert_eq!(adapter.text(), "lpha");
-}
-
-#[test]
-fn gui_editor_adapter_materializes_reverse_multiline_selection_without_reconstruction() {
-    let anchor = DocumentCursor { row: 1, column: 3 };
-    let focus = DocumentCursor { row: 0, column: 1 };
-    let mut paste_adapter = GuiEditorAdapter::from_text("one\ntwo\nthird");
-    paste_adapter.set_replacement_selection(anchor, focus, focus);
-
-    kfnotepad::reset_to_text_call_count();
-    kfnotepad::reset_from_text_call_count();
-    paste_adapter.apply(GuiEditorCommand::Paste("X".to_string()));
-
-    assert_eq!(kfnotepad::to_text_call_count(), 0);
-    assert_eq!(kfnotepad::from_text_call_count(), 0);
-    assert_eq!(paste_adapter.text(), "oX\nthird");
-    assert_eq!(paste_adapter.replacement_selection, None);
-
-    let mut delete_adapter = GuiEditorAdapter::from_text("one\ntwo\nthird");
-    delete_adapter.set_replacement_selection(anchor, focus, focus);
-    kfnotepad::reset_to_text_call_count();
-    kfnotepad::reset_from_text_call_count();
-    delete_adapter.apply(GuiEditorCommand::Delete);
-
-    assert_eq!(kfnotepad::to_text_call_count(), 0);
-    assert_eq!(kfnotepad::from_text_call_count(), 0);
-    assert_eq!(delete_adapter.text(), "o\nthird");
-    assert_eq!(delete_adapter.replacement_selection, None);
-
-    let mut full_delete_adapter = GuiEditorAdapter::from_text("alpha\n");
-    full_delete_adapter.apply(GuiEditorCommand::SelectAll);
-    kfnotepad::reset_to_text_call_count();
-    kfnotepad::reset_from_text_call_count();
-    full_delete_adapter.apply(GuiEditorCommand::Delete);
-
-    assert_eq!(kfnotepad::to_text_call_count(), 0);
-    assert_eq!(kfnotepad::from_text_call_count(), 0);
-    assert_eq!(full_delete_adapter.text(), "");
-    assert_eq!(full_delete_adapter.replacement_selection, None);
-}
-
-#[test]
-fn gui_editor_adapter_select_right_chars_snaps_to_grapheme_boundaries() {
-    let mut adapter = GuiEditorAdapter::from_text("🇺🇸e\u{301}x");
-
-    adapter.move_to(DocumentCursor { row: 0, column: 1 });
-    adapter.select_right_chars(1);
-
-    assert_eq!(
-        adapter
-            .replacement_selection
-            .expect("replacement selection")
-            .normalized(),
-        (
-            DocumentCursor { row: 0, column: 0 },
-            DocumentCursor { row: 0, column: 2 },
-        )
-    );
-    assert_eq!(adapter.selection().as_deref(), Some("🇺🇸"));
-
-    adapter.apply(GuiEditorCommand::MoveTo(DocumentCursor {
-        row: 0,
-        column: 3,
-    }));
-    adapter.select_right_chars(1);
-    assert_eq!(
-        adapter
-            .replacement_selection
-            .expect("replacement selection")
-            .normalized(),
-        (
-            DocumentCursor { row: 0, column: 2 },
-            DocumentCursor { row: 0, column: 4 },
-        )
-    );
-    assert_eq!(adapter.selection().as_deref(), Some("e\u{301}"));
-}
-
-#[test]
 fn gui_editor_adapter_viewport_keeps_cursor_visible_for_gutter() {
     let mut adapter = GuiEditorAdapter::from_text("one\ntwo\nthree\nfour\nfive");
 
@@ -451,11 +312,7 @@ fn gui_editor_adapter_viewport_keeps_cursor_visible_for_gutter() {
         }
     );
 
-    for _ in 0..4 {
-        adapter.apply(GuiEditorCommand::IcedAction(text_editor::Action::Move(
-            text_editor::Motion::Down,
-        )));
-    }
+    adapter.move_to(DocumentCursor { row: 4, column: 0 });
     assert_eq!(
         adapter.document_cursor(),
         DocumentCursor { row: 4, column: 0 }
@@ -470,11 +327,7 @@ fn gui_editor_adapter_viewport_keeps_cursor_visible_for_gutter() {
         }
     );
 
-    for _ in 0..3 {
-        adapter.apply(GuiEditorCommand::IcedAction(text_editor::Action::Move(
-            text_editor::Motion::Up,
-        )));
-    }
+    adapter.move_to(DocumentCursor { row: 1, column: 0 });
     assert_eq!(
         adapter.document_cursor(),
         DocumentCursor { row: 1, column: 0 }
@@ -494,7 +347,7 @@ fn gui_editor_adapter_viewport_keeps_cursor_visible_for_gutter() {
 fn gui_editor_adapter_scrolls_viewport_and_clamps_cursor_to_visible_lines() {
     let mut adapter = GuiEditorAdapter::from_text(&numbered_lines(100));
 
-    adapter.apply(GuiEditorCommand::ScrollViewportLines(2));
+    adapter.scroll_viewport_by_lines(2);
 
     assert_eq!(
         adapter.document_cursor(),
@@ -512,7 +365,7 @@ fn gui_editor_adapter_scrolls_viewport_and_clamps_cursor_to_visible_lines() {
         }
     );
 
-    adapter.apply(GuiEditorCommand::ScrollViewportLines(99));
+    adapter.scroll_viewport_by_lines(99);
 
     assert_eq!(
         adapter.document_cursor(),
@@ -530,7 +383,7 @@ fn gui_editor_adapter_scrolls_viewport_and_clamps_cursor_to_visible_lines() {
         }
     );
 
-    adapter.apply(GuiEditorCommand::ScrollViewportLines(-99));
+    adapter.scroll_viewport_by_lines(-99);
 
     assert_eq!(
         adapter.document_cursor(),
@@ -550,14 +403,12 @@ fn gui_editor_adapter_scrolls_viewport_and_clamps_cursor_to_visible_lines() {
 }
 
 #[test]
-fn gui_editor_adapter_page_motion_does_not_reconstruct_a_text_buffer() {
+fn gui_editor_adapter_page_scroll_does_not_reconstruct_a_text_buffer() {
     let mut adapter = GuiEditorAdapter::from_text(&numbered_lines(100));
 
     kfnotepad::reset_to_text_call_count();
     kfnotepad::reset_from_text_call_count();
-    adapter.apply(GuiEditorCommand::IcedAction(text_editor::Action::Move(
-        text_editor::Motion::PageDown,
-    )));
+    adapter.scroll_viewport_by_lines(GUI_LINE_NUMBER_GUTTER_VISIBLE_LINES as i32);
 
     assert_eq!(kfnotepad::to_text_call_count(), 0);
     assert_eq!(kfnotepad::from_text_call_count(), 0);

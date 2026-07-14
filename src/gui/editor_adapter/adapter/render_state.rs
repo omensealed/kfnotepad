@@ -10,8 +10,6 @@ impl GuiEditorAdapter {
     ) -> GuiEditorRenderState {
         GuiEditorRenderState {
             line_numbers: self.line_number_snapshot(visible_line_numbers, editor_font_size),
-            #[cfg(test)]
-            viewport_slice: self.viewport_slice(visible_line_numbers),
         }
     }
 
@@ -41,24 +39,6 @@ impl GuiEditorAdapter {
         self.viewport_tracks_cursor = true;
     }
 
-    #[cfg(test)]
-    pub(crate) fn viewport_slice(&self, visible_lines: usize) -> GuiEditorViewportSlice {
-        let line_count = self.line_count();
-        let cursor = self.document_cursor();
-        let viewport = self.viewport.with_visible_lines(visible_lines, line_count);
-        let viewport = if self.viewport_tracks_cursor {
-            viewport.with_cursor_visible_for_render(cursor, line_count)
-        } else {
-            viewport
-        };
-        gui_editor_viewport_slice(
-            &self.text(),
-            line_count,
-            viewport,
-            cursor,
-            self.replacement_selection,
-        )
-    }
     pub(crate) fn render_viewport_slice_from_lines(
         &self,
         document_lines: &[String],

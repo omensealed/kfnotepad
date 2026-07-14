@@ -52,7 +52,7 @@ fn gui_native_open_dialog_selection_uses_existing_open_adapter() {
 
     assert_eq!(state.workspace.tiles.len(), 2);
     assert_eq!(state.workspace.active_tile().document.path, opened);
-    assert_eq!(state.active_editor().text(), "opened\n");
+    assert_eq!(state.active_document_text(), "opened\n");
     assert!(state.status_message.starts_with("opened "));
 }
 
@@ -72,7 +72,7 @@ fn gui_native_open_dialog_cancel_is_noop() {
 
     assert_eq!(state.workspace.tiles.len(), 1);
     assert_eq!(state.workspace.active_tile().document.path, initial);
-    assert_eq!(state.active_editor().text(), "initial\n");
+    assert_eq!(state.active_document_text(), "initial\n");
     assert_eq!(state.status_message, "open canceled");
 }
 
@@ -119,11 +119,7 @@ fn gui_native_save_as_dialog_selection_uses_existing_save_adapter() {
         },
         temp.root.clone(),
     );
-    state
-        .panes
-        .get_mut(state.active_pane)
-        .expect("active pane")
-        .editor = GuiEditorAdapter::from_text("saved through dialog\n");
+    state.replace_active_document_text("saved through dialog\n");
 
     let _ = update(
         &mut state,

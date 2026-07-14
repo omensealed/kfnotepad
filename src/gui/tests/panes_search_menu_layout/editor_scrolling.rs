@@ -59,24 +59,20 @@ fn gui_viewport_scroll_message_routes_to_active_editor() {
 }
 
 #[test]
-fn gui_iced_scroll_action_keeps_gutter_synced_without_dirtying_document() {
-    let temp = TempArea::new("gui-iced-scroll-gutter-sync");
-    let file = temp.path("iced-scroll.txt");
+fn gui_scroll_message_keeps_gutter_synced_without_dirtying_document() {
+    let temp = TempArea::new("gui-scroll-gutter-sync");
+    let file = temp.path("scroll.txt");
     let text = numbered_lines(100);
-    fs::write(&file, &text).expect("write Iced scroll action fixture");
+    fs::write(&file, &text).expect("write scroll fixture");
     let mut state = KfnotepadGui::new_with_current_dir(
         GuiLaunch {
             requested_paths: vec![file],
         },
         temp.root.clone(),
     );
-    let pane = state.active_pane;
     let tile_id = state.workspace.active_tile().id;
 
-    let _ = update(
-        &mut state,
-        Message::Edit(pane, text_editor::Action::Scroll { lines: 5 }),
-    );
+    let _ = update(&mut state, Message::ScrollActiveEditorViewport(5));
 
     assert!(!state
         .workspace
@@ -97,7 +93,7 @@ fn gui_iced_scroll_action_keeps_gutter_synced_without_dirtying_document() {
             width: gui_line_number_gutter_width(100, 16),
         }
     );
-    assert_eq!(state.status_message, "scrolled");
+    assert_eq!(state.status_message, "viewport down");
 }
 
 #[test]

@@ -356,7 +356,7 @@ fn gui_editor_replacement_keyboard_bridge_applies_when_explicitly_routed() {
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 1, column: 0 }
     );
-    assert_eq!(state.active_editor().text(), "Xo\nne\ntwo");
+    assert_eq!(state.active_document_text(), "Xo\nne\ntwo");
     assert_eq!(
         state.active_editor().document_cursor(),
         DocumentCursor { row: 1, column: 0 }
@@ -432,7 +432,7 @@ fn gui_editor_replacement_ime_commit_applies_when_explicitly_routed() {
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 0, column: 2 }
     );
-    assert_eq!(state.active_editor().text(), "かなstart");
+    assert_eq!(state.active_document_text(), "かなstart");
 }
 
 #[test]
@@ -511,7 +511,7 @@ fn gui_editor_overwrite_ime_commit_uses_bulk_edit_and_preserves_filtering() {
         Message::ReplacementEditorIme(input_method::Event::Commit("か\nな".to_string())),
     );
 
-    assert_eq!(state.active_editor().text(), "aかなha");
+    assert_eq!(state.active_document_text(), "aかなha");
     assert_eq!(
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 0, column: 3 }
@@ -520,7 +520,7 @@ fn gui_editor_overwrite_ime_commit_uses_bulk_edit_and_preserves_filtering() {
     assert_eq!(kfnotepad::from_text_call_count(), 0);
 
     state.undo_active_edit();
-    assert_eq!(state.active_editor().text(), "alpha");
+    assert_eq!(state.active_document_text(), "alpha");
 }
 
 #[test]
@@ -580,7 +580,7 @@ fn gui_editor_replacement_selection_persists_until_next_active_tile_edit() {
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 0, column: 7 }
     );
-    assert_eq!(state.active_editor().text(), "alpha X");
+    assert_eq!(state.active_document_text(), "alpha X");
 }
 
 #[test]
@@ -604,7 +604,7 @@ fn gui_editor_replacement_message_edits_active_tile_when_renderer_is_live() {
         state.workspace.active_tile().document.buffer.to_text(),
         "Xunchanged"
     );
-    assert_eq!(state.active_editor().text(), "Xunchanged");
+    assert_eq!(state.active_document_text(), "Xunchanged");
     assert_eq!(state.status_message, "replacement edit");
 }
 

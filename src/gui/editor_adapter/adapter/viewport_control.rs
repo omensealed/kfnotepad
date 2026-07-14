@@ -4,12 +4,9 @@ use super::*;
 
 impl GuiEditorAdapter {
     pub(crate) fn move_to(&mut self, cursor: DocumentCursor) {
-        self.apply(GuiEditorCommand::MoveTo(cursor));
-    }
-
-    #[cfg(test)]
-    pub(crate) fn select_right_chars(&mut self, count: usize) {
-        self.apply(GuiEditorCommand::SelectRightChars(count));
+        self.cursor = cursor;
+        self.replacement_selection = None;
+        self.sync_viewport_to_cursor();
     }
 
     pub(crate) fn set_replacement_selection(
@@ -18,7 +15,7 @@ impl GuiEditorAdapter {
         focus: DocumentCursor,
         cursor: DocumentCursor,
     ) {
-        self.content.move_to(editor_cursor_from_document(cursor));
+        self.cursor = cursor;
         self.replacement_selection = GuiEditorReplacementSelection::new(anchor, focus);
         self.sync_viewport_to_cursor();
     }
@@ -29,8 +26,7 @@ impl GuiEditorAdapter {
         let cursor = self.document_cursor();
         let visible_cursor = self.viewport.clamp_cursor_to_visible(cursor, line_count);
         if visible_cursor != cursor {
-            self.content
-                .move_to(editor_cursor_from_document(visible_cursor));
+            self.cursor = visible_cursor;
         }
         self.viewport_tracks_cursor = true;
     }

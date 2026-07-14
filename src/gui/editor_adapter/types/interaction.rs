@@ -67,3 +67,20 @@ pub(crate) enum GuiEditorReplacementInput {
     },
     ClearSelection,
 }
+
+pub(crate) fn gui_replacement_inputs_invalidate_syntax(
+    inputs: &[GuiEditorReplacementInput],
+) -> bool {
+    inputs.iter().any(|input| {
+        matches!(
+            input,
+            GuiEditorReplacementInput::InsertChar(_)
+                | GuiEditorReplacementInput::InsertNewline
+                | GuiEditorReplacementInput::DeleteBackward
+                | GuiEditorReplacementInput::DeleteForward
+                | GuiEditorReplacementInput::DeletePreviousWord
+                | GuiEditorReplacementInput::DeleteNextWord
+                | GuiEditorReplacementInput::DeleteToLineEnd
+        )
+    })
+}

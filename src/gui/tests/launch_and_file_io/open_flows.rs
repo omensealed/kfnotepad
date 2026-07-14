@@ -26,7 +26,7 @@ fn gui_open_prompt_opens_relative_path_into_new_pane() {
     assert_eq!(state.path_prompt_value, "");
     assert_eq!(state.workspace.tiles.len(), 2);
     assert_eq!(state.workspace.active_tile().document.path, opened);
-    assert_eq!(state.active_editor().text(), "opened\n");
+    assert_eq!(state.active_document_text(), "opened\n");
     assert!(state.status_message.starts_with("opened "));
 }
 
@@ -49,7 +49,7 @@ fn gui_open_dialog_completed_opens_requested_file() {
 
     assert_eq!(state.workspace.tiles.len(), 2);
     assert_eq!(state.workspace.active_tile().document.path, opened);
-    assert_eq!(state.active_editor().text(), "opened\n");
+    assert_eq!(state.active_document_text(), "opened\n");
     assert!(state.status_message.starts_with("opened "));
 }
 

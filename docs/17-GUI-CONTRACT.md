@@ -255,7 +255,7 @@ kfnotepad-gui FILE1 FILE2
   replacement editor selection through kfnotepad's editor model and Iced's public clipboard tasks. Copy/Cut require a
   selection; Cut and Paste update the in-memory document and dirty state but do not save files.
 - Search: active-pane search field, Next/Prev buttons, Edit menu commands, Ctrl-F, F3, and Shift-F3. Successful
-  search moves to the match and selects the matched text using the native Iced editor selection highlight. If a query
+  search moves to the match and selects the matched text using the app-owned editor selection highlight. If a query
   matches inside a multi-codepoint grapheme cluster, the match selection expands to the whole grapheme so the editor
   never selects only part of one visual character.
 - Navigation: Document start/end buttons, Nav menu commands, Ctrl-Home, Ctrl-End, line-number field, Apply line

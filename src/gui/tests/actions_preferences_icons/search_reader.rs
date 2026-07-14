@@ -47,14 +47,14 @@ fn gui_case_insensitive_search_maps_expanded_unicode_to_original_columns() {
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 0, column: 1 }
     );
-    assert_eq!(state.active_editor().selection().as_deref(), Some("ß"));
+    assert_eq!(state.active_editor_selection_text().as_deref(), Some("ß"));
 
     let _ = update(&mut state, Message::SearchNext);
     assert_eq!(
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 0, column: 4 }
     );
-    assert_eq!(state.active_editor().selection().as_deref(), Some("SS"));
+    assert_eq!(state.active_editor_selection_text().as_deref(), Some("SS"));
 
     let _ = update(&mut state, Message::SearchQueryChanged("i".to_string()));
     let _ = update(&mut state, Message::SearchNext);
@@ -62,7 +62,7 @@ fn gui_case_insensitive_search_maps_expanded_unicode_to_original_columns() {
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 1, column: 0 }
     );
-    assert_eq!(state.active_editor().selection().as_deref(), Some("İ"));
+    assert_eq!(state.active_editor_selection_text().as_deref(), Some("İ"));
 }
 
 #[test]
@@ -81,7 +81,7 @@ fn gui_case_sensitive_search_selects_full_grapheme_for_partial_match() {
         state.workspace.active_tile().state.cursor,
         DocumentCursor { row: 0, column: 0 }
     );
-    assert_eq!(state.active_editor().selection().as_deref(), Some("🇺🇸"));
+    assert_eq!(state.active_editor_selection_text().as_deref(), Some("🇺🇸"));
 
     let _ = update(
         &mut state,
@@ -93,7 +93,7 @@ fn gui_case_sensitive_search_selects_full_grapheme_for_partial_match() {
         DocumentCursor { row: 0, column: 3 }
     );
     assert_eq!(
-        state.active_editor().selection().as_deref(),
+        state.active_editor_selection_text().as_deref(),
         Some("e\u{301}")
     );
 }

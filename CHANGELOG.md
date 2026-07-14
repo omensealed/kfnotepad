@@ -8,8 +8,10 @@ safety and privacy behavior.
 
 ### Engineering
 
+- Removed the GUI's duplicate Iced full-text mirror. The shared `TextBuffer` is now the canonical editor text state,
+  while the GUI adapter retains only interaction and viewport metadata.
 - Removed the dormant native-Iced GUI editor branch and its hardcoded backend selector. The app-owned editor renderer
-  is now the sole production GUI editing path; compatibility-only Iced action tests remain isolated to test builds.
+  is now the sole GUI editing path.
 
 ## 0.2.0 - 2026-07-13
 

@@ -45,11 +45,10 @@ impl KfnotepadGui {
             return false;
         }
         let cursor = tile.state.cursor;
-        let text = tile.document.buffer.to_text();
+        let line_count = gui_editor_line_count(&tile.document.buffer);
 
         if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
-            pane_state.editor = GuiEditorAdapter::new(text_editor::Content::with_text(&text));
-            pane_state.editor.move_to(cursor);
+            pane_state.editor.sync_document_metadata(line_count, cursor);
             pane_state.editor.viewport = viewport;
             pane_state.editor.viewport_tracks_cursor = true;
             pane_state.editor.replacement_selection = replacement_selection;
@@ -85,7 +84,6 @@ impl KfnotepadGui {
             }
         }
         let invalidates_syntax = gui_replacement_inputs_invalidate_syntax(&inputs);
-        let mutates_text = gui_replacement_inputs_mutates_text(&inputs);
         self.replacement_ime_preedit = None;
 
         let Some(tile_id) = self
@@ -95,10 +93,6 @@ impl KfnotepadGui {
         else {
             return;
         };
-        let initial_replacement_selection = self
-            .panes
-            .get(self.active_pane)
-            .and_then(|pane_state| pane_state.editor.replacement_selection);
         let mut viewport = self
             .panes
             .get(self.active_pane)
@@ -112,9 +106,7 @@ impl KfnotepadGui {
         let Some(tile) = self.workspace.tile_mut(tile_id) else {
             return;
         };
-        let mut applied_editor_inputs = Vec::with_capacity(inputs.len());
         for input in inputs.iter() {
-            let revision_before = tile.document.buffer.edit_revision();
             apply_gui_editor_replacement_input_with_mode(
                 &mut tile.document,
                 &mut tile.state.cursor,
@@ -123,37 +115,11 @@ impl KfnotepadGui {
                 self.replacement_overwrite_mode,
                 *input,
             );
-            let input_mutates_text =
-                gui_replacement_inputs_mutates_text(std::slice::from_ref(input));
-            if !input_mutates_text || tile.document.buffer.edit_revision() != revision_before {
-                applied_editor_inputs.push(*input);
-            }
         }
         let cursor = tile.state.cursor;
+        let line_count = gui_editor_line_count(&tile.document.buffer);
         if let Some(pane_state) = self.panes.get_mut(self.active_pane) {
-            if mutates_text {
-                let can_sync_editor = !self.replacement_overwrite_mode
-                    && initial_replacement_selection.is_none()
-                    && replacement_selection.is_none()
-                    && applied_editor_inputs
-                        .iter()
-                        .all(Self::gui_editor_replacement_input_has_editor_delta_binding);
-                if can_sync_editor {
-                    for input in applied_editor_inputs.iter() {
-                        Self::gui_editor_replacement_input_apply_delta_to_editor(
-                            &mut pane_state.editor,
-                            input,
-                        );
-                    }
-                } else {
-                    let text = tile.document.buffer.to_text();
-                    pane_state.editor =
-                        GuiEditorAdapter::new(text_editor::Content::with_text(&text));
-                }
-                pane_state.editor.move_to(cursor);
-            } else {
-                pane_state.editor.move_to(cursor);
-            }
+            pane_state.editor.sync_document_metadata(line_count, cursor);
             pane_state.editor.viewport = viewport;
             pane_state.editor.viewport_tracks_cursor = true;
             pane_state.editor.replacement_selection = replacement_selection;

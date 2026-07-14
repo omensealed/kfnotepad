@@ -1,7 +1,7 @@
 //! GUI editor adapter and read-only/editor bridge helpers.
 //!
 //! This module owns `GuiEditorAdapter` and the selection/cursor/input helper
-//! types that keep Iced editor and document synchronization coherent.
+//! types that keep the GUI surface and canonical document state coherent.
 
 use super::*;
 
@@ -20,3 +20,7 @@ pub(crate) use ime_bridge::*;
 pub(crate) use scrollbar_selection::*;
 pub(crate) use types::*;
 pub(crate) use viewport::*;
+
+pub(crate) fn gui_editor_line_count(buffer: &TextBuffer) -> usize {
+    buffer.line_count() + usize::from(buffer.has_trailing_newline())
+}
