@@ -41,7 +41,9 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ env.RELEASE_TAG }}
-      - run: rustup toolchain install stable --profile minimal
+      - name: Install repository Rust toolchain
+        shell: bash
+        run: ./scripts/install-rust-toolchain.sh
       - name: Install Linux packaging prerequisites
         run: |
           sudo apt-get update
@@ -74,7 +76,9 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ env.RELEASE_TAG }}
-      - run: rustup toolchain install stable --profile minimal
+      - name: Install repository Rust toolchain
+        shell: bash
+        run: ./scripts/install-rust-toolchain.sh
       - name: Build Windows packages
         shell: pwsh
         run: ./scripts/package-windows.ps1
@@ -94,7 +98,9 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           ref: ${{ env.RELEASE_TAG }}
-      - run: rustup toolchain install stable --profile minimal
+      - name: Install repository Rust toolchain
+        shell: bash
+        run: ./scripts/install-rust-toolchain.sh
       - name: Build macOS package
         run: ./scripts/package-macos.sh
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

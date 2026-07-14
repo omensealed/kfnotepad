@@ -22,10 +22,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-      - name: Set up Rust
-        run: rustup toolchain install stable --profile minimal
+      - name: Install repository Rust toolchain
+        run: ./scripts/install-rust-toolchain.sh
       - name: Install dependency policy tool
-        run: cargo install cargo-deny --locked
+        run: |
+          source ./scripts/security-tool-versions.sh
+          cargo install cargo-deny --version "$CARGO_DENY_VERSION" --locked
       - name: Update compatible dependency versions
         run: cargo update
       - name: Check temporary advisory exceptions

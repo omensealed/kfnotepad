@@ -19,5 +19,8 @@ CI runs this check matrix across `ubuntu-24.04`, `macos-15`, and `windows-2025`.
 
 Do not include secrets, production data, generated databases, build outputs, or unrelated formatting changes.
 Document the rationale before changing architecture, persistent formats, public interfaces, or production dependencies.
-When a dependency update changes a package tracked by `scripts/advisory-exceptions.sh`, review the upstream advisory
-and dependency path, then remove or revise the matching `deny.toml` exception in the same change.
+Security automation uses the exact cargo-audit and cargo-deny releases declared in
+`scripts/security-tool-versions.sh`. When a dependency update changes a package tracked by
+`scripts/advisory-exceptions.sh`, review the upstream advisory and dependency path, then remove or revise the matching
+`deny.toml` and `.cargo/audit.toml` exceptions in the same change. The audit list is intentionally smaller because
+cargo-audit does not report the unmaintained advisories tracked by cargo-deny.
