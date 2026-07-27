@@ -6,22 +6,17 @@ expected_advisories=(
     RUSTSEC-2024-0436
     RUSTSEC-2025-0141
     RUSTSEC-2026-0192
-    RUSTSEC-2026-0194
-    RUSTSEC-2026-0195
 )
 
 # cargo-audit reports vulnerability advisories. cargo-deny additionally tracks
 # the unmaintained advisories that are reviewed and allowed in deny.toml.
 expected_audit_advisories=(
     RUSTSEC-2025-0141
-    RUSTSEC-2026-0194
-    RUSTSEC-2026-0195
 )
 
 expected_packages=(
     bincode@1.3.3
     paste@1.0.15
-    quick-xml@0.39.4
     ttf-parser@0.25.1
 )
 
